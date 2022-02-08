@@ -1,6 +1,8 @@
-const formatValue = (value: any) => {
+import stringify from './stringify';
+
+const formatValue = (value: any, depth = Infinity) => {
   if (Array.isArray(value) || typeof value === 'object') {
-    return JSON.stringify(value);
+    return stringify(value, null, null, depth);
   }
   if (typeof value === 'string') {
     return `"${value}"`;

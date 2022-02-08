@@ -1,12 +1,15 @@
 import detectCircular from './utils/detect-circular';
+import diffArrayLCS from './utils/diff-array-lcs';
 import diffArrayNormal from './utils/diff-array-normal';
 import diffObject from './utils/diff-object';
 import getType from './utils/get-type';
+import sortInnerArrays from './utils/sort-inner-arrays';
+import stringify from './utils/stringify';
 
 export interface DifferOptions {
   /**
    * Whether to detect circular reference in source objects before diff starts. Default
-   * is `true`. If you are confident for your data (e.g. from `JSON.stringify` or an API
+   * is `true`. If you are confident for your data (e.g. from `JSON.parse` or an API
    * response), you can set it to `false` to improve performance, but the algorithm may
    * not stop if circular reference does show up.
    */
@@ -16,7 +19,7 @@ export interface DifferOptions {
    */
   maxDepth?: number;
   /**
-   * Support recognizing modification, default `true` means the differ will output the
+   * Support recognizing modifications, default `true` means the differ will output the
    * `* modified` sign apart from the basic `+ add` and `- remove` sign. If you prefer
    * Git output, please set it to `false`.
    */
@@ -53,7 +56,7 @@ export interface DifferOptions {
    * +   0
    * ```
    *
-   * When using `unorder-normal`, the differ will sort 2 arrays first, then act like `normal`.
+   * When using `unorder-normal`, the differ will first sort 2 arrays, then act like `normal`.
    * The output will be:
    *
    * ```text
@@ -65,7 +68,7 @@ export interface DifferOptions {
    * +   4
    * ```
    *
-   * When using `unorder-lcs`, the differ will sort 2 arrays first, then act like `lcs`.
+   * When using `unorder-lcs`, the differ will first sort 2 arrays, then act like `lcs`.
    * The output will be:
    *
    * ```text
@@ -88,8 +91,19 @@ export interface DiffResult {
   lineNumber?: number;
 }
 
+export type ArrayDiffFunc = (
+  arrLeft: any[],
+  arrRight: any[],
+  keyLeft: string,
+  keyRight: string,
+  level: number,
+  options: DifferOptions,
+  ...args: any[]
+) => [DiffResult[], DiffResult[]];
+
 class Differ {
   private options: DifferOptions;
+  private arrayDiffFunc: ArrayDiffFunc;
 
   constructor({
     detectCircular = true,
@@ -103,12 +117,15 @@ class Differ {
       showModifications,
       arrayDiffMethod,
     };
+    this.arrayDiffFunc = arrayDiffMethod === 'lcs' || arrayDiffMethod === 'unorder-lcs'
+      ? diffArrayLCS
+      : diffArrayNormal;
   }
 
   private detectCircular(source: any) {
     if (this.options.detectCircular) {
       if (detectCircular(source)) {
-        throw new Error('Circular reference detected in "before" object');
+        throw new Error(`Circular reference detected in object (with keys ${Object.keys(source).map(t => `"${t}"`).join(', ')})`);
       }
     }
   }
@@ -175,41 +192,61 @@ class Differ {
     this.detectCircular(sourceLeft);
     this.detectCircular(sourceRight);
 
+    if (
+      this.options.arrayDiffMethod === 'unorder-normal'
+      || this.options.arrayDiffMethod === 'unorder-lcs'
+    ) {
+      sourceLeft = sortInnerArrays(sourceLeft);
+      sourceRight = sortInnerArrays(sourceRight);
+    }
+
     let resultLeft: DiffResult[] = [];
     let resultRight: DiffResult[] = [];
 
     const typeLeft = getType(sourceLeft);
     const typeRight = getType(sourceRight);
     if (typeLeft !== typeRight) {
-      resultLeft = JSON.stringify(sourceLeft, null, 1).split('\n').map(line => ({
+      resultLeft = stringify(sourceLeft, null, 1, this.options.maxDepth).split('\n').map(line => ({
         level: line.match(/^\s+/)?.[0]?.length || 0,
         type: 'remove',
         text: line.replace(/^\s+/, '').replace(/,$/g, ''),
         comma: line.endsWith(','),
       }));
-      resultRight = JSON.stringify(sourceRight, null, 1).split('\n').map(line => ({
+      resultRight = stringify(sourceRight, null, 1, this.options.maxDepth).split('\n').map(line => ({
         level: line.match(/^\s+/)?.[0]?.length || 0,
         type: 'add',
         text: line.replace(/^\s+/, '').replace(/,$/g, ''),
         comma: line.endsWith(','),
       }));
-      const lineCount = Math.max(resultLeft.length, resultRight.length);
-      resultLeft.push(...Array(lineCount - resultLeft.length).fill({ level: 0, type: 'equal', text: '' }));
-      resultRight.push(...Array(lineCount - resultRight.length).fill({ level: 0, type: 'equal', text: '' }));
+      const lLength = resultLeft.length;
+      const rLength = resultRight.length;
+      resultLeft.push(...Array(rLength).fill({ level: 0, type: 'equal', text: '' }));
+      resultRight.unshift(...Array(lLength).fill({ level: 0, type: 'equal', text: '' }));
     } else if (typeLeft === 'object') {
-      [resultLeft, resultRight] = diffObject(sourceLeft, sourceRight, 1);
+      [resultLeft, resultRight] = diffObject(sourceLeft, sourceRight, 1, this.options, this.arrayDiffFunc);
       resultLeft.unshift({ level: 0, type: 'equal', text: '{' });
       resultLeft.push({ level: 0, type: 'equal', text: '}' });
       resultRight.unshift({ level: 0, type: 'equal', text: '{' });
       resultRight.push({ level: 0, type: 'equal', text: '}' });
     } else if (typeLeft === 'array') {
-      [resultLeft, resultRight] = diffArrayNormal(sourceLeft, sourceRight, '', '', 0);
+      [resultLeft, resultRight] = this.arrayDiffFunc(sourceLeft, sourceRight, '', '', 0, this.options);
     } else if (sourceLeft !== sourceRight) {
-      resultLeft = [{ level: 0, type: 'modify', text: JSON.stringify(sourceLeft) }];
-      resultRight = [{ level: 0, type: 'modify', text: JSON.stringify(sourceRight) }];
+      if (this.options.showModifications) {
+        resultLeft = [{ level: 0, type: 'modify', text: stringify(sourceLeft, null, null, this.options.maxDepth) }];
+        resultRight = [{ level: 0, type: 'modify', text: stringify(sourceRight, null, null, this.options.maxDepth) }];
+      } else {
+        resultLeft = [
+          { level: 0, type: 'remove', text: stringify(sourceLeft, null, null, this.options.maxDepth) },
+          { level: 0, type: 'equal', text: '' },
+        ];
+        resultRight = [
+          { level: 0, type: 'equal', text: '' },
+          { level: 0, type: 'add', text: stringify(sourceRight, null, null, this.options.maxDepth) },
+        ];
+      }
     } else {
-      resultLeft = [{ level: 0, type: 'equal', text: JSON.stringify(sourceLeft) }];
-      resultRight = [{ level: 0, type: 'equal', text: JSON.stringify(sourceRight) }];
+      resultLeft = [{ level: 0, type: 'equal', text: stringify(sourceLeft, null, null, this.options.maxDepth) }];
+      resultRight = [{ level: 0, type: 'equal', text: stringify(sourceRight, null, null, this.options.maxDepth) }];
     }
 
     this.sortResultLines(resultLeft, resultRight);

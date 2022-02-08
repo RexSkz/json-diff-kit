@@ -1,6 +1,7 @@
 .json-diff-viewer {
-  width: 100%;
   border-spacing: 0;
+  table-layout: fixed;
+  width: 100%;
 
   tr {
     .line-add {
@@ -33,8 +34,12 @@
 
   td {
     &.line-number {
+      border-right: 1px solid;
+      box-sizing: content-box;
+      font-family: monospace;
+      padding: 0 8px;
+      text-align: right;
       user-select: none;
-      width: max-content;
     }
   }
 

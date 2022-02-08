@@ -2,13 +2,22 @@ import diffArrayLCS from './diff-array-lcs';
 import formatValue from './format-value';
 import getType from './get-type';
 
-import type { DiffResult } from '../differ';
+import type { DifferOptions, DiffResult, ArrayDiffFunc } from '../differ';
 
 const diffObject = (
   lhs: Record<string, any>,
   rhs: Record<string, any>,
   level = 1,
+  options: DifferOptions,
+  arrayDiffFunc: ArrayDiffFunc,
 ): [DiffResult[], DiffResult[]] => {
+  if (level > options.maxDepth) {
+    return [
+      [{ level, type: 'equal', text: '...' }],
+      [{ level, type: 'equal', text: '...' }],
+    ];
+  }
+
   const linesLeft: DiffResult[] = [];
   const linesRight: DiffResult[] = [];
 
@@ -35,12 +44,19 @@ const diffObject = (
 
     if (keyLeft === keyRight) {
       if (getType(lhs[keyLeft]) !== getType(rhs[keyRight])) {
-        linesLeft.push({ level, type: 'modify', text: `"${keyLeft}": ${formatValue(lhs[keyLeft])}` });
-        linesRight.push({ level, type: 'modify', text: `"${keyRight}": ${formatValue(rhs[keyRight])}` });
+        if (options.showModifications) {
+          linesLeft.push({ level, type: 'modify', text: `"${keyLeft}": ${formatValue(lhs[keyLeft])}` });
+          linesRight.push({ level, type: 'modify', text: `"${keyRight}": ${formatValue(rhs[keyRight])}` });
+        } else {
+          linesLeft.push({ level, type: 'remove', text: `"${keyLeft}": ${formatValue(lhs[keyLeft])}` });
+          linesLeft.push({ level, type: 'equal', text: '' });
+          linesRight.push({ level, type: 'equal', text: '' });
+          linesRight.push({ level, type: 'add', text: `"${keyRight}": ${formatValue(rhs[keyRight])}` });
+        }
       } else if (Array.isArray(lhs[keyLeft])) {
         const arrLeft = [...lhs[keyLeft]];
         const arrRight = [...rhs[keyRight]];
-        const [resLeft, resRight] = diffArrayLCS(arrLeft, arrRight, keyLeft, keyRight, level, [], []);
+        const [resLeft, resRight] = arrayDiffFunc(arrLeft, arrRight, keyLeft, keyRight, level, options, [], []);
         linesLeft.push(...resLeft);
         linesRight.push(...resRight);
       } else if (typeof lhs[keyLeft] === 'object') {
@@ -48,6 +64,8 @@ const diffObject = (
           lhs[keyLeft],
           rhs[keyRight],
           level + 1,
+          options,
+          arrayDiffFunc,
         );
         linesLeft.push({ level, type: 'equal', text: `"${keyLeft}": {` });
         linesLeft.push(...result[0]);
@@ -57,8 +75,15 @@ const diffObject = (
         linesRight.push({ level, type: 'equal', text: '}' });
       } else {
         if (lhs[keyLeft] !== rhs[keyRight]) {
-          linesLeft.push({ level, type: 'modify', text: `"${keyLeft}": ${formatValue(lhs[keyLeft])}` });
-          linesRight.push({ level, type: 'modify', text: `"${keyRight}": ${formatValue(rhs[keyRight])}` });
+          if (options.showModifications) {
+            linesLeft.push({ level, type: 'modify', text: `"${keyLeft}": ${formatValue(lhs[keyLeft])}` });
+            linesRight.push({ level, type: 'modify', text: `"${keyRight}": ${formatValue(rhs[keyRight])}` });
+          } else {
+            linesLeft.push({ level, type: 'remove', text: `"${keyLeft}": ${formatValue(lhs[keyLeft])}` });
+            linesLeft.push({ level, type: 'equal', text: '' });
+            linesRight.push({ level, type: 'equal', text: '' });
+            linesRight.push({ level, type: 'add', text: `"${keyRight}": ${formatValue(rhs[keyRight])}` });
+          }
         } else {
           linesLeft.push({ level, type: 'equal', text: `"${keyLeft}": ${formatValue(lhs[keyLeft])}` });
           linesRight.push({ level, type: 'equal', text: `"${keyRight}": ${formatValue(rhs[keyRight])}` });

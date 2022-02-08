@@ -4,20 +4,49 @@ body {
   padding: 0;
 }
 
-.demo-root {
-  overflow: hidden;
+code {
+  background: #f9f2f4;
+  color: #c7254e;
+  padding: 0 4px;
+}
 
-  .json-diff-viewer {
+[disabled] {
+  cursor: not-allowed;
+}
+
+.demo-root {
+  box-sizing: border-box;
+  max-width: 960px;
+  margin: auto;
+  padding: 1em 0;
+  width: 100%;
+
+  blockquote {
+    margin: 0 0 1em;
+  }
+
+  .diff-config form {
+    overflow: hidden;
+
+    & > label {
+      font-weight: bold;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      user-select: none;
+
+      input,
+      select {
+        margin-left: 8px;
+      }
+    }
+  }
+
+  .diff-result .json-diff-viewer {
     border: 1px solid;
     border-radius: 4px;
-    margin: 1em 0 0 1em;
+    box-sizing: border-box;
+    margin-top: 1em;
     padding: 1em;
-    float: left;
-
-    .line-number {
-      border-right: 1px solid;
-      text-align: right;
-      padding: 0 4px 0 0;
-    }
   }
 }
