@@ -2,6 +2,7 @@ html,
 body {
   margin: 0;
   padding: 0;
+  background: #f2f4f6;
 }
 
 code {
@@ -15,11 +16,20 @@ code {
 }
 
 .demo-root {
+  background: #fff;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.01);
   box-sizing: border-box;
   max-width: 960px;
   margin: auto;
-  padding: 1em 0;
+  padding: 1em 2em;
+  position: relative;
   width: 100%;
+
+  .statistics {
+    img {
+      margin-right: 8px;
+    }
+  }
 
   blockquote {
     margin: 0 0 1em;
@@ -48,5 +58,12 @@ code {
     box-sizing: border-box;
     margin-top: 1em;
     padding: 1em;
+  }
+
+  .demo-footer {
+    border-top: 1px dashed;
+    margin: 4em 0 0;
+    padding: 2em 0;
+    text-align: center;
   }
 }

@@ -3,7 +3,9 @@
 [![NPM version][npm-image]][npm-url]
 [![Downloads][download-badge]][npm-url]
 
-> A better JSON differ & viewer.
+A better JSON differ & viewer.
+
+> Notice: considering most of the browsers now support ES6, this library has only the ES6 version. If you need the compatibility with older browsers, please configure the compiler in your project (e.g. add this library to the `include` field in `babel.config.js`).
 
 ## Install
 
@@ -42,10 +44,10 @@ const after = {
 
 // all configs are optional
 const differ = new Differ({
-  detectCircular: true,
-  maxDepth: Infinity,
-  showModifications: true,
-  arrayDiffMethod: 'lcs',
+  detectCircular: true,    // default `true`
+  maxDepth: Infinity,      // default `Infinity`
+  showModifications: true, // default `true`
+  arrayDiffMethod: 'lcs',  // default `"normal"`
 });
 
 const diff = differ.diff(before, after);
@@ -58,6 +60,8 @@ You can use your own component to visualize the `diff` data, or use the built-in
 import { Viewer } from 'json-diff-kit';
 import type { DiffResult } from 'json-diff-kit';
 
+import 'json-diff-kit/dist/viewer.css';
+
 interface PageProps {
   diff: [DiffResult[], DiffResult[]];
 }
@@ -65,9 +69,9 @@ interface PageProps {
 const Page: React.FC<PageProps> = props => {
   return (
     <Viewer
-      diff={props.diff}
-      indent={4}
-      lineNumbers={true}
+      diff={props.diff}  // required
+      indent={4}         // default `2`
+      lineNumbers={true} // default `false`
     />
   );
 };
@@ -79,7 +83,7 @@ The result is here:
 
 ## More Complex Usages
 
-Please check the [GitHub pages](https://rexskz.github.io/json-diff-kit/). The code is at [here](./demo/index.tsx).
+Please check the [demo pages](https://json-diff-kit.js.org/).
 
 ## License
 
@@ -88,4 +92,4 @@ MIT
 [npm-url]: https://npmjs.org/package/json-diff-kit
 [npm-image]: https://img.shields.io/npm/v/json-diff-kit.svg?style=flat-square
 
-[download-badge]: http://img.shields.io/npm/dm/json-diff-kit.svg?style=flat-square
+[download-badge]: https://img.shields.io/npm/dm/json-diff-kit.svg?style=flat-square
