@@ -10,6 +10,7 @@ install:
   - pnpm i
 script:
   - pnpm build:pages
+  - echo "json-diff-kit.js.org" > docs/CNAME
   - git add -A
   - git commit -m Pages
 deploy:
