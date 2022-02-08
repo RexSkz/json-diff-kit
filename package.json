@@ -1,6 +1,6 @@
 {
   "name": "json-diff-kit",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A better JSON differ & viewer.",
   "scripts": {
     "start": "rollup -c -w",
