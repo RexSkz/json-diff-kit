@@ -1,5 +1,3 @@
-import fs from 'fs';
-
 import commonjs from '@rollup/plugin-commonjs';
 import esbuild from 'rollup-plugin-esbuild';
 import html from '@rollup/plugin-html';
@@ -7,10 +5,12 @@ import less from 'rollup-plugin-less';
 import resolve from '@rollup/plugin-node-resolve';
 import serve from 'rollup-plugin-serve';
 
+const BASEDIR = process.env.BASEDIR || '.cache';
+
 export default {
   input: 'demo/index.tsx',
   output: {
-    file: '.cache/index.js',
+    file: `${BASEDIR}/index.js`,
     format: 'umd',
     name: 'JSONDiffKit',
     globals: {
@@ -27,7 +27,7 @@ export default {
       jsxFactory: 'React.createElement',
       jsxFragment: 'React.Fragment',
       define: {
-        'process.env.NODE_ENV': process.env.NODE_ENV,
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
         __VERSION__: JSON.stringify(require('./package.json').version),
       },
       loaders: {
@@ -36,7 +36,7 @@ export default {
       },
     }),
     less({
-      output: '.cache/index.css',
+      output: `${BASEDIR}/index.css`,
     }),
     html({
       template: ({ files }) => {
@@ -54,8 +54,8 @@ export default {
 `;
       },
     }),
-    serve({
-      contentBase: '.cache',
+    process.env.NODE_ENV !== 'production' && serve({
+      contentBase: BASEDIR,
       open: true,
       openPage: '/index.html',
       port: 3000,

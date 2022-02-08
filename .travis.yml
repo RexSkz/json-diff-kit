@@ -1,0 +1,22 @@
+language: node_js
+node_js:
+  - '16'
+cache:
+  directories:
+    - node_modules
+before_install:
+  - npm install -g pnpm
+install:
+  - pnpm i
+script:
+  - pnpm build:pages
+  - git add -A
+  - git commit -m Pages
+deploy:
+  provider: pages
+  cleanup: false
+  keep_history: true
+  github_token: $GITHUB_TOKEN
+  target_branch: gh-pages
+  on:
+    branch: master

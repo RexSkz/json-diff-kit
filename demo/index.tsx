@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import { Differ, Viewer } from '../src';
 import type { DifferOptions } from '../src/differ';
 
+import '../src/viewer.less';
 import './demo.less';
 
 const Demo: React.FC = () => {

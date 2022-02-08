@@ -2,8 +2,6 @@ import * as React from 'react';
 
 import type { DiffResult } from './differ';
 
-import './viewer.less';
-
 interface ViewerProps {
   /** The diff result `[before, after]`. */
   diff: readonly [DiffResult[], DiffResult[]];
