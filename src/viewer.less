@@ -1,0 +1,48 @@
+.json-diff-viewer {
+  width: 100%;
+  border-spacing: 0;
+
+  tr {
+    .line-add {
+      background: #a5d6a7;
+    }
+
+    .line-remove {
+      background: #ef9a9a;
+    }
+
+    .line-modify {
+      background: #ffe082;
+    }
+
+    &:hover td {
+      position: relative;
+
+      &::before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.05);
+        content: '';
+        pointer-events: none;
+      }
+    }
+  }
+
+  td {
+    &.line-number {
+      user-select: none;
+      width: max-content;
+    }
+  }
+
+  pre {
+    margin: 0;
+    font-size: 12px;
+    line-height: 16px;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+}
