@@ -5,7 +5,7 @@ import { Differ, Viewer } from '../src';
 import type { DifferOptions } from '../src/differ';
 
 import '../src/viewer.less';
-import './demo.less';
+import './index.less';
 
 const Demo: React.FC = () => {
   const [detectCircular] = React.useState(true);
@@ -49,6 +49,18 @@ const Demo: React.FC = () => {
   return (
     <div className="demo-root">
       <h1>JSON Diff Kit</h1>
+      <div className="statistics">
+        <img src="https://img.shields.io/npm/v/json-diff-kit.svg" />
+        <img src="https://img.shields.io/npm/dm/json-diff-kit.svg" />
+        <iframe
+          src="https://ghbtns.com/github-btn.html?user=rexskz&repo=json-diff-kit&type=star&count=true"
+          frameBorder="0"
+          scrolling="0"
+          width="150"
+          height="20"
+          title="GitHub"
+        />
+      </div>
       <p>A better JSON differ & viewer.</p>
       <h2>Diff Configuration</h2>
       <div className="diff-config">
@@ -122,9 +134,19 @@ const Demo: React.FC = () => {
         <Viewer diff={diff2} indent={4} lineNumbers={true} />
         <p>2 variables with different types. The algorithm always returns the result "left is removed, right is added".</p>
         <Viewer diff={diff3} indent={4} lineNumbers={true} />
-        <p>2 variables with the same primitive type. The algorithm always returns the result "left is modified to right".</p>
+        <p>2 variables with the same primitive type. The algorithm always returns the result "left is modified to right" (if <code>showModification</code> is set to <code>false</code>, it will return the result "left is removed, right is added").</p>
         <Viewer diff={diff4} indent={4} lineNumbers={true} />
       </div>
+      <div className="demo-footer">
+        <p>Made with ♥ by Rex Zeng</p>
+      </div>
+      <a href="https://github.com/tuanchauict/Repo-stars-image">
+        <img
+          style={{ position: 'absolute', top: 0, right: 0, border: 'none' }}
+          src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67"
+          alt="Fork me on GitHub"
+        />
+      </a>
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { lessLoader } from 'esbuild-plugin-less';
 build({
   entryPoints: [
     path.resolve('src', 'index.ts'),
+    path.resolve('src', 'viewer.less'),
   ],
   outdir: path.resolve('dist'),
   bundle: true,

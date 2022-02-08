@@ -43,7 +43,7 @@ export default {
         return `<!DOCTYPE html>
 <html>
 <head>
-  <title>JSON Diff Demo</title>
+  <title>JSON Diff Kit Demo</title>
   <link rel="stylesheet" href="index.css" />
 </head>
 <body>
