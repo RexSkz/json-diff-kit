@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "esModuleInterop": true,
+    "jsx": "react",
+    "moduleResolution": "node",
+    "outDir": "typings",
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "target": "esnext",
+  },
+  "include": ["src"],
+}

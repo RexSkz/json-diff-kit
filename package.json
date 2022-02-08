@@ -6,7 +6,7 @@
     "start": "rollup -c -w",
     "dev": "pnpm start",
     "test": "jest",
-    "build": "node ./esbuild.mjs",
+    "build": "node ./esbuild.mjs && tsc",
     "build:pages": "NODE_ENV=production BASEDIR=docs rollup -c"
   },
   "repository": {
@@ -39,7 +39,8 @@
     "rollup": "^2.67.0",
     "rollup-plugin-esbuild": "^4.8.2",
     "rollup-plugin-less": "^1.1.3",
-    "rollup-plugin-serve": "^1.1.0"
+    "rollup-plugin-serve": "^1.1.0",
+    "typescript": "^4.5.5"
   },
   "peerDependencies": {
     "react": "^17.0.0 || ^16.0.0",
