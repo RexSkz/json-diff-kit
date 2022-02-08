@@ -7,4 +7,5 @@ src
 .travis.yml
 esbuild.mjs
 pnpm-lock.yaml
-rollup.config.js
+preview.png
+rollup.config.ts
