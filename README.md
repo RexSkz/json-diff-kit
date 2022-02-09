@@ -85,6 +85,10 @@ The result is here:
 
 Please check the [demo pages](https://json-diff-kit.js.org/).
 
+## Algorithm Details
+
+Please refer to the article [JSON Diff Kit: A Combination of Several Simple Algorithms](https://blog.rexskz.info/json-diff-kit-a-combination-of-several-simple-algorithms.html).
+
 ## License
 
 MIT
