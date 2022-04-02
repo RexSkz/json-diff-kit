@@ -1,4 +1,6 @@
 language: node_js
+os: linux
+dist: xenial
 node_js:
   - '16'
 cache:
@@ -9,15 +11,20 @@ before_install:
 install:
   - pnpm i
 script:
+  - pnpm test
+  - curl -Os https://uploader.codecov.io/latest/linux/codecov
+  - chmod +x codecov
+  - ./codecov
   - pnpm build:pages
   - echo "json-diff-kit.js.org" > docs/CNAME
   - git add -A
   - git commit -m Pages
 deploy:
+  strategy: git
   provider: pages
   cleanup: false
   keep_history: true
-  github_token: $GITHUB_TOKEN
+  token: $GITHUB_TOKEN
   target_branch: gh-pages
   on:
     branch: master
