@@ -2,6 +2,7 @@
 
 [![NPM version][npm-image]][npm-url]
 [![Downloads][download-badge]][npm-url]
+[![Codecov](https://codecov.io/gh/RexSkz/json-diff-kit/branch/master/graph/badge.svg?token=8YRG3M4WTO)](https://codecov.io/gh/RexSkz/json-diff-kit)
 
 A better JSON differ & viewer.
 
