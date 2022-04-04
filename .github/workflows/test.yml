@@ -1,0 +1,21 @@
+name: Unit Test
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: |
+          npm install -g pnpm
+          pnpm i
+          pnpm test
+          curl -Os https://uploader.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          ./codecov
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}

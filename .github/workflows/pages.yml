@@ -1,0 +1,27 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: |
+          git config user.name "Rex Zeng"
+          git config user.email "rex@rexskz.info"
+          git checkout gh-pages
+          git pull origin master --rebase
+          npm install -g pnpm
+          pnpm i
+          pnpm build:pages
+          echo "json-diff-kit.js.org" > docs/CNAME
+          git add -A
+          git commit -m Pages
+          git remote set-uri origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push -f origin gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
