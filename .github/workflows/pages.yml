@@ -20,7 +20,7 @@ jobs:
           echo "json-diff-kit.js.org" > docs/CNAME
           git add -A
           git commit -m Pages
-          git remote set-uri origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push -f origin gh-pages
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
