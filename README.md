@@ -95,6 +95,6 @@ Please refer to the article [JSON Diff Kit: A Combination of Several Simple Algo
 MIT
 
 [npm-url]: https://npmjs.org/package/json-diff-kit
-[npm-image]: https://img.shields.io/npm/v/json-diff-kit.svg?style=flat-square
+[npm-image]: https://img.shields.io/npm/v/json-diff-kit.svg
 
-[download-badge]: https://img.shields.io/npm/dm/json-diff-kit.svg?style=flat-square
+[download-badge]: https://img.shields.io/npm/dm/json-diff-kit.svg
