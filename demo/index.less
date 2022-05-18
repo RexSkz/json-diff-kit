@@ -35,19 +35,26 @@ code {
     margin: 0 0 1em;
   }
 
-  .diff-config form {
-    overflow: hidden;
+  .diff-config,
+  .view-config {
+    form {
+      overflow: hidden;
 
-    & > label {
-      font-weight: bold;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      user-select: none;
+      & > label {
+        font-weight: bold;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        user-select: none;
 
-      input,
-      select {
-        margin-left: 8px;
+        input,
+        select {
+          margin-left: 8px;
+        }
+
+        input[type=number] {
+          min-width: 8em;
+        }
       }
     }
   }

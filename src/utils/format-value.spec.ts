@@ -13,9 +13,14 @@ describe('Utility function: formatValue', () => {
     expect(formatValue(NaN)).toBe('null');
   });
 
-  it('should work for array & object ', () => {
+  it('should work for array & object', () => {
     expect(formatValue([1, 2, '3'])).toBe('[1,2,"3"]');
     expect(formatValue({ a: 1, b: ['2', true] })).toBe('{"a":1,"b":["2",true]}');
+  });
+
+  it('should escape the characters when necessary for better display', () => {
+    expect(formatValue('first line\n\tsecond line')).toBe('"first line\\n\\tsecond line"');
+    expect(formatValue('"')).toBe('"\\""');
   });
 
 });

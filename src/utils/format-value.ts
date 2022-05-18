@@ -8,9 +8,9 @@ const formatValue = (value: any, depth = Infinity) => {
     return stringify(value, null, null, depth);
   }
   if (typeof value === 'string') {
-    return `"${value}"`;
+    return stringify(value);
   }
-  return String(value);
+  return stringify(value);
 };
 
 export default formatValue;

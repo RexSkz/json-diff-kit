@@ -2,7 +2,7 @@
   "name": "json-diff-kit",
   "version": "1.0.2",
   "description": "A better JSON differ & viewer.",
-  "main": "dist/index.js",
+  "module": "dist/index.js",
   "typings": "typings",
   "scripts": {
     "start": "rollup -c -w",
