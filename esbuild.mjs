@@ -9,13 +9,13 @@ build({
     path.resolve('src', 'viewer.less'),
   ],
   outdir: path.resolve('dist'),
+  format: 'esm',
   bundle: true,
   loader: {
     '.ts': 'ts',
     '.json': 'json',
   },
   external: ['react', 'react-dom'],
-  minify: true,
   plugins: [
     lessLoader(),
   ],
