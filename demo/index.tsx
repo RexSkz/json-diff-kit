@@ -12,6 +12,7 @@ const Demo: React.FC = () => {
   const [maxDepth, setMaxDepth] = React.useState(Infinity);
   const [showModifications, setShowModifications] = React.useState(true);
   const [arrayDiffMethod, setArrayDiffMethod] = React.useState<DifferOptions['arrayDiffMethod']>('lcs');
+  const [indent, setIndent] = React.useState(4);
 
   const differ = React.useMemo(() => new Differ({
     detectCircular,
@@ -25,12 +26,18 @@ const Demo: React.FC = () => {
     b: 2,
     d: [1, 5, 4],
     e: ['1', 2, { f: 3, g: null, h: [5], i: [] }, 9],
+    m: [],
   });
   const [after1] = React.useState({
     b: 2,
     c: 3,
     d: [1, 3, 4, 6],
     e: ['1', 2, 3, { f: 4, g: false, i: [7, 8] }, 10],
+    j: { k: 11, l: 12 },
+    m: [
+      { n: 1, o: 2 },
+      { p: 3 },
+    ],
   });
   const diff1 = React.useMemo(() => differ.diff(before1, after1), [differ, before1, after1]);
 
@@ -126,16 +133,33 @@ const Demo: React.FC = () => {
           <blockquote>The way to diff arrays, default is <code>"normal"</code>. You can change this value and see the examples below to see their differences.</blockquote>
         </form>
       </div>
+      <h2>Diff Configuration</h2>
+      <div className="view-config">
+        <form>
+          <label htmlFor="indent">
+            Indent:
+            <input
+              type="number"
+              id="indent"
+              min={1}
+              max={16}
+              value={indent}
+              onChange={e => setIndent(Number(e.target.value))}
+            />
+          </label>
+          <blockquote>Controls the indent to the <code>&lt;Viewer&gt;</code> component.</blockquote>
+        </form>
+      </div>
       <div className="diff-result">
         <h2>Examples</h2>
         <p>An regular example with 2 objects.</p>
-        <Viewer diff={diff1} indent={4} lineNumbers={true} />
+        <Viewer diff={diff1} indent={indent} lineNumbers={true} />
         <p>An example with 2 arrays.</p>
-        <Viewer diff={diff2} indent={4} lineNumbers={true} />
+        <Viewer diff={diff2} indent={indent} lineNumbers={true} />
         <p>2 variables with different types. The algorithm always returns the result "left is removed, right is added".</p>
-        <Viewer diff={diff3} indent={4} lineNumbers={true} />
+        <Viewer diff={diff3} indent={indent} lineNumbers={true} />
         <p>2 variables with the same primitive type. The algorithm always returns the result "left is modified to right" (if <code>showModification</code> is set to <code>false</code>, it will return the result "left is removed, right is added").</p>
-        <Viewer diff={diff4} indent={4} lineNumbers={true} />
+        <Viewer diff={diff4} indent={indent} lineNumbers={true} />
       </div>
       <div className="demo-footer">
         <p>Made with ♥ by Rex Zeng</p>

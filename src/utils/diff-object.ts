@@ -1,6 +1,7 @@
 import diffArrayLCS from './diff-array-lcs';
 import formatValue from './format-value';
 import getType from './get-type';
+import stringify from './stringify';
 
 import type { DifferOptions, DiffResult, ArrayDiffFunc } from '../differ';
 
@@ -24,12 +25,26 @@ const diffObject = (
   if (lhs === null && rhs === null || lhs === undefined && rhs === undefined) {
     return [linesLeft, linesRight];
   } else if (lhs === null || lhs === undefined) {
-    linesLeft.push({ level, type: 'equal', text: '' });
-    linesRight.push({ level, type: 'add', text: formatValue(rhs) });
+    const addedLines = stringify(rhs, null, 1).split('\n');
+    for (let i = 0; i < addedLines.length; i++) {
+      linesLeft.push({ level, type: 'equal', text: '' });
+      linesRight.push({
+        level: level + (addedLines[i].match(/^\s+/)?.[0]?.length || 0),
+        type: 'add',
+        text: addedLines[i].replace(/^\s+/, '').replace(/,$/g, ''),
+      });
+    }
     return [linesLeft, linesRight];
   } else if (rhs === null || rhs === undefined) {
-    linesLeft.push({ level, type: 'remove', text: formatValue(lhs) });
-    linesRight.push({ level, type: 'equal', text: '' });
+    const addedLines = stringify(lhs, null, 1).split('\n');
+    for (let i = 0; i < addedLines.length; i++) {
+      linesLeft.push({
+        level: level + (addedLines[i].match(/^\s+/)?.[0]?.length || 0),
+        type: 'remove',
+        text: addedLines[i].replace(/^\s+/, '').replace(/,$/g, ''),
+      });
+      linesRight.push({ level, type: 'equal', text: '' });
+    }
     return [linesLeft, linesRight];
   }
 
@@ -91,18 +106,50 @@ const diffObject = (
       }
     } else if (keyLeft && keyRight) {
       if (keyLeft < keyRight) {
-        linesLeft.push({ level, type: 'remove', text: `"${keyLeft}": ${formatValue(lhs[keyLeft])}` });
-        linesRight.push({ level, type: 'equal', text: '' });
+        const addedLines = stringify(lhs[keyLeft], null, 1).split('\n');
+        for (let i = 0; i < addedLines.length; i++) {
+          const text = addedLines[i].replace(/^\s+/, '').replace(/,$/g, '');
+          linesLeft.push({
+            level: level + (addedLines[i].match(/^\s+/)?.[0]?.length || 0),
+            type: 'remove',
+            text: i ? text : `"${keyLeft}": ${text}`,
+          });
+          linesRight.push({ level, type: 'equal', text: '' });
+        }
       } else {
-        linesLeft.push({ level, type: 'equal', text: '' });
-        linesRight.push({ level, type: 'add', text: `"${keyRight}": ${formatValue(rhs[keyRight])}` });
+        const addedLines = stringify(rhs[keyRight], null, 1).split('\n');
+        for (let i = 0; i < addedLines.length; i++) {
+          const text = addedLines[i].replace(/^\s+/, '').replace(/,$/g, '');
+          linesLeft.push({ level, type: 'equal', text: '' });
+          linesRight.push({
+            level: level + (addedLines[i].match(/^\s+/)?.[0]?.length || 0),
+            type: 'add',
+            text: i ? text : `"${keyRight}": ${text}`,
+          });
+        }
       }
     } else if (keyLeft) {
-      linesLeft.push({ level, type: 'remove', text: `"${keyLeft}": ${formatValue(lhs[keyLeft])}` });
-      linesRight.push({ level, type: 'equal', text: '' });
+      const addedLines = stringify(lhs[keyLeft], null, 1).split('\n');
+      for (let i = 0; i < addedLines.length; i++) {
+        const text = addedLines[i].replace(/^\s+/, '').replace(/,$/g, '');
+        linesLeft.push({
+          level: level + (addedLines[i].match(/^\s+/)?.[0]?.length || 0),
+          type: 'remove',
+          text: i ? text : `"${keyLeft}": ${text}`,
+        });
+        linesRight.push({ level, type: 'equal', text: '' });
+      }
     } else if (keyRight) {
-      linesLeft.push({ level, type: 'equal', text: '' });
-      linesRight.push({ level, type: 'add', text: `"${keyRight}": ${formatValue(rhs[keyRight])}` });
+      const addedLines = stringify(rhs[keyRight], null, 1).split('\n');
+      for (let i = 0; i < addedLines.length; i++) {
+        const text = addedLines[i].replace(/^\s+/, '').replace(/,$/g, '');
+        linesLeft.push({ level, type: 'equal', text: '' });
+        linesRight.push({
+          level: level + (addedLines[i].match(/^\s+/)?.[0]?.length || 0),
+          type: 'add',
+          text: i ? text : `"${keyRight}": ${text}`,
+        });
+      }
     }
 
     if (!keyLeft) {

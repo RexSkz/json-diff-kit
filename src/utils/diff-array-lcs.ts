@@ -1,6 +1,7 @@
 import formatValue from './format-value';
 import diffObject from './diff-object';
 import getType from './get-type';
+import stringify from './stringify';
 
 import type { DifferOptions, DiffResult } from '../differ';
 
@@ -77,13 +78,27 @@ const lcs = (
         i--;
         j--;
       } else {
-        tLeft.unshift({ level: level + 1, type: 'remove', text: formatValue(arrLeft[i - 1]) });
-        tRight.unshift({ level: level + 1, type: 'equal', text: '' });
+        const addedLines = stringify(arrLeft[i - 1], null, 1).split('\n');
+        for (let i = addedLines.length - 1; i >= 0; i--) {
+          tLeft.unshift({
+            level: level + 1 + (addedLines[i].match(/^\s+/)?.[0]?.length || 0),
+            type: 'remove',
+            text: addedLines[i].replace(/^\s+/, '').replace(/,$/g, ''),
+          });
+          tRight.unshift({ level: level + 1, type: 'equal', text: '' });
+        }
         i--;
       }
     } else {
-      tLeft.unshift({ level: level + 1, type: 'equal', text: '' });
-      tRight.unshift({ level: level + 1, type: 'add', text: formatValue(arrRight[j - 1]) });
+      const addedLines = stringify(arrRight[j - 1], null, 1).split('\n');
+      for (let i = addedLines.length - 1; i >= 0; i--) {
+        tLeft.unshift({ level: level + 1, type: 'equal', text: '' });
+        tRight.unshift({
+          level: level + 1 + (addedLines[i].match(/^\s+/)?.[0]?.length || 0),
+          type: 'add',
+          text: addedLines[i].replace(/^\s+/, '').replace(/,$/g, ''),
+        });
+      }
       j--;
     }
   }
