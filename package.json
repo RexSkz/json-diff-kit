@@ -9,7 +9,8 @@
     "dev": "pnpm start",
     "test": "jest --coverage",
     "build": "node ./esbuild.mjs && tsc",
-    "build:pages": "NODE_ENV=production BASEDIR=docs rollup -c"
+    "build:pages": "NODE_ENV=production BASEDIR=docs rollup -c",
+    "prepublish": "pnpm build"
   },
   "repository": {
     "type": "git",
