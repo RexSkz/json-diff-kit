@@ -13,6 +13,7 @@ const Demo: React.FC = () => {
   const [showModifications, setShowModifications] = React.useState(true);
   const [arrayDiffMethod, setArrayDiffMethod] = React.useState<DifferOptions['arrayDiffMethod']>('lcs');
   const [indent, setIndent] = React.useState(4);
+  const [highlightInlineDiff, setHighlightInlineDiff] = React.useState(true);
 
   const differ = React.useMemo(() => new Differ({
     detectCircular,
@@ -27,6 +28,9 @@ const Demo: React.FC = () => {
     d: [1, 5, 4],
     e: ['1', 2, { f: 3, g: null, h: [5], i: [] }, 9],
     m: [],
+    q: 'JSON diff can\'t be possible',
+    r: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    s: 1024,
   });
   const [after1] = React.useState({
     b: 2,
@@ -38,6 +42,9 @@ const Demo: React.FC = () => {
       { n: 1, o: 2 },
       { p: 3 },
     ],
+    q: 'JSON diff is possible!',
+    r: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed quasi architecto beatae incididunt ut labore et dolore magna aliqua.',
+    s: '1024',
   });
   const diff1 = React.useMemo(() => differ.diff(before1, after1), [differ, before1, after1]);
 
@@ -148,18 +155,28 @@ const Demo: React.FC = () => {
             />
           </label>
           <blockquote>Controls the indent to the <code>&lt;Viewer&gt;</code> component.</blockquote>
+          <label htmlFor="highlight-inline-diff">
+            Highlight Inline Diff:
+            <input
+              type="checkbox"
+              id="highlight-inline-diff"
+              checked={highlightInlineDiff}
+              onChange={e => setHighlightInlineDiff(e.target.checked)}
+            />
+          </label>
+          <blockquote>Whether to show the inline diff highlight. For example, if the left value <code>"JSON diff can't be possible"</code> is changed to the right value <code>"JSON diff is possible"</code>, it will be recognized as we first remove <code>can't be</code> and then add <code>is</code>. Note: the <code>showModification</code> must be enabled, or you will not see modified lines.</blockquote>
         </form>
       </div>
       <div className="diff-result">
         <h2>Examples</h2>
         <p>An regular example with 2 objects.</p>
-        <Viewer diff={diff1} indent={indent} lineNumbers={true} />
+        <Viewer diff={diff1} indent={indent} lineNumbers={true} highlightInlineDiff={highlightInlineDiff} />
         <p>An example with 2 arrays.</p>
-        <Viewer diff={diff2} indent={indent} lineNumbers={true} />
+        <Viewer diff={diff2} indent={indent} lineNumbers={true} highlightInlineDiff={highlightInlineDiff} />
         <p>2 variables with different types. The algorithm always returns the result "left is removed, right is added".</p>
-        <Viewer diff={diff3} indent={indent} lineNumbers={true} />
+        <Viewer diff={diff3} indent={indent} lineNumbers={true} highlightInlineDiff={highlightInlineDiff} />
         <p>2 variables with the same primitive type. The algorithm always returns the result "left is modified to right" (if <code>showModification</code> is set to <code>false</code>, it will return the result "left is removed, right is added").</p>
-        <Viewer diff={diff4} indent={indent} lineNumbers={true} />
+        <Viewer diff={diff4} indent={indent} lineNumbers={true} highlightInlineDiff={highlightInlineDiff} />
       </div>
       <div className="demo-footer">
         <p>Made with ♥ by Rex Zeng</p>

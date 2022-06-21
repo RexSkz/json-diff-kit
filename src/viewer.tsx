@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import type { DiffResult } from './differ';
+import getInlineDiff, { InlineDiffResult } from './utils/get-inline-diff';
 
 interface ViewerProps {
   /** The diff result `[before, after]`. */
@@ -15,6 +16,8 @@ interface ViewerProps {
   };
   /** Display line numbers, default is `true`. */
   lineNumbers?: boolean;
+  /** Whether to show the inline diff highlight, default is `true`. */
+  highlightInlineDiff?: boolean;
   /** Extra class names */
   className?: string;
   /** Extra styles */
@@ -30,9 +33,39 @@ const Viewer: React.FC<ViewerProps> = props => {
   const indentChar = indent === 'tab' ? '\t' : ' ';
   const indentSize = indent === 'tab' ? 1 : indent;
 
+  const renderInlineDiffResult = (arr: InlineDiffResult[][]) => {
+    return arr.map(result => (
+      <>
+        {
+          result.map((item, index) => {
+            if (item.type === 'equal') {
+              return (
+                <span key={`${index}-${item.type}-${item.text}`}>
+                  {item.text}
+                </span>
+              );
+            }
+            return (
+              <span
+                key={`${index}-${item.type}-${item.text}`}
+                className={`inline-diff-${item.type}`}
+              >
+                {item.text}
+              </span>
+            )
+          })
+        }
+      </>
+    ));
+  };
+
   const renderLine = (index: number) => {
     const l = linesLeft[index];
     const r = linesRight[index];
+    const [lText, rText] = props.highlightInlineDiff && l.type === 'modify' && r.type === 'modify'
+      ? renderInlineDiffResult(getInlineDiff(l.text, r.text))
+      : [l.text, r.text];
+
     return (
       // eslint-disable-next-line react/no-array-index-key
       <tr key={index}>
@@ -47,7 +80,7 @@ const Viewer: React.FC<ViewerProps> = props => {
           )
         }
         <td className={`line-${l.type}`}>
-          <pre>{l.text && indentChar.repeat(l.level * indentSize)}{l.text}{l.comma && ','}</pre>
+          <pre>{l.text && indentChar.repeat(l.level * indentSize)}{lText}{l.comma && ','}</pre>
         </td>
         {
           props.lineNumbers && (
@@ -60,7 +93,7 @@ const Viewer: React.FC<ViewerProps> = props => {
           )
         }
         <td className={`line-${r.type}`}>
-          <pre>{r.text && indentChar.repeat(r.level * indentSize)}{r.text}{r.comma && ','}</pre>
+          <pre>{r.text && indentChar.repeat(r.level * indentSize)}{rText}{r.comma && ','}</pre>
         </td>
       </tr>
     );
