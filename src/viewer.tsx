@@ -14,9 +14,9 @@ interface ViewerProps {
     remove?: string;
     modify?: string;
   };
-  /** Display line numbers, default is `true`. */
+  /** Display line numbers, default is `false`. */
   lineNumbers?: boolean;
-  /** Whether to show the inline diff highlight, default is `true`. */
+  /** Whether to show the inline diff highlight, default is `false`. */
   highlightInlineDiff?: boolean;
   /** Extra class names */
   className?: string;
@@ -27,7 +27,7 @@ interface ViewerProps {
 const Viewer: React.FC<ViewerProps> = props => {
   const [linesLeft, linesRight] = props.diff;
 
-  const lineNumberWidth = `${String(linesLeft.length).length / 2}em`;
+  const lineNumberWidth = props.lineNumbers ? `${String(linesLeft.length).length / 2}em` : 0;
 
   const indent = props.indent ?? 2;
   const indentChar = indent === 'tab' ? '\t' : ' ';
@@ -66,6 +66,9 @@ const Viewer: React.FC<ViewerProps> = props => {
       ? renderInlineDiffResult(getInlineDiff(l.text, r.text))
       : [l.text, r.text];
 
+    const bgColourL = l.type !== 'equal' ? props.bgColour?.[l.type] ?? '' : '';
+    const bgColourR = r.type !== 'equal' ? props.bgColour?.[r.type] ?? '' : '';
+
     return (
       // eslint-disable-next-line react/no-array-index-key
       <tr key={index}>
@@ -73,26 +76,26 @@ const Viewer: React.FC<ViewerProps> = props => {
           props.lineNumbers && (
             <td
               className={`line-${l.type} line-number`}
-              style={{ width: lineNumberWidth }}
+              style={{ width: lineNumberWidth, backgroundColor: bgColourL }}
             >
               {l.lineNumber}
             </td>
           )
         }
-        <td className={`line-${l.type}`}>
+        <td className={`line-${l.type}`} style={{ backgroundColor: bgColourL }}>
           <pre>{l.text && indentChar.repeat(l.level * indentSize)}{lText}{l.comma && ','}</pre>
         </td>
         {
           props.lineNumbers && (
             <td
               className={`line-${r.type} line-number`}
-              style={{ width: lineNumberWidth }}
+              style={{ width: lineNumberWidth, backgroundColor: bgColourR }}
             >
               {r.lineNumber}
             </td>
           )
         }
-        <td className={`line-${r.type}`}>
+        <td className={`line-${r.type}`} style={{ backgroundColor: bgColourR }}>
           <pre>{r.text && indentChar.repeat(r.level * indentSize)}{rText}{r.comma && ','}</pre>
         </td>
       </tr>

@@ -70,9 +70,10 @@ interface PageProps {
 const Page: React.FC<PageProps> = props => {
   return (
     <Viewer
-      diff={props.diff}  // required
-      indent={4}         // default `2`
-      lineNumbers={true} // default `false`
+      diff={props.diff}          // required
+      indent={4}                 // default `2`
+      lineNumbers={true}         // default `false`
+      highlightInlineDiff={true} // default `false`
     />
   );
 };

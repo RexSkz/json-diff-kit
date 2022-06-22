@@ -50,5 +50,8 @@
   "peerDependencies": {
     "react": "^17.0.0 || ^16.0.0",
     "react-dom": "^17.0.0 || ^16.0.0"
+  },
+  "dependencies": {
+    "fast-myers-diff": "^3.0.1"
   }
 }
