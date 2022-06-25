@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 
 import { Differ, Viewer } from '../src';
 import type { DifferOptions } from '../src/differ';
+import { InlineDiffOptions } from '../src/utils/get-inline-diff';
+import type { ViewerProps } from '../src/viewer';
 
 import '../src/viewer.less';
 import './index.less';
@@ -14,6 +16,8 @@ const Demo: React.FC = () => {
   const [arrayDiffMethod, setArrayDiffMethod] = React.useState<DifferOptions['arrayDiffMethod']>('lcs');
   const [indent, setIndent] = React.useState(4);
   const [highlightInlineDiff, setHighlightInlineDiff] = React.useState(true);
+  const [inlineDiffMode, setInlineDiffMode] = React.useState<InlineDiffOptions['mode']>('word');
+  const [inlineDiffSeparator, setInlineDiffSeparator] = React.useState(' ');
 
   const differ = React.useMemo(() => new Differ({
     detectCircular,
@@ -60,12 +64,23 @@ const Demo: React.FC = () => {
   const [after4] = React.useState(666);
   const diff4 = React.useMemo(() => differ.diff(before4, after4), [differ, before4, after4]);
 
+  const viewerCommonProps: Partial<ViewerProps> = {
+    indent: indent,
+    lineNumbers: true,
+    highlightInlineDiff,
+    inlineDiffOptions: {
+      mode: inlineDiffMode,
+      wordSeparator: inlineDiffSeparator || '',
+    },
+  };
+
   return (
     <div className="demo-root">
       <h1>JSON Diff Kit</h1>
       <div className="statistics">
         <img src="https://img.shields.io/npm/v/json-diff-kit.svg" />
         <img src="https://img.shields.io/npm/dm/json-diff-kit.svg" />
+        <img src="https://codecov.io/gh/RexSkz/json-diff-kit/branch/master/graph/badge.svg?token=8YRG3M4WTO" />
         <iframe
           src="https://ghbtns.com/github-btn.html?user=rexskz&repo=json-diff-kit&type=star&count=true"
           frameBorder="0"
@@ -75,8 +90,8 @@ const Demo: React.FC = () => {
           title="GitHub"
         />
       </div>
-      <p>A better JSON differ & viewer.</p>
-      <h2>Diff Configuration</h2>
+      <p>A better JSON differ & viewer library written in TypeScript.</p>
+      <h2>Differ Configuration</h2>
       <div className="diff-config">
         <form>
           <label htmlFor="detect-circular">
@@ -123,7 +138,7 @@ const Demo: React.FC = () => {
               onChange={e => setShowModifications(e.target.checked)}
             />
           </label>
-          <blockquote>Support recognizing modifications, default <code>true</code> means the differ will output the <code>* modified</code> sign apart from the basic <code>+ add</code> and <code>- remove</code> sign. If you prefer Git output, please set it to <code>false</code>.</blockquote>
+          <blockquote>Support recognizing modifications, default <code>true</code> means the differ will output the <code>* modified</code> sign apart from the basic <code>+ add</code> and <code>- remove</code> sign. If you prefer Git-style output, please set it to <code>false</code>.</blockquote>
           <label htmlFor="array-diff-method">
             Array diff method:
             <select
@@ -131,7 +146,7 @@ const Demo: React.FC = () => {
               value={arrayDiffMethod}
               onChange={e => setArrayDiffMethod(e.target.value as DifferOptions['arrayDiffMethod'])}
             >
-              <option value="normal">normal</option>
+              <option value="normal">normal (default)</option>
               <option value="lcs">lcs</option>
               <option value="unorder-normal">unorder-normal</option>
               <option value="unorder-lcs">unorder-lcs</option>
@@ -140,7 +155,7 @@ const Demo: React.FC = () => {
           <blockquote>The way to diff arrays, default is <code>"normal"</code>. You can change this value and see the examples below to see their differences.</blockquote>
         </form>
       </div>
-      <h2>Diff Configuration</h2>
+      <h2>Viewer Configuration</h2>
       <div className="view-config">
         <form>
           <label htmlFor="indent">
@@ -164,19 +179,39 @@ const Demo: React.FC = () => {
               onChange={e => setHighlightInlineDiff(e.target.checked)}
             />
           </label>
-          <blockquote>Whether to show the inline diff highlight. For example, if the left value <code>"JSON diff can't be possible"</code> is changed to the right value <code>"JSON diff is possible"</code>, it will be recognized as we first remove <code>can't be</code> and then add <code>is</code>. Note: the <code>showModification</code> must be enabled, or you will not see modified lines.</blockquote>
+          <blockquote>Whether to show the inline diff highlight. For example, if the left value <code>"JSON diff can't be possible"</code> is changed to the right value <code>"JSON diff is possible"</code>, it will be recognized as we first remove <code>can't be</code> and then add <code>is</code>. This feature is powered by <a href="https://github.com/gliese1337/fast-myers-diff" target="_blank">gliese1337/fast-myers-diff</a>. Note: the <code>showModification</code> must be enabled, or you will not see modified lines.</blockquote>
+          <label htmlFor="inline-diff-options">
+            Inline Diff Options:
+            <span>Diff method</span>
+            <select
+              id="inline-diff-mode"
+              value={inlineDiffMode}
+              onChange={e => setInlineDiffMode(e.target.value as InlineDiffOptions['mode'])}
+            >
+              <option value="char">char (default)</option>
+              <option value="word">word</option>
+            </select>
+            <span>Word separator</span>
+            <input
+              id="inline-diff-separator"
+              value={inlineDiffSeparator}
+              onChange={e => setInlineDiffSeparator(e.target.value)}
+              placeholder="Works when mode = char"
+            />
+          </label>
+          <blockquote>You can control the inline diff behaviour. If the inline diff sources are sentences, we can diff them "by word" instead of "by character". For normal sentences, just set the method to <code>word</code> and the separator to <code>" "</code> (a half-width space) like this demo. But if you prefer the Git-style output, you can leave this props default, which is diffing "by character".</blockquote>
         </form>
       </div>
       <div className="diff-result">
         <h2>Examples</h2>
         <p>An regular example with 2 objects.</p>
-        <Viewer diff={diff1} indent={indent} lineNumbers={true} highlightInlineDiff={highlightInlineDiff} />
+        <Viewer diff={diff1} {...viewerCommonProps} />
         <p>An example with 2 arrays.</p>
-        <Viewer diff={diff2} indent={indent} lineNumbers={true} highlightInlineDiff={highlightInlineDiff} />
+        <Viewer diff={diff2} {...viewerCommonProps} />
         <p>2 variables with different types. The algorithm always returns the result "left is removed, right is added".</p>
-        <Viewer diff={diff3} indent={indent} lineNumbers={true} highlightInlineDiff={highlightInlineDiff} />
+        <Viewer diff={diff3} {...viewerCommonProps} />
         <p>2 variables with the same primitive type. The algorithm always returns the result "left is modified to right" (if <code>showModification</code> is set to <code>false</code>, it will return the result "left is removed, right is added").</p>
-        <Viewer diff={diff4} indent={indent} lineNumbers={true} highlightInlineDiff={highlightInlineDiff} />
+        <Viewer diff={diff4} {...viewerCommonProps} />
       </div>
       <div className="demo-footer">
         <p>Made with ♥ by Rex Zeng</p>

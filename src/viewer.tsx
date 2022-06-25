@@ -1,9 +1,10 @@
 import * as React from 'react';
 
 import type { DiffResult } from './differ';
-import getInlineDiff, { InlineDiffResult } from './utils/get-inline-diff';
+import getInlineDiff from './utils/get-inline-diff';
+import type { InlineDiffResult, InlineDiffOptions } from './utils/get-inline-diff';
 
-interface ViewerProps {
+export interface ViewerProps {
   /** The diff result `[before, after]`. */
   diff: readonly [DiffResult[], DiffResult[]];
   /** Configure indent, default `2` means 2 spaces. */
@@ -18,6 +19,8 @@ interface ViewerProps {
   lineNumbers?: boolean;
   /** Whether to show the inline diff highlight, default is `false`. */
   highlightInlineDiff?: boolean;
+  /** Controls the inline diff behaviour, the `highlightInlineDiff` must be enabled. */
+  inlineDiffOptions?: InlineDiffOptions;
   /** Extra class names */
   className?: string;
   /** Extra styles */
@@ -32,6 +35,10 @@ const Viewer: React.FC<ViewerProps> = props => {
   const indent = props.indent ?? 2;
   const indentChar = indent === 'tab' ? '\t' : ' ';
   const indentSize = indent === 'tab' ? 1 : indent;
+  const inlineDiffOptions: InlineDiffOptions = {
+    mode: props.inlineDiffOptions?.mode || 'char',
+    wordSeparator: props.inlineDiffOptions?.wordSeparator || '',
+  };
 
   const renderInlineDiffResult = (arr: InlineDiffResult[][]) => {
     return arr.map(result => (
@@ -62,8 +69,9 @@ const Viewer: React.FC<ViewerProps> = props => {
   const renderLine = (index: number) => {
     const l = linesLeft[index];
     const r = linesRight[index];
+
     const [lText, rText] = props.highlightInlineDiff && l.type === 'modify' && r.type === 'modify'
-      ? renderInlineDiffResult(getInlineDiff(l.text, r.text))
+      ? renderInlineDiffResult(getInlineDiff(l.text, r.text, inlineDiffOptions))
       : [l.text, r.text];
 
     const bgColourL = l.type !== 'equal' ? props.bgColour?.[l.type] ?? '' : '';

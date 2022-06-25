@@ -1,4 +1,4 @@
-lockfileVersion: 5.4
+lockfileVersion: 5.3
 
 specifiers:
   '@rollup/plugin-commonjs': ^21.0.1
@@ -37,7 +37,7 @@ devDependencies:
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
   rollup: 2.67.0
-  rollup-plugin-esbuild: 4.8.2_lxqpcj4qa3qr4matv424zp2wza
+  rollup-plugin-esbuild: 4.8.2_esbuild@0.14.18+rollup@2.67.0
   rollup-plugin-less: 1.1.3
   rollup-plugin-serve: 1.1.0
   typescript: 4.5.5
@@ -988,8 +988,6 @@ packages:
     dependencies:
       micromatch: 3.1.10
       normalize-path: 2.1.1
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /anymatch/3.1.2:
@@ -1205,8 +1203,6 @@ packages:
       snapdragon-node: 2.1.1
       split-string: 3.1.0
       to-regex: 3.0.2
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /braces/3.0.2:
@@ -1477,22 +1473,12 @@ packages:
 
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
     dependencies:
       ms: 2.0.0
     dev: true
 
   /debug/3.2.7:
     resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
     dependencies:
       ms: 2.1.2
     dev: true
@@ -1762,8 +1748,6 @@ packages:
       '@types/less': 3.0.3
       esbuild: 0.14.18
       less: 4.1.2
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /esbuild-sunos-64/0.14.18:
@@ -1932,8 +1916,6 @@ packages:
       regex-not: 1.0.2
       snapdragon: 0.8.2
       to-regex: 3.0.2
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /expect/27.4.6:
@@ -1973,8 +1955,6 @@ packages:
       regex-not: 1.0.2
       snapdragon: 0.8.2
       to-regex: 3.0.2
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /fast-json-stable-stringify/2.1.0:
@@ -2655,8 +2635,6 @@ packages:
       walker: 1.0.8
     optionalDependencies:
       fsevents: 2.3.2
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /jest-haste-map/27.4.6:
@@ -3142,8 +3120,6 @@ packages:
       mime: 1.6.0
       needle: 2.9.1
       source-map: 0.6.1
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /leven/3.1.0:
@@ -3246,8 +3222,6 @@ packages:
       regex-not: 1.0.2
       snapdragon: 0.8.2
       to-regex: 3.0.2
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /micromatch/4.0.4:
@@ -3337,8 +3311,6 @@ packages:
       regex-not: 1.0.2
       snapdragon: 0.8.2
       to-regex: 3.0.2
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /native-request/1.1.0:
@@ -3360,8 +3332,6 @@ packages:
       debug: 3.2.7
       iconv-lite: 0.4.24
       sax: 1.2.4
-    transitivePeerDependencies:
-      - supports-color
     dev: true
     optional: true
 
@@ -3721,7 +3691,7 @@ packages:
       glob: 7.2.0
     dev: true
 
-  /rollup-plugin-esbuild/4.8.2_lxqpcj4qa3qr4matv424zp2wza:
+  /rollup-plugin-esbuild/4.8.2_esbuild@0.14.18+rollup@2.67.0:
     resolution: {integrity: sha512-wsaYNOjzTb6dN1qCIZsMZ7Q0LWiPJklYs2TDI8vJA2LUbvtPUY+17TC8C0vSat3jPMInfR9XWKdA7ttuwkjsGQ==}
     engines: {node: '>=12'}
     peerDependencies:
@@ -3814,8 +3784,6 @@ packages:
       micromatch: 3.1.10
       minimist: 1.2.5
       walker: 1.0.8
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /sax/1.2.4:
@@ -3930,8 +3898,6 @@ packages:
       source-map: 0.5.7
       source-map-resolve: 0.5.3
       use: 3.1.1
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /source-map-resolve/0.5.3:
