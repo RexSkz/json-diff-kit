@@ -32,6 +32,42 @@
         pointer-events: none;
       }
     }
+
+    &.expand-line {
+      text-align: center;
+
+      td {
+        padding: 4px 0;
+      }
+
+      &:hover td:before {
+        background: transparent;
+      }
+
+      .has-lines-before {
+        border-bottom: 1px solid;
+      }
+
+      .has-lines-after {
+        border-top: 1px solid;
+      }
+
+      button {
+        margin: 0 0.5em;
+        padding: 0;
+        color: #2196f3;
+        font-family: 'Apple Color Emoji', 'Segoe UI Emoji';
+        font-size: 12px;
+        border: none;
+        background: transparent;
+        user-select: none;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
   }
 
   td {

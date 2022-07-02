@@ -54,8 +54,8 @@ const diffObject = (
   keysRight.sort();
 
   while (keysLeft.length || keysRight.length) {
-    const keyLeft = keysLeft[0] ?? null;
-    const keyRight = keysRight[0] ?? null;
+    const keyLeft = keysLeft[0];
+    const keyRight = keysRight[0];
 
     if (keyLeft === keyRight) {
       if (getType(lhs[keyLeft]) !== getType(rhs[keyRight])) {
@@ -104,7 +104,7 @@ const diffObject = (
           linesRight.push({ level, type: 'equal', text: `"${keyRight}": ${formatValue(rhs[keyRight])}` });
         }
       }
-    } else if (keyLeft && keyRight) {
+    } else if (keysLeft.length && keysRight.length) {
       if (keyLeft < keyRight) {
         const addedLines = stringify(lhs[keyLeft], null, 1).split('\n');
         for (let i = 0; i < addedLines.length; i++) {
@@ -128,7 +128,7 @@ const diffObject = (
           });
         }
       }
-    } else if (keyLeft) {
+    } else if (keysLeft.length) {
       const addedLines = stringify(lhs[keyLeft], null, 1).split('\n');
       for (let i = 0; i < addedLines.length; i++) {
         const text = addedLines[i].replace(/^\s+/, '').replace(/,$/g, '');
@@ -139,7 +139,7 @@ const diffObject = (
         });
         linesRight.push({ level, type: 'equal', text: '' });
       }
-    } else if (keyRight) {
+    } else if (keysRight.length) {
       const addedLines = stringify(rhs[keyRight], null, 1).split('\n');
       for (let i = 0; i < addedLines.length; i++) {
         const text = addedLines[i].replace(/^\s+/, '').replace(/,$/g, '');

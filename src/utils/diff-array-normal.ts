@@ -29,9 +29,9 @@ const diffArrayNormal = (
     linesRight.push({ level: level + 1, type: 'equal', text: '...' });
   } else {
     while (arrLeft.length || arrRight.length) {
-      const itemLeft = arrLeft[0] ?? null;
-      const itemRight = arrRight[0] ?? null;
-      if (itemLeft && itemRight) {
+      const itemLeft = arrLeft[0];
+      const itemRight = arrRight[0];
+      if (arrLeft.length && arrRight.length) {
         if (getType(itemLeft) !== getType(itemRight)) {
           linesLeft.push({ level: level + 1, type: 'remove', text: formatValue(itemLeft) });
           linesLeft.push({ level, type: 'equal', text: '' });
@@ -65,11 +65,11 @@ const diffArrayNormal = (
         }
         arrLeft.shift();
         arrRight.shift();
-      } else if (itemLeft) {
+      } else if (arrLeft.length) {
         linesLeft.push({ level: level + 1, type: 'remove', text: formatValue(itemLeft) });
         linesRight.push({ level: level + 1, type: 'equal', text: '' });
         arrLeft.shift();
-      } else if (itemRight) {
+      } else if (arrRight.length) {
         linesLeft.push({ level: level + 1, type: 'equal', text: '' });
         linesRight.push({ level: level + 1, type: 'add', text: formatValue(itemRight) });
         arrRight.shift();

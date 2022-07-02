@@ -64,6 +64,10 @@ const Demo: React.FC = () => {
   const [after4] = React.useState(666);
   const diff4 = React.useMemo(() => differ.diff(before4, after4), [differ, before4, after4]);
 
+  const [before5] = React.useState([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]);
+  const [after5] = React.useState([0, 1, 2, 3, 4, 5, 6, 7, 8, 99, 10, 11, 12, 13, 14, 15, 16, 17, 1818, 1919, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]);
+  const diff5 = React.useMemo(() => differ.diff(before5, after5), [differ, before5, after5]);
+
   const viewerCommonProps: Partial<ViewerProps> = {
     indent: indent,
     lineNumbers: true,
@@ -212,6 +216,8 @@ const Demo: React.FC = () => {
         <Viewer diff={diff3} {...viewerCommonProps} />
         <p>2 variables with the same primitive type. The algorithm always returns the result "left is modified to right" (if <code>showModification</code> is set to <code>false</code>, it will return the result "left is removed, right is added").</p>
         <Viewer diff={diff4} {...viewerCommonProps} />
+        <p>Most of the lines are equal, only small amount of lines are different. You can use the <code>hideUnchangedLines</code> prop to hide the unchanged parts and make the result shorter. Notice: when the <code>diff</code> prop is changed, the expand status will be reset, it's your responsibility to keep the <code>diff</code> props unchanged (you may want to use <code>useState</code> or <code>useMemo</code>).</p>
+        <Viewer diff={diff5} {...viewerCommonProps} hideUnchangedLines />
       </div>
       <div className="demo-footer">
         <p>Made with ♥ by Rex Zeng</p>

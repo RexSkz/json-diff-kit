@@ -3,6 +3,60 @@ import * as React from 'react';
 import type { DiffResult } from './differ';
 import getInlineDiff from './utils/get-inline-diff';
 import type { InlineDiffResult, InlineDiffOptions } from './utils/get-inline-diff';
+import getSegments from './utils/get-segments';
+import type { HiddenUnchangedLinesInfo, SegmentItem } from './utils/get-segments';
+
+interface ExpandLineRendererOptions {
+  /**
+   * If this is `true`, you can show a "⬆️ Show xx lines" button
+   */
+  hasLinesBefore: boolean;
+  /**
+   * If this is `true`, you can show a "⬇️ Show xx lines" button
+   */
+  hasLinesAfter: boolean;
+  /**
+   * Call this function to expand `lines` lines before,
+   * if there are not enough lines before, it will expand all lines before.
+   */
+  onExpandBefore: (lines: number) => void;
+  /**
+   * Call this function to expand `lines` lines after,
+   * if there are not enough lines after, it will expand all lines after.
+   */
+  onExpandAfter: (lines: number) => void;
+  /**
+   * Call this function to expand all lines in this continuous part.
+   */
+  onExpandAll: () => void;
+}
+
+export type HideUnchangedLinesOptions = boolean | {
+  /**
+   * If there are continuous unchanged lines exceeding the limit, they should be hidden,
+   * default is `8`.
+   */
+  threshold?: number;
+  /**
+   * We can keep displaying some lines around the "expand" line for a better context,
+   * default is `3`.
+   */
+  margin?: number;
+  /**
+   * Controls how many lines will be displayed when clicking the "Show xx lines before"
+   * or "Show xx lines after" button in the "expand" line, default is `20`.
+   */
+  expandMoreLinesLimit?: number;
+  /**
+   * The custom renderer of the "expand" line,
+   * default renderer will produce the following buttons in this line:
+   *
+   * ```text
+   * [⬆️ Show 20 lines] [↕️ Show all unchanged lines] [⬇️ Show 20 lines]
+   * ```
+   */
+  expandLineRenderer?: (options?: ExpandLineRendererOptions) => JSX.Element;
+}
 
 export interface ViewerProps {
   /** The diff result `[before, after]`. */
@@ -21,54 +75,82 @@ export interface ViewerProps {
   highlightInlineDiff?: boolean;
   /** Controls the inline diff behaviour, the `highlightInlineDiff` must be enabled. */
   inlineDiffOptions?: InlineDiffOptions;
+  /**
+   * Hide continuous unchanged lines and display an "expand" instead,
+   * default `false` means it won't hide unchanged lines.
+   */
+  hideUnchangedLines?: HideUnchangedLinesOptions;
   /** Extra class names */
   className?: string;
   /** Extra styles */
   style?: React.CSSProperties;
 }
 
+const DEFAULT_INDENT = 2;
+const DEFAULT_EXPAND_MORE_LINES_LIMIT = 20;
+
 const Viewer: React.FC<ViewerProps> = props => {
   const [linesLeft, linesRight] = props.diff;
 
   const lineNumberWidth = props.lineNumbers ? `${String(linesLeft.length).length / 2}em` : 0;
-
-  const indent = props.indent ?? 2;
+  const indent = props.indent ?? DEFAULT_INDENT;
   const indentChar = indent === 'tab' ? '\t' : ' ';
   const indentSize = indent === 'tab' ? 1 : indent;
   const inlineDiffOptions: InlineDiffOptions = {
     mode: props.inlineDiffOptions?.mode || 'char',
     wordSeparator: props.inlineDiffOptions?.wordSeparator || '',
   };
+  const hideUnchangedLines = props.hideUnchangedLines ?? false;
+
+  // Use these refs to keep the diff data and segments sync,
+  // or it may cause runtime error because of their mismatch.
+  // Do not use the states to render, use the refs to render and use `updateViewer` to update.
+  const linesLeftRef = React.useRef(linesLeft);
+  const linesRightRef = React.useRef(linesRight);
+  const segmentsRef = React.useRef(getSegments(linesLeft, linesRight, hideUnchangedLines));
+  const [, updateViewer] = React.useState({});
+
+  React.useEffect(() => {
+    linesLeftRef.current = linesLeft;
+    linesRightRef.current = linesRight;
+    segmentsRef.current = getSegments(linesLeft, linesRight, hideUnchangedLines);
+    updateViewer({});
+  }, [hideUnchangedLines, linesLeft, linesRight]);
+
+  const renderMeasureLine = () => (
+    <colgroup className="measure-line">
+      {props.lineNumbers && <col style={{ width: `calc(${lineNumberWidth} + 16px)` }} />}
+      <col />
+      {props.lineNumbers && <col style={{ width: `calc(${lineNumberWidth} + 16px)` }} />}
+      <col />
+    </colgroup>
+  );
 
   const renderInlineDiffResult = (arr: InlineDiffResult[][]) => {
     return arr.map(result => (
-      <>
-        {
-          result.map((item, index) => {
-            if (item.type === 'equal') {
-              return (
-                <span key={`${index}-${item.type}-${item.text}`}>
-                  {item.text}
-                </span>
-              );
-            }
-            return (
-              <span
-                key={`${index}-${item.type}-${item.text}`}
-                className={`inline-diff-${item.type}`}
-              >
-                {item.text}
-              </span>
-            )
-          })
+      result.map((item, index) => {
+        if (item.type === 'equal') {
+          return (
+            <span key={`${index}-${item.type}-${item.text}`}>
+              {item.text}
+            </span>
+          );
         }
-      </>
+        return (
+          <span
+            key={`${index}-${item.type}-${item.text}`}
+            className={`inline-diff-${item.type}`}
+          >
+            {item.text}
+          </span>
+        )
+      })
     ));
   };
 
   const renderLine = (index: number) => {
-    const l = linesLeft[index];
-    const r = linesRight[index];
+    const l = linesLeftRef.current[index];
+    const r = linesRightRef.current[index];
 
     const [lText, rText] = props.highlightInlineDiff && l.type === 'modify' && r.type === 'modify'
       ? renderInlineDiffResult(getInlineDiff(l.text, r.text, inlineDiffOptions))
@@ -110,13 +192,134 @@ const Viewer: React.FC<ViewerProps> = props => {
     );
   };
 
+  const onExpandBefore = (segmentIndex: number) => (lines: number) => {
+    const newSegments = [...segmentsRef.current];
+    const newSegment = newSegments[segmentIndex] as HiddenUnchangedLinesInfo;
+    newSegments[segmentIndex] = {
+      ...newSegment,
+      end: Math.max(newSegment.end - lines, newSegment.start),
+    };
+    if (segmentIndex + 1 < segmentsRef.current.length - 1) {
+      newSegments[segmentIndex + 1] = {
+        ...newSegments[segmentIndex + 1],
+        start: Math.max(newSegment.end - lines, newSegment.start),
+      }
+    }
+    segmentsRef.current = newSegments;
+    updateViewer({});
+  };
+
+  const onExpandAfter = (segmentIndex: number) => (lines: number) => {
+    const newSegments = [...segmentsRef.current];
+    const newSegment = newSegments[segmentIndex] as HiddenUnchangedLinesInfo;
+    newSegments[segmentIndex] = {
+      ...newSegment,
+      start: Math.min(newSegment.start + lines, newSegment.end),
+    };
+    if (segmentIndex > 1) {
+      newSegments[segmentIndex - 1] = {
+        ...newSegments[segmentIndex - 1],
+        end: Math.min(newSegment.start + lines, newSegment.end),
+      }
+    }
+    segmentsRef.current = newSegments;
+    updateViewer({});
+  };
+
+  const onExpandAll = (segmentIndex: number) => () => {
+    const newSegments = [...segmentsRef.current];
+    const newSegment = newSegments[segmentIndex] as HiddenUnchangedLinesInfo;
+    newSegments[segmentIndex] = {
+      ...newSegment,
+      start: newSegment.start,
+      end: newSegment.start,
+    };
+    if (segmentIndex + 1 < segmentsRef.current.length - 1) {
+      newSegments[segmentIndex + 1] = {
+        ...newSegments[segmentIndex + 1],
+        start: newSegment.start,
+      }
+    } else {
+      newSegments[segmentIndex - 1] = {
+        ...newSegments[segmentIndex - 1],
+        end: newSegment.end,
+      }
+    }
+    segmentsRef.current = newSegments;
+    updateViewer({});
+  };
+
+  const renderExpandLine = (
+    hasLinesBefore: boolean,
+    hasLinesAfter: boolean,
+    expandMoreLinesLimit: number,
+    index: number,
+  ) => {
+    return (
+      <>
+        {
+          hasLinesBefore && (
+            <button onClick={() => onExpandBefore(index)(expandMoreLinesLimit)}>
+              ⬆️ Show {expandMoreLinesLimit} lines before
+            </button>
+          )
+        }
+        <button onClick={() => onExpandAll(index)()}>
+          ↕️ Show all unchanged lines
+        </button>
+        {
+          hasLinesAfter && (
+            <button onClick={() => onExpandAfter(index)(expandMoreLinesLimit)}>
+              ⬇️ Show {expandMoreLinesLimit} lines after
+            </button>
+          )
+        }
+      </>
+    );
+  }
+
+  const renderSegment = (segment: SegmentItem | HiddenUnchangedLinesInfo, index: number) => {
+    const { start, end } = segment;
+    if (start === end) {
+      return null;
+    }
+    if (!('hasLinesBefore' in segment)) {
+      return Array(end - start).fill(0).map((_, index) => renderLine(start + index));
+    }
+    const { hasLinesBefore, hasLinesAfter } = segment;
+    const expandMoreLinesLimit = typeof hideUnchangedLines === 'boolean'
+      ? DEFAULT_EXPAND_MORE_LINES_LIMIT
+      : hideUnchangedLines.expandMoreLinesLimit;
+    return (
+      <tr key={`expand-line-${index}`} className="expand-line">
+        <td
+          colSpan={4}
+          className={`${hasLinesBefore ? 'has-lines-before' : ''} ${hasLinesAfter ? 'has-lines-after' : ''}`}
+        >
+          {
+            typeof hideUnchangedLines !== 'boolean' && hideUnchangedLines.expandLineRenderer ? (
+              hideUnchangedLines.expandLineRenderer({
+                hasLinesBefore,
+                hasLinesAfter,
+                onExpandBefore: onExpandBefore(index),
+                onExpandAfter: onExpandAfter(index),
+                onExpandAll: onExpandAll(index),
+              })
+            ) : renderExpandLine(hasLinesBefore, hasLinesAfter, expandMoreLinesLimit, index)
+          }
+        </td>
+      </tr>
+    );
+  };
+
   return (
     <table
       className={`json-diff-viewer ${props.className || ''}`}
       style={props.style}
     >
+      {renderMeasureLine()}
       <tbody>
-        {linesLeft.map((_, index) => renderLine(index))}
+        {segmentsRef.current.map(renderSegment)}
       </tbody>
     </table>
   );
