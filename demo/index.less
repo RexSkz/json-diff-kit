@@ -84,3 +84,54 @@ a:visited {
     text-align: center;
   }
 }
+
+.toolbox {
+  .toggle {
+    font-family: monospace;
+    font-size: 14px;
+    margin-bottom: 1em;
+    user-select: none;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .inputs {
+    display: flex;
+    align-content: stretch;
+    width: 100%;
+
+    textarea {
+      border-radius: 4px;
+      flex: 1 1 auto;
+      height: 300px;
+      resize: vertical;
+      padding: 1em;
+    }
+  }
+
+  button {
+    margin: 1em 1em 0 0;
+    padding: 0.5em;
+  }
+
+  .error {
+    color: red;
+    font-size: 14px;
+  }
+
+  .viewer {
+    border: 1px solid;
+    border-radius: 4px;
+    margin-top: 1em;
+    padding: 1em;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid;
+    margin: 2em 0;
+  }
+}

@@ -6,6 +6,8 @@ import type { DifferOptions } from '../src/differ';
 import { InlineDiffOptions } from '../src/utils/get-inline-diff';
 import type { ViewerProps } from '../src/viewer';
 
+import Toolbox from './toolbox';
+
 import '../src/viewer.less';
 import './index.less';
 
@@ -95,6 +97,7 @@ const Demo: React.FC = () => {
         />
       </div>
       <p>A better JSON differ & viewer library written in TypeScript.</p>
+      <Toolbox />
       <h2>Differ Configuration</h2>
       <div className="diff-config">
         <form>
