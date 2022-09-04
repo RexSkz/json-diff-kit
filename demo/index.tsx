@@ -16,16 +16,19 @@ const Demo: React.FC = () => {
   const [maxDepth, setMaxDepth] = React.useState(Infinity);
   const [showModifications, setShowModifications] = React.useState(true);
   const [arrayDiffMethod, setArrayDiffMethod] = React.useState<DifferOptions['arrayDiffMethod']>('lcs');
+  const [ignoreCase, setIgnoreCase] = React.useState(false);
   const [indent, setIndent] = React.useState(4);
   const [highlightInlineDiff, setHighlightInlineDiff] = React.useState(true);
   const [inlineDiffMode, setInlineDiffMode] = React.useState<InlineDiffOptions['mode']>('word');
   const [inlineDiffSeparator, setInlineDiffSeparator] = React.useState(' ');
+  const [hideUnchangedLines, setHideUnchangedLines] = React.useState(true);
 
   const differ = React.useMemo(() => new Differ({
     detectCircular,
     maxDepth,
     showModifications,
     arrayDiffMethod,
+    ignoreCase,
   }), [detectCircular, maxDepth, showModifications, arrayDiffMethod]);
 
   const [before1] = React.useState({
@@ -78,6 +81,7 @@ const Demo: React.FC = () => {
       mode: inlineDiffMode,
       wordSeparator: inlineDiffSeparator || '',
     },
+    hideUnchangedLines,
   };
 
   return (
@@ -97,7 +101,6 @@ const Demo: React.FC = () => {
         />
       </div>
       <p>A better JSON differ & viewer library written in TypeScript.</p>
-      <Toolbox />
       <h2>Differ Configuration</h2>
       <div className="diff-config">
         <form>
@@ -110,13 +113,13 @@ const Demo: React.FC = () => {
               disabled={true}
             />
           </label>
-          <blockquote>Whether to detect circular reference in source objects before diff starts. Default is <code>true</code>. If you are confident for your data (e.g. from <code>JSON.parse</code> or an API response), you can set it to <code>false</code> to improve performance, but the algorithm may not stop if circular reference does show up.</blockquote>
+          <blockquote>Whether to detect circular reference in source objects before diff starts. Default is <code>true</code>. If you are confident about your data (maybe it's from <code>JSON.parse</code> or an API response), you can set it to <code>false</code> to improve performance, but the algorithm may not stop if circular reference does show up.</blockquote>
           <label htmlFor="max-depth">
             Max depth:
             <input
               type="number"
               id="max-depth"
-              value={maxDepth}
+              value={maxDepth === Infinity ? undefined : maxDepth}
               onChange={e => setMaxDepth(Number(e.target.value))}
               min={0}
               max={10}
@@ -125,14 +128,14 @@ const Demo: React.FC = () => {
               style={{ width: '3em' }}
             />
             <label htmlFor="max-depth-infinity" style={{ margin: '0 0 0 4px' }}>
-              (infinity
+              (
               <input
                 type="checkbox"
                 id="max-depth-infinity"
                 checked={maxDepth === Infinity}
                 onChange={e => setMaxDepth(e.target.checked ? Infinity : 0)}
               />
-              )
+              infinity)
             </label>
           </label>
           <blockquote>Max depth, default <code>Infinity</code> means no depth limit.</blockquote>
@@ -160,6 +163,16 @@ const Demo: React.FC = () => {
             </select>
           </label>
           <blockquote>The way to diff arrays, default is <code>"normal"</code>. You can change this value and see the examples below to see their differences.</blockquote>
+          <label htmlFor="ignore-case">
+            Ignore case:
+            <input
+              type="checkbox"
+              id="ignore-case"
+              checked={ignoreCase}
+              onChange={e => setIgnoreCase(e.target.checked)}
+            />
+          </label>
+          <blockquote>Whether to ignore case when comparing strings.</blockquote>
         </form>
       </div>
       <h2>Viewer Configuration</h2>
@@ -207,8 +220,19 @@ const Demo: React.FC = () => {
             />
           </label>
           <blockquote>You can control the inline diff behaviour. If the inline diff sources are sentences, we can diff them "by word" instead of "by character". For normal sentences, just set the method to <code>word</code> and the separator to <code>" "</code> (a half-width space) like this demo. But if you prefer the Git-style output, you can leave this props default, which is diffing "by character".</blockquote>
+          <label htmlFor="hide-unchanged-lines">
+            Hide unchanged lines:
+            <input
+              type="checkbox"
+              id="hide-unchanged-lines"
+              checked={hideUnchangedLines}
+              onChange={e => setHideUnchangedLines(e.target.checked)}
+            />
+          </label>
+          <blockquote>Whether to hide the unchanged lines (like what GitHub and GitLab does).</blockquote>
         </form>
       </div>
+      <Toolbox />
       <div className="diff-result">
         <h2>Examples</h2>
         <p>An regular example with 2 objects.</p>
@@ -220,7 +244,7 @@ const Demo: React.FC = () => {
         <p>2 variables with the same primitive type. The algorithm always returns the result "left is modified to right" (if <code>showModification</code> is set to <code>false</code>, it will return the result "left is removed, right is added").</p>
         <Viewer diff={diff4} {...viewerCommonProps} />
         <p>Most of the lines are equal, only small amount of lines are different. You can use the <code>hideUnchangedLines</code> prop to hide the unchanged parts and make the result shorter. Notice: when the <code>diff</code> prop is changed, the expand status will be reset, it's your responsibility to keep the <code>diff</code> props unchanged (you may want to use <code>useState</code> or <code>useMemo</code>).</p>
-        <Viewer diff={diff5} {...viewerCommonProps} hideUnchangedLines />
+        <Viewer diff={diff5} {...viewerCommonProps} />
       </div>
       <div className="demo-footer">
         <p>Made with ♥ by Rex Zeng</p>

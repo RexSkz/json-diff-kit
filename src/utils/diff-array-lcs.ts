@@ -4,6 +4,7 @@ import getType from './get-type';
 import stringify from './stringify';
 
 import type { DifferOptions, DiffResult } from '../differ';
+import isEqual from './is-equal';
 
 const lcs = (
   arrLeft: any[],
@@ -31,7 +32,7 @@ const lcs = (
         // algorithm should assume they are equal in order to diff recursively later
         f[i][j] = f[i - 1][j - 1] + 1;
         backtrack[i][j] = 'diag';
-      } else if (arrLeft[i - 1] === arrRight[j - 1]) {
+      } else if (isEqual(arrLeft[i - 1], arrRight[j - 1], options)) {
         f[i][j] = f[i - 1][j - 1] + 1;
         backtrack[i][j] = 'diag';
       } else if (f[i - 1][j] >= f[i][j - 1]) {

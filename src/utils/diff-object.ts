@@ -1,9 +1,9 @@
-import diffArrayLCS from './diff-array-lcs';
 import formatValue from './format-value';
 import getType from './get-type';
 import stringify from './stringify';
 
 import type { DifferOptions, DiffResult, ArrayDiffFunc } from '../differ';
+import sortStrings from './sort-strings';
 
 const diffObject = (
   lhs: Record<string, any>,
@@ -50,8 +50,8 @@ const diffObject = (
 
   const keysLeft = Object.keys(lhs);
   const keysRight = Object.keys(rhs);
-  keysLeft.sort();
-  keysRight.sort();
+  sortStrings(keysLeft, options);
+  sortStrings(keysRight, options);
 
   while (keysLeft.length || keysRight.length) {
     const keyLeft = keysLeft[0];

@@ -81,6 +81,10 @@ export interface DifferOptions {
    * ```
    */
   arrayDiffMethod?: 'normal' | 'lcs' | 'unorder-normal' | 'unorder-lcs';
+  /**
+   * Whether to ignore the case when comparing strings, default `false`.
+   */
+  ignoreCase?: boolean;
 }
 
 export interface DiffResult {
@@ -196,8 +200,8 @@ class Differ {
       this.options.arrayDiffMethod === 'unorder-normal'
       || this.options.arrayDiffMethod === 'unorder-lcs'
     ) {
-      sourceLeft = sortInnerArrays(sourceLeft);
-      sourceRight = sortInnerArrays(sourceRight);
+      sourceLeft = sortInnerArrays(sourceLeft, this.options);
+      sourceRight = sortInnerArrays(sourceRight, this.options);
     }
 
     let resultLeft: DiffResult[] = [];
@@ -231,7 +235,16 @@ class Differ {
     } else if (typeLeft === 'array') {
       [resultLeft, resultRight] = this.arrayDiffFunc(sourceLeft, sourceRight, '', '', 0, this.options);
     } else if (sourceLeft !== sourceRight) {
-      if (this.options.showModifications) {
+      if (this.options.ignoreCase) {
+        if (
+          typeof sourceLeft === 'string' &&
+          typeof sourceRight === 'string' &&
+          sourceLeft.toLowerCase() === sourceRight.toLowerCase()
+        ) {
+          resultLeft = [{ level: 0, type: 'equal', text: sourceLeft }];
+          resultRight = [{ level: 0, type: 'equal', text: sourceRight }];
+        }
+      } else if (this.options.showModifications) {
         resultLeft = [{ level: 0, type: 'modify', text: stringify(sourceLeft, null, null, this.options.maxDepth) }];
         resultRight = [{ level: 0, type: 'modify', text: stringify(sourceRight, null, null, this.options.maxDepth) }];
       } else {
