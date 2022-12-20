@@ -28,7 +28,7 @@ const getOrderByType = (value: any) => {
  *   - For boolean, number, string: use the `<` sign.
  *   - For array and object: preserve the original order (or do we have a better idea?)
  */
-const cmp = (a: any, b: any, options: DifferOptions) => {
+const cmp = (a: any, b: any, options?: DifferOptions) => {
   const orderByTypeA = getOrderByType(a);
   const orderByTypeB = getOrderByType(b);
 
@@ -44,7 +44,7 @@ const cmp = (a: any, b: any, options: DifferOptions) => {
     case 'number':
       return a - b;
     case 'string':
-      if (options.ignoreCase) {
+      if (options?.ignoreCase) {
         return a.toLowerCase().localeCompare(b.toLowerCase());
       }
       return a.localeCompare(b);
