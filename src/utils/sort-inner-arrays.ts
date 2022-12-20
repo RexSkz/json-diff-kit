@@ -1,7 +1,7 @@
 import type { DifferOptions } from '../differ';
 import cmp from './cmp';
 
-const sortInnerArrays = (source: any, options: DifferOptions) => {
+const sortInnerArrays = (source: any, options?: DifferOptions) => {
   if (!source || typeof source !== 'object') {
     return source;
   }
