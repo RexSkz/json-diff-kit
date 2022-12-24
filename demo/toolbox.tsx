@@ -1,17 +1,19 @@
 import React from 'react';
-import { Differ, DiffResult, Viewer } from '../src';
+import { Differ, DifferOptions, DiffResult, Viewer, ViewerProps } from '../src';
 
-const differ = new Differ({
-  detectCircular: false,
-  arrayDiffMethod: 'lcs',
-});
+interface ToolboxProps {
+  differOptions: DifferOptions;
+  viewerProps: Omit<ViewerProps, 'diff'>;
+}
 
-const Toolbox: React.FC = () => {
+const Toolbox: React.FC<ToolboxProps> = props => {
   const [expand, setExpand] = React.useState(false);
   const [before, setBefore] = React.useState('');
   const [after, setAfter] = React.useState('');
   const [error, setError] = React.useState('');
   const [diffResult, setDiffResult] = React.useState<readonly [DiffResult[], DiffResult[]]>([[], []]);
+
+  const differ = React.useMemo(() => new Differ(props.differOptions), [props.differOptions]);
 
   const diff = (before: string, after: string) => {
     setError('');
@@ -55,6 +57,7 @@ const Toolbox: React.FC = () => {
                   highlightInlineDiff={true}
                   inlineDiffOptions={{ mode: 'word' }}
                   hideUnchangedLines={true}
+                  {...props.viewerProps}
                 />
               )
             }

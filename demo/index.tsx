@@ -12,24 +12,36 @@ import '../src/viewer.less';
 import './index.less';
 
 const Demo: React.FC = () => {
+  // differ props
   const [detectCircular] = React.useState(true);
   const [maxDepth, setMaxDepth] = React.useState(Infinity);
   const [showModifications, setShowModifications] = React.useState(true);
   const [arrayDiffMethod, setArrayDiffMethod] = React.useState<DifferOptions['arrayDiffMethod']>('lcs');
   const [ignoreCase, setIgnoreCase] = React.useState(false);
+  const [recursiveEqual, setRecursiveEqual] = React.useState(false);
+
+  // viewer props
   const [indent, setIndent] = React.useState(4);
   const [highlightInlineDiff, setHighlightInlineDiff] = React.useState(true);
   const [inlineDiffMode, setInlineDiffMode] = React.useState<InlineDiffOptions['mode']>('word');
   const [inlineDiffSeparator, setInlineDiffSeparator] = React.useState(' ');
   const [hideUnchangedLines, setHideUnchangedLines] = React.useState(true);
 
-  const differ = React.useMemo(() => new Differ({
+  const differOptions = React.useMemo(() => ({
     detectCircular,
     maxDepth,
     showModifications,
     arrayDiffMethod,
     ignoreCase,
-  }), [detectCircular, maxDepth, showModifications, arrayDiffMethod]);
+    recursiveEqual,
+  }), [
+    detectCircular,
+    maxDepth,
+    showModifications,
+    arrayDiffMethod,
+    recursiveEqual,
+  ]);
+  const differ = React.useMemo(() => new Differ(differOptions), [differOptions]);
 
   const [before1] = React.useState({
     a: 1,
@@ -72,6 +84,16 @@ const Demo: React.FC = () => {
   const [before5] = React.useState([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]);
   const [after5] = React.useState([0, 1, 2, 3, 4, 5, 6, 7, 8, 99, 10, 11, 12, 13, 14, 15, 16, 17, 1818, 1919, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]);
   const diff5 = React.useMemo(() => differ.diff(before5, after5), [differ, before5, after5]);
+
+  const [before6] = React.useState([
+    { text: 'hello world' },
+  ]);
+  const [after6] = React.useState([
+    { text: 'above' },
+    { text: 'hello world' },
+    { text: 'below' },
+  ]);
+  const diff6 = React.useMemo(() => differ.diff(before6, after6), [differ, before6, after6]);
 
   const viewerCommonProps: Partial<ViewerProps> = {
     indent: indent,
@@ -173,6 +195,16 @@ const Demo: React.FC = () => {
             />
           </label>
           <blockquote>Whether to ignore case when comparing strings.</blockquote>
+          <label htmlFor="recursive-equal">
+            Recursive equal:
+            <input
+              type="checkbox"
+              id="recursive-equal"
+              checked={recursiveEqual}
+              onChange={e => setRecursiveEqual(e.target.checked)}
+            />
+          </label>
+          <blockquote>Whether to use recursive equal to compare objects. This can provide a better output when there are unchanged object items in an array, but it may cause performance issues when the data is very large.</blockquote>
         </form>
       </div>
       <h2>Viewer Configuration</h2>
@@ -232,7 +264,10 @@ const Demo: React.FC = () => {
           <blockquote>Whether to hide the unchanged lines (like what GitHub and GitLab does).</blockquote>
         </form>
       </div>
-      <Toolbox />
+      <Toolbox
+        differOptions={differOptions}
+        viewerProps={viewerCommonProps}
+      />
       <div className="diff-result">
         <h2>Examples</h2>
         <p>An regular example with 2 objects.</p>
@@ -245,6 +280,8 @@ const Demo: React.FC = () => {
         <Viewer diff={diff4} {...viewerCommonProps} />
         <p>Most of the lines are equal, only small amount of lines are different. You can use the <code>hideUnchangedLines</code> prop to hide the unchanged parts and make the result shorter. Notice: when the <code>diff</code> prop is changed, the expand status will be reset, it's your responsibility to keep the <code>diff</code> props unchanged (you may want to use <code>useState</code> or <code>useMemo</code>).</p>
         <Viewer diff={diff5} {...viewerCommonProps} />
+        <p>An example for the recursive equal. If the differ option <code>recursiveEqual</code> is set to <code>true</code>, the object items should be treated as equal.</p>
+        <Viewer diff={diff6} {...viewerCommonProps} />
       </div>
       <div className="demo-footer">
         <p>Made with ♥ by Rex Zeng</p>

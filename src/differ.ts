@@ -85,6 +85,23 @@ export interface DifferOptions {
    * Whether to ignore the case when comparing strings, default `false`.
    */
   ignoreCase?: boolean;
+  /**
+   * Whether to use recursive equal to compare objects, default `false`.
+   *
+   * This will only applied to objects, not arrays.
+   *
+   * Two objects are considered equal if they have the same properties and values, for example:
+   *
+   * ```js
+   * const x = { 'a': 1, 'b': 2 };
+   * const y = { 'b': 2, 'a': 1 };
+   * ```
+   *
+   * The `x` and `y` here will be considered equal.
+   *
+   * This comparation process is slow in huge objects.
+  */
+  recursiveEqual?: boolean;
 }
 
 export interface DiffResult {
@@ -114,12 +131,14 @@ class Differ {
     maxDepth = Infinity,
     showModifications = true,
     arrayDiffMethod = 'normal',
+    recursiveEqual = false,
   }: DifferOptions = {}) {
     this.options = {
       detectCircular,
       maxDepth,
       showModifications,
       arrayDiffMethod,
+      recursiveEqual,
     };
     this.arrayDiffFunc = arrayDiffMethod === 'lcs' || arrayDiffMethod === 'unorder-lcs'
       ? diffArrayLCS

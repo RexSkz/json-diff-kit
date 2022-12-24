@@ -5,6 +5,7 @@ import stringify from './stringify';
 
 import type { DifferOptions, DiffResult } from '../differ';
 import isEqual from './is-equal';
+import shallowSimilarity from './shallow-similarity';
 
 const lcs = (
   arrLeft: any[],
@@ -28,10 +29,26 @@ const lcs = (
       const typeI = getType(arrLeft[i - 1]);
       const typeJ = getType(arrRight[j - 1]);
       if (typeI === typeJ && (typeI === 'array' || typeI === 'object')) {
-        // this is a diff-specific logic, when 2 values are both arrays or both objects, the
-        // algorithm should assume they are equal in order to diff recursively later
-        f[i][j] = f[i - 1][j - 1] + 1;
-        backtrack[i][j] = 'diag';
+        if (options.recursiveEqual) {
+          if (
+            isEqual(arrLeft[i - 1], arrRight[j - 1], options) ||
+            shallowSimilarity(arrLeft[i - 1], arrRight[j - 1]) > 0.5
+          ) {
+            f[i][j] = f[i - 1][j - 1] + 1;
+            backtrack[i][j] = 'diag';
+          } else if (f[i - 1][j] >= f[i][j - 1]) {
+            f[i][j] = f[i - 1][j];
+            backtrack[i][j] = 'up';
+          } else {
+            f[i][j] = f[i][j - 1];
+            backtrack[i][j] = 'left';
+          }
+        } else {
+          // this is a diff-specific logic, when 2 values are both arrays or both objects, the
+          // algorithm should assume they are equal in order to diff recursively later
+          f[i][j] = f[i - 1][j - 1] + 1;
+          backtrack[i][j] = 'diag';
+        }
       } else if (isEqual(arrLeft[i - 1], arrRight[j - 1], options)) {
         f[i][j] = f[i - 1][j - 1] + 1;
         backtrack[i][j] = 'diag';
@@ -54,7 +71,14 @@ const lcs = (
   while (i > 0 || j > 0) {
     if (backtrack[i][j] === 'diag') {
       const type = getType(arrLeft[i - 1]);
-      if (type === 'array') {
+      if (
+        options.recursiveEqual &&
+        (type === 'array' || type === 'object') &&
+        isEqual(arrLeft[i - 1], arrRight[j - 1], options)
+      ) {
+        tLeft.unshift({ level: level + 1, type: 'equal', text: formatValue(arrLeft[i - 1]) });
+        tRight.unshift({ level: level + 1, type: 'equal', text: formatValue(arrRight[j - 1]) });
+      } else if (type === 'array') {
         const [l, r] = diffArrayLCS(arrLeft[i - 1], arrRight[j - 1], keyLeft, keyRight, level + 2, options);
         tLeft.unshift(...l);
         tRight.unshift(...r);

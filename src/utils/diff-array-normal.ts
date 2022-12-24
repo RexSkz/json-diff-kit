@@ -1,6 +1,7 @@
 import formatValue from './format-value';
 import diffObject from './diff-object';
 import getType from './get-type';
+import isEqual from './is-equal';
 
 import type { DiffResult, DifferOptions } from '../differ';
 
@@ -31,13 +32,22 @@ const diffArrayNormal = (
     while (arrLeft.length || arrRight.length) {
       const itemLeft = arrLeft[0];
       const itemRight = arrRight[0];
+      const leftType = getType(itemLeft);
+      const rightType = getType(itemRight);
       if (arrLeft.length && arrRight.length) {
-        if (getType(itemLeft) !== getType(itemRight)) {
+        if (leftType !== rightType) {
           linesLeft.push({ level: level + 1, type: 'remove', text: formatValue(itemLeft) });
           linesLeft.push({ level, type: 'equal', text: '' });
           linesRight.push({ level, type: 'equal', text: '' });
           linesRight.push({ level: level + 1, type: 'add', text: formatValue(itemRight) });
-        } else if (getType(itemLeft) === 'object') {
+        } else if (
+          options.recursiveEqual &&
+          ['object', 'array'].includes(leftType) &&
+          isEqual(itemLeft, itemRight, options)
+        ) {
+          linesLeft.push({ level: level + 1, type: 'equal', text: formatValue(itemLeft) });
+          linesRight.push({ level: level + 1, type: 'equal', text: formatValue(itemRight) });
+        } else if (leftType === 'object') {
           linesLeft.push({ level: level + 1, type: 'equal', text: '{' });
           linesRight.push({ level: level + 1, type: 'equal', text: '{' });
           const [leftLines, rightLines] = diffObject(itemLeft, itemRight, level + 2, options, diffArrayNormal);
@@ -45,7 +55,7 @@ const diffArrayNormal = (
           linesRight.push(...rightLines);
           linesLeft.push({ level: level + 1, type: 'equal', text: '}' });
           linesRight.push({ level: level + 1, type: 'equal', text: '}' });
-        } else if (getType(itemLeft) === 'array') {
+        } else if (leftType === 'array') {
           const [resLeft, resRight] = diffArrayNormal(itemLeft, itemRight, '', '', level + 2, options, [], []);
           linesLeft.push(...resLeft);
           linesRight.push(...resRight);
