@@ -59,8 +59,8 @@ const diffObject = (
 
     if (keyLeft === keyRight) {
       if (getType(lhs[keyLeft]) !== getType(rhs[keyRight])) {
-        const _resultLeft = formatValue(lhs[keyLeft]).split('\n');
-        const _resultRight = formatValue(rhs[keyRight]).split('\n');
+        const _resultLeft = formatValue(lhs[keyLeft], options.maxDepth, true).split('\n');
+        const _resultRight = formatValue(rhs[keyRight], options.maxDepth, true).split('\n');
         if (options.showModifications) {
           const maxLines = Math.max(_resultLeft.length, _resultRight.length);
           for (let i = _resultLeft.length; i < maxLines; i++) {
@@ -138,17 +138,17 @@ const diffObject = (
       } else {
         if (lhs[keyLeft] !== rhs[keyRight]) {
           if (options.showModifications) {
-            linesLeft.push({ level, type: 'modify', text: `"${keyLeft}": ${formatValue(lhs[keyLeft])}` });
-            linesRight.push({ level, type: 'modify', text: `"${keyRight}": ${formatValue(rhs[keyRight])}` });
+            linesLeft.push({ level, type: 'modify', text: `"${keyLeft}": ${formatValue(lhs[keyLeft], options.maxDepth)}` });
+            linesRight.push({ level, type: 'modify', text: `"${keyRight}": ${formatValue(rhs[keyRight], options.maxDepth)}` });
           } else {
-            linesLeft.push({ level, type: 'remove', text: `"${keyLeft}": ${formatValue(lhs[keyLeft])}` });
+            linesLeft.push({ level, type: 'remove', text: `"${keyLeft}": ${formatValue(lhs[keyLeft], options.maxDepth)}` });
             linesLeft.push({ level, type: 'equal', text: '' });
             linesRight.push({ level, type: 'equal', text: '' });
-            linesRight.push({ level, type: 'add', text: `"${keyRight}": ${formatValue(rhs[keyRight])}` });
+            linesRight.push({ level, type: 'add', text: `"${keyRight}": ${formatValue(rhs[keyRight], options.maxDepth)}` });
           }
         } else {
-          linesLeft.push({ level, type: 'equal', text: `"${keyLeft}": ${formatValue(lhs[keyLeft])}` });
-          linesRight.push({ level, type: 'equal', text: `"${keyRight}": ${formatValue(rhs[keyRight])}` });
+          linesLeft.push({ level, type: 'equal', text: `"${keyLeft}": ${formatValue(lhs[keyLeft], options.maxDepth)}` });
+          linesRight.push({ level, type: 'equal', text: `"${keyRight}": ${formatValue(rhs[keyRight], options.maxDepth)}` });
         }
       }
     } else if (keysLeft.length && keysRight.length) {
