@@ -94,7 +94,11 @@ const diffObject = (
         } else {
           linesLeft.push({ level, type: 'remove', text: `"${keyLeft}": ${_resultLeft[0]}` });
           for (let i = 1; i < _resultLeft.length; i++) {
-            linesLeft.push({ level: level + (_resultLeft[i].match(/^\s+/)?.[0]?.length || 0), type: 'remove', text: _resultLeft[i] });
+            linesLeft.push({
+              level: level + (_resultLeft[i].match(/^\s+/)?.[0]?.length || 0),
+              type: 'remove',
+              text: _resultLeft[i].replace(/^\s+/, '').replace(/,$/g, ''),
+            });
           }
           for (let i = 0; i < _resultRight.length; i++) {
             linesLeft.push({ level, type: 'equal', text: '' });
@@ -104,7 +108,11 @@ const diffObject = (
           }
           linesRight.push({ level, type: 'add', text: `"${keyRight}": ${_resultRight[0]}` });
           for (let i = 1; i < _resultRight.length; i++) {
-            linesRight.push({ level: level + (_resultRight[i].match(/^\s+/)?.[0]?.length || 0), type: 'add', text: _resultRight[i] });
+            linesRight.push({
+              level: level + (_resultRight[i].match(/^\s+/)?.[0]?.length || 0),
+              type: 'add',
+              text: _resultRight[i].replace(/^\s+/, '').replace(/,$/g, ''),
+            });
           }
         }
       } else if (Array.isArray(lhs[keyLeft])) {
