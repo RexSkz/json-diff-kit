@@ -14,8 +14,8 @@ describe('Utility function: formatValue', () => {
   });
 
   it('should work for array & object', () => {
-    expect(formatValue([1, 2, '3'])).toBe('[1,2,"3"]');
-    expect(formatValue({ a: 1, b: ['2', true] })).toBe('{"a":1,"b":["2",true]}');
+    expect(formatValue([1, 2, '3'])).toBe('[\n 1,\n 2,\n "3"\n]');
+    expect(formatValue({ a: 1, b: ['2', true] })).toBe('{\n "a": 1,\n "b": [\n  "2",\n  true\n ]\n}');
   });
 
   it('should escape the characters when necessary for better display', () => {

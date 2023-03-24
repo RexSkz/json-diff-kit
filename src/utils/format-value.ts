@@ -5,7 +5,7 @@ const formatValue = (value: any, depth = Infinity) => {
     return 'null';
   }
   if (Array.isArray(value) || typeof value === 'object') {
-    return stringify(value, null, null, depth);
+    return stringify(value, null, 1, depth);
   }
   if (typeof value === 'string') {
     return stringify(value);
