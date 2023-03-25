@@ -1,0 +1,164 @@
+.playground {
+  display: flex;
+  height: 100vh;
+  background: #fff;
+
+  .layout-left,
+  .layout-right {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  .layout-left {
+    flex: 0 0 300px;
+    border-right: 1px solid #ecf0f4;
+    padding: 0 16px;
+    overflow-y: auto;
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 0 8px;
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    .back {
+      background: #000;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 4px;
+      text-align: center;
+      cursor: pointer;
+
+      &:hover {
+        background: #333;
+        text-decoration: underline;
+      }
+    }
+
+    .config {
+      margin-top: 16px;
+
+      legend {
+        color: rgba(0, 0, 0, 0.5);
+        margin: 16px 0 8px;
+      }
+
+      label {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+
+        & > span:first-child {
+          margin-right: auto;
+        }
+
+        input,
+        select {
+          height: 20px;
+          box-sizing: border-box;
+          font-size: 14px;
+          max-width: 120px;
+        }
+
+        input[type=checkbox] {
+          margin: 0;
+        }
+      }
+    }
+
+    pre {
+      margin: 0 -16px;
+      padding: 8px 16px;
+      background: #f5f6f9;
+      font-size: 12px;
+    }
+
+    .statistics {
+      position: sticky;
+      bottom: 0;
+      margin: auto -16px 0;
+      padding: 16px;
+      display: flex;
+      background: #fff;
+    }
+  }
+
+  .layout-right {
+    flex: 1;
+
+    .title {
+      padding: 8px 16px;
+      color: rgba(0, 0, 0, 0.5);
+
+      .control-button {
+        margin-left: 4px;
+        padding: 0 4px;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .error {
+      margin-left: 8px;
+      color: red;
+    }
+
+    .inputs,
+    .results {
+      flex: 1;
+    }
+
+    .inputs {
+      display: flex;
+      border-top: 1px solid #ecf0f4;
+      border-bottom: 1px solid #ecf0f4;
+
+      textarea {
+        position: relative;
+        flex: 1;
+        height: 100%;
+        padding: 16px;
+        box-sizing: border-box;
+        font-size: 14px;
+        line-height: 1.5;
+        border: none;
+        outline: none;
+        resize: none;
+        font-family: monospace;
+        transition: all 0.3s;
+
+        &:first-child {
+          border-right: 1px solid #ecf0f4;
+        }
+
+        &:focus {
+          z-index: 1;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+      }
+
+      &:focus-within textarea {
+        border-color: transparent;
+      }
+    }
+
+    .results {
+      overflow-y: auto;
+      border-top: 1px solid #ecf0f4;
+    }
+
+    &.layout-right-fullscreen {
+      .title:first-child,
+      .inputs {
+        display: none;
+      }
+    }
+  }
+}
