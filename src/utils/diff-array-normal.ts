@@ -1,3 +1,4 @@
+import concat from './concat';
 import formatValue from './format-value';
 import diffObject from './diff-object';
 import getType from './get-type';
@@ -51,14 +52,14 @@ const diffArrayNormal = (
           linesLeft.push({ level: level + 1, type: 'equal', text: '{' });
           linesRight.push({ level: level + 1, type: 'equal', text: '{' });
           const [leftLines, rightLines] = diffObject(itemLeft, itemRight, level + 2, options, diffArrayNormal);
-          linesLeft.push(...leftLines);
-          linesRight.push(...rightLines);
+          linesLeft = concat(linesLeft, leftLines);
+          linesRight = concat(linesRight, rightLines);
           linesLeft.push({ level: level + 1, type: 'equal', text: '}' });
           linesRight.push({ level: level + 1, type: 'equal', text: '}' });
         } else if (leftType === 'array') {
           const [resLeft, resRight] = diffArrayNormal(itemLeft, itemRight, '', '', level + 2, options, [], []);
-          linesLeft.push(...resLeft);
-          linesRight.push(...resRight);
+          linesLeft = concat(linesLeft, resLeft);
+          linesRight = concat(linesRight, resRight);
         } else if (itemLeft === itemRight) {
           linesLeft.push({ level: level + 1, type: 'equal', text: formatValue(itemLeft) });
           linesRight.push({ level: level + 1, type: 'equal', text: formatValue(itemRight) });

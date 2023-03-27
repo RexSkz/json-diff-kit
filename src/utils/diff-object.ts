@@ -1,9 +1,10 @@
+import concat from './concat';
 import formatValue from './format-value';
 import getType from './get-type';
+import sortStrings from './sort-strings';
 import stringify from './stringify';
 
 import type { DifferOptions, DiffResult, ArrayDiffFunc } from '../differ';
-import sortStrings from './sort-strings';
 
 const diffObject = (
   lhs: Record<string, any>,
@@ -19,8 +20,8 @@ const diffObject = (
     ];
   }
 
-  const linesLeft: DiffResult[] = [];
-  const linesRight: DiffResult[] = [];
+  let linesLeft: DiffResult[] = [];
+  let linesRight: DiffResult[] = [];
 
   if (lhs === null && rhs === null || lhs === undefined && rhs === undefined) {
     return [linesLeft, linesRight];
@@ -119,8 +120,8 @@ const diffObject = (
         const arrLeft = [...lhs[keyLeft]];
         const arrRight = [...rhs[keyRight]];
         const [resLeft, resRight] = arrayDiffFunc(arrLeft, arrRight, keyLeft, keyRight, level, options, [], []);
-        linesLeft.push(...resLeft);
-        linesRight.push(...resRight);
+        linesLeft = concat(linesLeft, resLeft);
+        linesRight = concat(linesRight, resRight);
       } else if (typeof lhs[keyLeft] === 'object') {
         const result = diffObject(
           lhs[keyLeft],
@@ -130,10 +131,10 @@ const diffObject = (
           arrayDiffFunc,
         );
         linesLeft.push({ level, type: 'equal', text: `"${keyLeft}": {` });
-        linesLeft.push(...result[0]);
+        linesLeft = concat(linesLeft, result[0]);
         linesLeft.push({ level, type: 'equal', text: '}' });
         linesRight.push({ level, type: 'equal', text: `"${keyRight}": {` });
-        linesRight.push(...result[1]);
+        linesRight = concat(linesRight, result[1]);
         linesRight.push({ level, type: 'equal', text: '}' });
       } else {
         if (lhs[keyLeft] !== rhs[keyRight]) {

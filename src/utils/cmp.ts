@@ -45,9 +45,10 @@ const cmp = (a: any, b: any, options?: DifferOptions) => {
       return a - b;
     case 'string':
       if (options?.ignoreCase) {
-        return a.toLowerCase().localeCompare(b.toLowerCase());
+        a = a.toLowerCase();
+        b = b.toLowerCase();
       }
-      return a.localeCompare(b);
+      return a < b ? -1 : a > b ? 1 : 0;
     case 'boolean':
       return (+a) - (+b);
   }

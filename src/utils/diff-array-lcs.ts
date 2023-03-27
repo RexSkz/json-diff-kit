@@ -6,6 +6,7 @@ import stringify from './stringify';
 import type { DifferOptions, DiffResult } from '../differ';
 import isEqual from './is-equal';
 import shallowSimilarity from './shallow-similarity';
+import concat from './concat';
 
 const lcs = (
   arrLeft: any[],
@@ -64,8 +65,8 @@ const lcs = (
 
   let i = arrLeft.length;
   let j = arrRight.length;
-  const tLeft: DiffResult[] = [];
-  const tRight: DiffResult[] = [];
+  let tLeft: DiffResult[] = [];
+  let tRight: DiffResult[] = [];
   // this is a backtracking process, all new lines should be unshifted to the result, not
   // pushed to the result
   while (i > 0 || j > 0) {
@@ -80,14 +81,14 @@ const lcs = (
         tRight.unshift({ level: level + 1, type: 'equal', text: formatValue(arrRight[j - 1]) });
       } else if (type === 'array') {
         const [l, r] = diffArrayLCS(arrLeft[i - 1], arrRight[j - 1], keyLeft, keyRight, level + 2, options);
-        tLeft.unshift(...l);
-        tRight.unshift(...r);
+        tLeft = concat(tLeft, l, true);
+        tRight = concat(tRight, r, true);
       } else if (type === 'object') {
         const [l, r] = diffObject(arrLeft[i - 1], arrRight[j - 1], level + 2, options, diffArrayLCS);
         tLeft.unshift({ level: level + 1, type: 'equal', text: '}' });
         tRight.unshift({ level: level + 1, type: 'equal', text: '}' });
-        tLeft.unshift(...l);
-        tRight.unshift(...r);
+        tLeft = concat(tLeft, l, true);
+        tRight = concat(tRight, r, true);
         tLeft.unshift({ level: level + 1, type: 'equal', text: '{' });
         tRight.unshift({ level: level + 1, type: 'equal', text: '{' });
       } else {
@@ -154,8 +155,8 @@ const diffArrayLCS = (
     linesRight.push({ level: level + 1, type: 'equal', text: '...' });
   } else {
     const [tLeftReverse, tRightReverse] = lcs(arrLeft, arrRight, keyLeft, keyRight, level, options);
-    linesLeft.push(...tLeftReverse);
-    linesRight.push(...tRightReverse);
+    linesLeft = concat(linesLeft, tLeftReverse);
+    linesRight = concat(linesRight, tRightReverse);;
   }
 
   linesLeft.push({ level, type: 'equal', text: ']' });

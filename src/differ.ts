@@ -1,3 +1,4 @@
+import concat from './utils/concat';
 import detectCircular from './utils/detect-circular';
 import diffArrayLCS from './utils/diff-array-lcs';
 import diffArrayNormal from './utils/diff-array-normal';
@@ -122,6 +123,10 @@ export type ArrayDiffFunc = (
   ...args: any[]
 ) => [DiffResult[], DiffResult[]];
 
+const EQUAL_EMPTY_LINE: DiffResult = { level: 0, type: 'equal', text: '' };
+const EQUAL_LEFT_BRACKET_LINE: DiffResult = { level: 0, type: 'equal', text: '{' };
+const EQUAL_RIGHT_BRACKET_LINE: DiffResult = { level: 0, type: 'equal', text: '}' };
+
 class Differ {
   private options: DifferOptions;
   private arrayDiffFunc: ArrayDiffFunc;
@@ -243,14 +248,14 @@ class Differ {
       }));
       const lLength = resultLeft.length;
       const rLength = resultRight.length;
-      resultLeft.push(...Array(rLength).fill({ level: 0, type: 'equal', text: '' }));
-      resultRight.unshift(...Array(lLength).fill({ level: 0, type: 'equal', text: '' }));
+      resultLeft = concat(resultLeft, Array(rLength).fill(EQUAL_EMPTY_LINE));
+      resultRight = concat(resultRight, Array(lLength).fill(EQUAL_EMPTY_LINE), true);
     } else if (typeLeft === 'object') {
       [resultLeft, resultRight] = diffObject(sourceLeft, sourceRight, 1, this.options, this.arrayDiffFunc);
-      resultLeft.unshift({ level: 0, type: 'equal', text: '{' });
-      resultLeft.push({ level: 0, type: 'equal', text: '}' });
-      resultRight.unshift({ level: 0, type: 'equal', text: '{' });
-      resultRight.push({ level: 0, type: 'equal', text: '}' });
+      resultLeft.unshift(EQUAL_LEFT_BRACKET_LINE);
+      resultLeft.push(EQUAL_RIGHT_BRACKET_LINE);
+      resultRight.unshift(EQUAL_LEFT_BRACKET_LINE);
+      resultRight.push(EQUAL_RIGHT_BRACKET_LINE);
     } else if (typeLeft === 'array') {
       [resultLeft, resultRight] = this.arrayDiffFunc(sourceLeft, sourceRight, '', '', 0, this.options);
     } else if (sourceLeft !== sourceRight) {
@@ -269,10 +274,10 @@ class Differ {
       } else {
         resultLeft = [
           { level: 0, type: 'remove', text: stringify(sourceLeft, null, null, this.options.maxDepth) },
-          { level: 0, type: 'equal', text: '' },
+          EQUAL_EMPTY_LINE,
         ];
         resultRight = [
-          { level: 0, type: 'equal', text: '' },
+          EQUAL_EMPTY_LINE,
           { level: 0, type: 'add', text: stringify(sourceRight, null, null, this.options.maxDepth) },
         ];
       }
