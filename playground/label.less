@@ -1,0 +1,45 @@
+.label {
+  &-wrapper {
+    position: relative;
+    margin-right: 4px;
+  }
+
+  &-question-mark {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 14px;
+    height: 14px;
+    box-sizing: border-box;
+    border: 1px solid;
+    border-radius: 50%;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  &-tip {
+    display: none;
+  }
+
+  &-wrapper:hover &-question-mark {
+    background: #000;
+    border-color: #000;
+    color: #fff;
+  }
+
+  &-wrapper:hover &-tip {
+    display: block;
+    position: absolute;
+    top: 100%;
+    width: 268px;
+    padding: 8px 16px;
+    box-sizing: border-box;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    line-height: 1.5;
+    color: #333;
+    font-size: 12px;
+    z-index: 1;
+  }
+}

@@ -104,7 +104,7 @@ The result is here:
 
 ## More Complex Usages
 
-Please check the [demo page](https://json-diff-kit.js.org/), where you can adjust nearly all parameters and see the result.
+Please check the [playground page](https://json-diff-kit.js.org/), where you can adjust nearly all parameters and see the result.
 
 ## Algorithm Details
 
@@ -115,9 +115,11 @@ Please refer to the article [JSON Diff Kit: A Combination of Several Simple Algo
 - [x] Provide a `Differ` class and a `Viewer` component
 - [x] Merge "remove & add" at the same place as a modification
 - [x] Support inline diffing by word instead of by character
-- [ ] Generate code directly in the demo page
+- [x] Generate code directly in the demo page (covered by playground)
 - [ ] Add CLI tool
 - [ ] Improve unit tests
+- [ ] Optimise `Viewer` performance by adding virtual scrolling
+- [ ] Provide a Vue version of `Viewer`
 
 ## License
 

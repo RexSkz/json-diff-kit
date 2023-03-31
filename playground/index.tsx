@@ -7,13 +7,12 @@ import { InlineDiffOptions } from '../src/utils/get-inline-diff';
 import type { ViewerProps } from '../src/viewer';
 
 import Playground from './playground';
-import Toolbox from './toolbox';
 
 import '../src/viewer.less';
 import './index.less';
 
 const Index: React.FC = () => {
-  const [usePlayground, setUsePlayground] = React.useState(!!window.location.hash);
+  const [usePlayground, setUsePlayground] = React.useState(true);
 
   // differ props
   const [detectCircular] = React.useState(true);
@@ -21,7 +20,7 @@ const Index: React.FC = () => {
   const [showModifications, setShowModifications] = React.useState(true);
   const [arrayDiffMethod, setArrayDiffMethod] = React.useState<DifferOptions['arrayDiffMethod']>('lcs');
   const [ignoreCase, setIgnoreCase] = React.useState(false);
-  const [recursiveEqual, setRecursiveEqual] = React.useState(false);
+  const [recursiveEqual, setRecursiveEqual] = React.useState(true);
 
   // viewer props
   const [indent, setIndent] = React.useState(4);
@@ -191,7 +190,7 @@ const Index: React.FC = () => {
                 <option value="unorder-lcs">unorder-lcs</option>
               </select>
             </label>
-            <blockquote>The way to diff arrays, default is <code>"normal"</code>. You can change this value and see the examples below to see their differences.</blockquote>
+            <blockquote>The way to diff arrays, default is <code>"normal"</code>, using <code>"lcs"</code> may get a better result but much slower. <code>"unorder-normal"</code> and <code>"unorder-lcs"</code> are for unordered arrays (the order of elements in the array doesn't matter).</blockquote>
             <label htmlFor="ignore-case">
               Ignore case:
               <input
@@ -201,7 +200,7 @@ const Index: React.FC = () => {
                 onChange={e => setIgnoreCase(e.target.checked)}
               />
             </label>
-            <blockquote>Whether to ignore case when comparing strings.</blockquote>
+            <blockquote>Whether to ignore case when comparing string values.</blockquote>
             <label htmlFor="recursive-equal">
               Recursive equal:
               <input
@@ -228,7 +227,7 @@ const Index: React.FC = () => {
                 onChange={e => setIndent(Number(e.target.value))}
               />
             </label>
-            <blockquote>Controls the indent to the <code>&lt;Viewer&gt;</code> component.</blockquote>
+            <blockquote>Controls the indent in the <code>&lt;Viewer&gt;</code> component.</blockquote>
             <label htmlFor="highlight-inline-diff">
               Highlight Inline Diff:
               <input
@@ -271,10 +270,6 @@ const Index: React.FC = () => {
             <blockquote>Whether to hide the unchanged lines (like what GitHub and GitLab does).</blockquote>
           </form>
         </div>
-        <Toolbox
-          differOptions={differOptions}
-          viewerProps={viewerCommonProps}
-        />
         <div className="diff-result">
           <h2>Examples</h2>
           <p>An regular example with 2 objects.</p>

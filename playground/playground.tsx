@@ -4,8 +4,12 @@ import debounce from 'lodash/debounce';
 import { Differ, Viewer } from '../src';
 import type { DifferOptions, InlineDiffOptions } from '../src';
 
-import './playground.less';
+import GeneratedCode from './generated-code';
+import jsStringify from './js-stringify';
 import useInitialValues from './use-initial-values';
+
+import './playground.less';
+import Label from './label';
 
 interface PlaygroundProps {
   onClose: () => void;
@@ -18,7 +22,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
   const [showModifications, setShowModifications] = React.useState(true);
   const [arrayDiffMethod, setArrayDiffMethod] = React.useState<DifferOptions['arrayDiffMethod']>('lcs');
   const [ignoreCase, setIgnoreCase] = React.useState(false);
-  const [recursiveEqual, setRecursiveEqual] = React.useState(false);
+  const [recursiveEqual, setRecursiveEqual] = React.useState(true);
 
   // viewer props
   const [indent, setIndent] = React.useState(4);
@@ -70,10 +74,10 @@ const Playground: React.FC<PlaygroundProps> = props => {
   };
 
   const code = `
-const d = new Differ(${JSON.stringify(differOptions, null, 2)});
+const d = new Differ(${jsStringify(differOptions)});
 const diff = d.diff(before, after);
 
-const viewerProps = ${JSON.stringify(viewerOptions, null, 2)};
+const viewerProps = ${jsStringify(viewerOptions)};
 return (
   <Viewer
     diff={diff}
@@ -114,7 +118,14 @@ return (
           <form>
             <legend>DIFFER CONFIGURATION</legend>
             <label htmlFor="detect-circular">
-              <span>Detect circular references</span>
+              <Label
+                title="Detect circular references"
+                tip={
+                  <>
+                    Whether to detect circular reference in source objects before diff starts. Default is <code>true</code>. If you are confident about your data (maybe it's from <code>JSON.parse</code> or an API response), you can set it to <code>false</code> to improve performance, but the algorithm may not stop if circular reference does show up.
+                  </>
+                }
+              />
               <input
                 type="checkbox"
                 id="detect-circular"
@@ -123,7 +134,14 @@ return (
               />
             </label>
             <label htmlFor="max-depth">
-              <span>Max depth</span>
+              <Label
+                title="Max depth"
+                tip={
+                  <>
+                    If there are nested objects in your data, you can set a max depth to limit the diff to a certain level. Default is <code>Infinity</code>. If you set it to <code>0</code>, only the top level will be diffed.
+                  </>
+                }
+              />
               <label htmlFor="max-depth-infinity" style={{ margin: '0 4px 0 0' }}>
                 ∞&nbsp;
                 <input
@@ -146,7 +164,14 @@ return (
               />
             </label>
             <label htmlFor="show-modifications">
-              <span>Show modifications</span>
+              <Label
+                title="Show modifications"
+                tip={
+                  <>
+                    Support recognizing modifications, default <code>true</code> means the differ will output the <code>* modified</code> sign apart from the basic <code>+ add</code> and <code>- remove</code> sign. If you prefer Git-style output, please set it to <code>false</code>.
+                  </>
+                }
+              />
               <input
                 type="checkbox"
                 id="show-modifications"
@@ -155,7 +180,14 @@ return (
               />
             </label>
             <label htmlFor="array-diff-method">
-              <span>Array diff method</span>
+              <Label
+                title="Array diff method"
+                tip={
+                  <>
+                    The way to diff arrays, default is <code>"normal"</code>, using <code>"lcs"</code> may get a better result but much slower. <code>"unorder-normal"</code> and <code>"unorder-lcs"</code> are for unordered arrays (the order of elements in the array doesn't matter).
+                  </>
+                }
+              />
               <select
                 id="array-diff-method"
                 value={arrayDiffMethod}
@@ -168,7 +200,10 @@ return (
               </select>
             </label>
             <label htmlFor="ignore-case">
-              <span>Ignore case</span>
+              <Label
+                title="Ignore case"
+                tip="Whether to ignore case when comparing string values."
+              />
               <input
                 type="checkbox"
                 id="ignore-case"
@@ -177,7 +212,10 @@ return (
               />
             </label>
             <label htmlFor="recursive-equal">
-              <span>Recursive equal</span>
+              <Label
+                title="Recursive equal"
+                tip="Whether to use recursive equal to compare objects. This can provide a better output when there are unchanged object items in an array, but it may cause performance issues when the data is very large."
+              />
               <input
                 type="checkbox"
                 id="recursive-equal"
@@ -191,7 +229,10 @@ return (
           <form>
             <legend>VIEWER CONFIGURATION</legend>
             <label htmlFor="indent">
-              <span>Indent</span>
+              <Label
+                title="Indent"
+                tip={<>Controls the indent in the <code>&lt;Viewer&gt;</code> component.</>}
+              />
               <input
                 type="number"
                 id="indent"
@@ -202,7 +243,14 @@ return (
               />
             </label>
             <label htmlFor="highlight-inline-diff">
-              <span>Highlight inline diff</span>
+              <Label
+                title="Highlight inline diff"
+                tip={
+                  <>
+                    Whether to show the inline diff highlight. For example, if the left value <code>"JSON diff can't be possible"</code> is changed to the right value <code>"JSON diff is possible"</code>, it will be recognized as we first remove <code>can't be</code> and then add <code>is</code>. This feature is powered by <a href="https://github.com/gliese1337/fast-myers-diff" target="_blank">gliese1337/fast-myers-diff</a>. Note: the <code>showModification</code> must be enabled, or you will not see modified lines.
+                  </>
+                }
+              />
               <input
                 type="checkbox"
                 id="highlight-inline-diff"
@@ -211,7 +259,14 @@ return (
               />
             </label>
             <label htmlFor="inline-diff-mode">
-              <span>Inline diff method</span>
+              <Label
+                title="Inline diff mode"
+                tip={
+                  <>
+                    Control the inline diff behaviour. If the inline diff sources are sentences, we can diff them "by word" instead of "by character". For normal sentences, just set the method to <code>word</code> and the separator to <code>" "</code> (a half-width space) works like a charm. But if you prefer the Git-style output, you can leave this props default, which is diffing "by character".
+                  </>
+                }
+              />
               <select
                 id="inline-diff-mode"
                 disabled={!highlightInlineDiff}
@@ -223,7 +278,10 @@ return (
               </select>
             </label>
             <label htmlFor="inline-diff-separator">
-              <span>Word separator</span>
+              <Label
+                title="Word separator"
+                tip="The separator to split the inline diff sources, default is a half-width space."
+              />
               <input
                 id="inline-diff-separator"
                 disabled={!highlightInlineDiff}
@@ -233,7 +291,10 @@ return (
               />
             </label>
             <label htmlFor="hide-unchanged-lines">
-              <span>Hide unchanged lines</span>
+              <Label
+                title="Hide unchanged lines"
+                tip="Whether to hide the unchanged lines (like what GitHub and GitLab does)."
+              />
               <input
                 type="checkbox"
                 id="hide-unchanged-lines"
@@ -246,7 +307,7 @@ return (
         <div className="config">
           <form>
             <legend>GENERATEDE CODE</legend>
-            <pre>{code}</pre>
+            <GeneratedCode code={code} />
           </form>
         </div>
         <div className="statistics">

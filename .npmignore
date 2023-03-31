@@ -1,5 +1,5 @@
 .cache
-demo
+playground
 node_modules
 src
 .gitignore

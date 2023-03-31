@@ -5,44 +5,37 @@ import less from 'rollup-plugin-less';
 import livereload from 'rollup-plugin-livereload';
 import resolve from '@rollup/plugin-node-resolve';
 import serve from 'rollup-plugin-serve';
+import styles from 'rollup-plugin-styles';
+
+import packageJson from './package.json';
 
 const BASEDIR = process.env.BASEDIR || '.cache';
 
-export default {
-  input: 'demo/index.tsx',
-  output: {
-    file: `${BASEDIR}/index.js`,
-    format: 'umd',
-    name: 'JSONDiffKit',
-    globals: {
-      react: 'React',
-      'react-dom': 'ReactDOM',
+const plugins = [
+  resolve({ preferBuiltins: true }),
+  commonjs(),
+  esbuild({
+    exclude: [],
+    minify: process.env.NODE_ENV === 'production',
+    jsxFactory: 'React.createElement',
+    jsxFragment: 'React.Fragment',
+    define: {
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      __VERSION__: JSON.stringify(packageJson.version),
     },
-  },
-  plugins: [
-    resolve({ preferBuiltins: true }),
-    commonjs(),
-    esbuild({
-      exclude: [],
-      minify: process.env.NODE_ENV === 'production',
-      jsxFactory: 'React.createElement',
-      jsxFragment: 'React.Fragment',
-      define: {
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-        __VERSION__: JSON.stringify(require('./package.json').version),
-      },
-      loaders: {
-        '.json': 'json', // require @rollup/plugin-commonjs
-        '.js': 'jsx',
-      },
-    }),
-    less({
-      output: `${BASEDIR}/index.css`,
-      insert: true,
-    }),
-    html({
-      template: ({ files }) => {
-        return `<!DOCTYPE html>
+    loaders: {
+      '.json': 'json', // require @rollup/plugin-commonjs
+      '.js': 'jsx',
+    },
+  }),
+  less({
+    output: `${BASEDIR}/index.css`,
+    insert: true,
+  }),
+  styles(),
+  html({
+    template: ({ files }) => {
+      return `<!DOCTYPE html>
 <html>
 <head>
   <title>JSON Diff Kit Demo</title>
@@ -53,17 +46,35 @@ export default {
 </body>
 </html>
 `;
-      },
-    }),
-    process.env.NODE_ENV !== 'production' && serve({
+    },
+  }),
+];
+
+if (process.env.NODE_ENV !== 'production') {
+  plugins.push(
+    serve({
       contentBase: BASEDIR,
       open: true,
       openPage: '/index.html',
       port: 3000,
     }),
-    process.env.NODE_ENV !== 'production' && livereload({
+    livereload({
       watch: BASEDIR,
       delay: 300,
     }),
-  ],
+  );
+}
+
+export default {
+  input: 'playground/index.tsx',
+  output: {
+    file: `${BASEDIR}/index.js`,
+    format: 'umd',
+    name: 'JSONDiffKit',
+    globals: {
+      react: 'React',
+      'react-dom': 'ReactDOM',
+    },
+  },
+  plugins,
 };
