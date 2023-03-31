@@ -2,6 +2,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import esbuild from 'rollup-plugin-esbuild';
 import html from '@rollup/plugin-html';
 import less from 'rollup-plugin-less';
+import livereload from 'rollup-plugin-livereload';
 import resolve from '@rollup/plugin-node-resolve';
 import serve from 'rollup-plugin-serve';
 
@@ -37,6 +38,7 @@ export default {
     }),
     less({
       output: `${BASEDIR}/index.css`,
+      insert: true,
     }),
     html({
       template: ({ files }) => {
@@ -44,7 +46,6 @@ export default {
 <html>
 <head>
   <title>JSON Diff Kit Demo</title>
-  <link rel="stylesheet" href="index.css" />
 </head>
 <body>
   <div id="root"></div>
@@ -59,6 +60,10 @@ export default {
       open: true,
       openPage: '/index.html',
       port: 3000,
+    }),
+    process.env.NODE_ENV !== 'production' && livereload({
+      watch: BASEDIR,
+      delay: 300,
     }),
   ],
 };

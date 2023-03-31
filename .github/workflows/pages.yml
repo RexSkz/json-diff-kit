@@ -18,7 +18,7 @@ jobs:
           pnpm i
           pnpm build:pages
           echo "json-diff-kit.js.org" > docs/CNAME
-          git add -A
+          git add docs -f
           git commit -m Pages
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push -f origin gh-pages
