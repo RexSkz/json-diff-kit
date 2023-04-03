@@ -87,6 +87,13 @@ export interface DifferOptions {
    */
   ignoreCase?: boolean;
   /**
+   * Whether to ignore the case when comparing keys, default `false`.
+   *
+   * Notice: if there are keys with different cases in the same object, the algorithm may fail
+   * since it's not able to tell which key is the correct one.
+   */
+  ignoreCaseForKey?: boolean;
+  /**
    * Whether to use recursive equal to compare objects, default `false`.
    *
    * This will only applied to objects, not arrays.
@@ -136,6 +143,8 @@ class Differ {
     maxDepth = Infinity,
     showModifications = true,
     arrayDiffMethod = 'normal',
+    ignoreCase = false,
+    ignoreCaseForKey = false,
     recursiveEqual = false,
   }: DifferOptions = {}) {
     this.options = {
@@ -143,6 +152,8 @@ class Differ {
       maxDepth,
       showModifications,
       arrayDiffMethod,
+      ignoreCase,
+      ignoreCaseForKey,
       recursiveEqual,
     };
     this.arrayDiffFunc = arrayDiffMethod === 'lcs' || arrayDiffMethod === 'unorder-lcs'

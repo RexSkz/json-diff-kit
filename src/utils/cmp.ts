@@ -1,4 +1,6 @@
-import type { DifferOptions } from '../differ';
+interface CmpOptions {
+  ignoreCase?: boolean;
+}
 
 const getOrderByType = (value: any) => {
   if (typeof value === 'boolean') {
@@ -28,7 +30,7 @@ const getOrderByType = (value: any) => {
  *   - For boolean, number, string: use the `<` sign.
  *   - For array and object: preserve the original order (or do we have a better idea?)
  */
-const cmp = (a: any, b: any, options?: DifferOptions) => {
+const cmp = (a: any, b: any, options: CmpOptions) => {
   const orderByTypeA = getOrderByType(a);
   const orderByTypeB = getOrderByType(b);
 
