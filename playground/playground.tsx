@@ -13,7 +13,7 @@ import './playground.less';
 import Label from './label';
 
 interface PlaygroundProps {
-  onClose: () => void;
+  onSwitch: () => void;
 }
 
 const Playground: React.FC<PlaygroundProps> = props => {
@@ -124,7 +124,7 @@ return (
     <div className="playground">
       <div className="layout-left">
         <div className="logo">JSON Diff Kit</div>
-        <div className="back" onClick={props.onClose}>Go to docs & demo</div>
+        <div className="back" onClick={props.onSwitch}>Go to docs & demo</div>
         <div className="config">
           <form>
             <legend>DIFFER CONFIGURATION</legend>
