@@ -81,14 +81,14 @@ const lcs = (
         tRight.unshift({ level: level + 1, type: 'equal', text: formatValue(arrRight[j - 1]) });
       } else if (type === 'array') {
         const [l, r] = diffArrayLCS(arrLeft[i - 1], arrRight[j - 1], keyLeft, keyRight, level + 2, options);
-        tLeft = concat(tLeft, l, true);
-        tRight = concat(tRight, r, true);
+        tLeft = concat(tLeft, l.reverse(), true);
+        tRight = concat(tRight, r.reverse(), true);
       } else if (type === 'object') {
         const [l, r] = diffObject(arrLeft[i - 1], arrRight[j - 1], level + 2, options, diffArrayLCS);
         tLeft.unshift({ level: level + 1, type: 'equal', text: '}' });
         tRight.unshift({ level: level + 1, type: 'equal', text: '}' });
-        tLeft = concat(tLeft, l, true);
-        tRight = concat(tRight, r, true);
+        tLeft = concat(tLeft, l.reverse(), true);
+        tRight = concat(tRight, r.reverse(), true);
         tLeft.unshift({ level: level + 1, type: 'equal', text: '{' });
         tRight.unshift({ level: level + 1, type: 'equal', text: '{' });
       } else {
@@ -156,7 +156,7 @@ const diffArrayLCS = (
   } else {
     const [tLeftReverse, tRightReverse] = lcs(arrLeft, arrRight, keyLeft, keyRight, level, options);
     linesLeft = concat(linesLeft, tLeftReverse);
-    linesRight = concat(linesRight, tRightReverse);;
+    linesRight = concat(linesRight, tRightReverse);
   }
 
   linesLeft.push({ level, type: 'equal', text: ']' });

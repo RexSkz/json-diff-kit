@@ -38,7 +38,7 @@ const plugins = [
       return `<!DOCTYPE html>
 <html>
 <head>
-  <title>JSON Diff Kit Demo</title>
+  <title>JSON Diff Kit Playground</title>
 </head>
 <body>
   <div id="root"></div>

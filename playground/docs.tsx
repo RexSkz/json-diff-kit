@@ -26,6 +26,7 @@ const Docs: React.FC<PropTypes> = props => {
   const [inlineDiffMode, setInlineDiffMode] = React.useState<InlineDiffOptions['mode']>('word');
   const [inlineDiffSeparator, setInlineDiffSeparator] = React.useState(' ');
   const [hideUnchangedLines, setHideUnchangedLines] = React.useState(true);
+  const [useVirtual, setUseVirtual] = React.useState(false);
 
   const differOptions = React.useMemo(() => ({
     detectCircular,
@@ -39,6 +40,7 @@ const Docs: React.FC<PropTypes> = props => {
     maxDepth,
     showModifications,
     arrayDiffMethod,
+    ignoreCase,
     recursiveEqual,
   ]);
   const differ = React.useMemo(() => new Differ(differOptions), [differOptions]);
@@ -104,6 +106,7 @@ const Docs: React.FC<PropTypes> = props => {
       wordSeparator: inlineDiffSeparator || '',
     },
     hideUnchangedLines,
+    virtual: useVirtual ? {} : false,
   };
 
   return (
@@ -265,6 +268,16 @@ const Docs: React.FC<PropTypes> = props => {
             />
           </label>
           <blockquote>Whether to hide the unchanged lines (like what GitHub and GitLab does).</blockquote>
+          <label htmlFor="use-virtual">
+            Use virtual:
+            <input
+              type="checkbox"
+              id="use-virtual"
+              checked={useVirtual}
+              onChange={e => setUseVirtual(e.target.checked)}
+            />
+          </label>
+          <blockquote>Whether to use virtual list to render the diff. This can improve the performance when the diff result is very large.</blockquote>
         </form>
       </div>
       <div className="diff-result">

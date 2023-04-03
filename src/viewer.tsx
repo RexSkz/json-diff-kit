@@ -80,6 +80,17 @@ export interface ViewerProps {
    * default `false` means it won't hide unchanged lines.
    */
   hideUnchangedLines?: HideUnchangedLinesOptions;
+  /**
+   * Use virtual list to speed up rendering, default is `false`.
+   */
+  virtual?: boolean | {
+    /** @default 'body' */
+    scrollContainer?: string;
+    /** @default 16 */
+    itemHeight?: number;
+    /** @default 27 */
+    expandLineHeight?: number;
+  };
   /** Extra class names */
   className?: string;
   /** Extra styles */
@@ -101,6 +112,14 @@ const Viewer: React.FC<ViewerProps> = props => {
     wordSeparator: props.inlineDiffOptions?.wordSeparator || '',
   };
   const hideUnchangedLines = props.hideUnchangedLines ?? false;
+  const {
+    scrollContainer: _scrollContainer = 'body',
+    itemHeight = 16,
+    expandLineHeight = 27,
+  } = !props.virtual || props.virtual === true ? {} : props.virtual;
+  const scrollContainer = _scrollContainer === 'body'
+    ? document.body
+    : document.querySelector(_scrollContainer);
 
   // Use these refs to keep the diff data and segments sync,
   // or it may cause runtime error because of their mismatch.
@@ -108,23 +127,94 @@ const Viewer: React.FC<ViewerProps> = props => {
   const linesLeftRef = React.useRef(linesLeft);
   const linesRightRef = React.useRef(linesRight);
   const segmentsRef = React.useRef(getSegments(linesLeft, linesRight, hideUnchangedLines));
+  const prefixSumRef = React.useRef<number[]>([]);
+  const tbodyRef = React.useRef<HTMLTableSectionElement>(null);
   const [, updateViewer] = React.useState({});
 
   React.useEffect(() => {
     linesLeftRef.current = linesLeft;
     linesRightRef.current = linesRight;
     segmentsRef.current = getSegments(linesLeft, linesRight, hideUnchangedLines);
+    prefixSumRef.current = Array(segmentsRef.current.length).fill(0);
+    if (props.virtual) {
+      for (let i = 1; i < segmentsRef.current.length; i++) {
+        if ('hasLinesBefore' in segmentsRef.current[i]) {
+          prefixSumRef.current[i] = prefixSumRef.current[i - 1] + expandLineHeight;
+        } else {
+          prefixSumRef.current[i] = prefixSumRef.current[i - 1] + (segmentsRef.current[i].end - segmentsRef.current[i].start) * itemHeight;
+        }
+      }
+    }
     updateViewer({});
   }, [hideUnchangedLines, linesLeft, linesRight]);
 
-  const renderMeasureLine = () => (
-    <colgroup className="measure-line">
-      {props.lineNumbers && <col style={{ width: `calc(${lineNumberWidth} + 16px)` }} />}
-      <col />
-      {props.lineNumbers && <col style={{ width: `calc(${lineNumberWidth} + 16px)` }} />}
-      <col />
-    </colgroup>
-  );
+  React.useEffect(() => {
+    if (!props.virtual || !scrollContainer) {
+      return;
+    }
+    const onScroll = () => updateViewer({});
+    scrollContainer.addEventListener('scroll', onScroll);
+    return () => {
+      scrollContainer.removeEventListener('scroll', onScroll);
+    }
+  }, [props.virtual]);
+
+  const onExpandBefore = (segmentIndex: number) => (lines: number) => {
+    const newSegments = [...segmentsRef.current];
+    const newSegment = newSegments[segmentIndex] as HiddenUnchangedLinesInfo;
+    newSegments[segmentIndex] = {
+      ...newSegment,
+      end: Math.max(newSegment.end - lines, newSegment.start),
+    };
+    if (segmentIndex + 1 < segmentsRef.current.length - 1) {
+      newSegments[segmentIndex + 1] = {
+        ...newSegments[segmentIndex + 1],
+        start: Math.max(newSegment.end - lines, newSegment.start),
+      }
+    }
+    segmentsRef.current = newSegments;
+    updateViewer({});
+  };
+
+  const onExpandAfter = (segmentIndex: number) => (lines: number) => {
+    const newSegments = [...segmentsRef.current];
+    const newSegment = newSegments[segmentIndex] as HiddenUnchangedLinesInfo;
+    newSegments[segmentIndex] = {
+      ...newSegment,
+      start: Math.min(newSegment.start + lines, newSegment.end),
+    };
+    if (segmentIndex > 1) {
+      newSegments[segmentIndex - 1] = {
+        ...newSegments[segmentIndex - 1],
+        end: Math.min(newSegment.start + lines, newSegment.end),
+      }
+    }
+    segmentsRef.current = newSegments;
+    updateViewer({});
+  };
+
+  const onExpandAll = (segmentIndex: number) => () => {
+    const newSegments = [...segmentsRef.current];
+    const newSegment = newSegments[segmentIndex] as HiddenUnchangedLinesInfo;
+    newSegments[segmentIndex] = {
+      ...newSegment,
+      start: newSegment.start,
+      end: newSegment.start,
+    };
+    if (segmentIndex + 1 < segmentsRef.current.length - 1) {
+      newSegments[segmentIndex + 1] = {
+        ...newSegments[segmentIndex + 1],
+        start: newSegment.start,
+      }
+    } else {
+      newSegments[segmentIndex - 1] = {
+        ...newSegments[segmentIndex - 1],
+        end: newSegment.end,
+      }
+    }
+    segmentsRef.current = newSegments;
+    updateViewer({});
+  };
 
   const renderInlineDiffResult = (arr: InlineDiffResult[][]) => {
     return arr.map(result => (
@@ -192,63 +282,6 @@ const Viewer: React.FC<ViewerProps> = props => {
     );
   };
 
-  const onExpandBefore = (segmentIndex: number) => (lines: number) => {
-    const newSegments = [...segmentsRef.current];
-    const newSegment = newSegments[segmentIndex] as HiddenUnchangedLinesInfo;
-    newSegments[segmentIndex] = {
-      ...newSegment,
-      end: Math.max(newSegment.end - lines, newSegment.start),
-    };
-    if (segmentIndex + 1 < segmentsRef.current.length - 1) {
-      newSegments[segmentIndex + 1] = {
-        ...newSegments[segmentIndex + 1],
-        start: Math.max(newSegment.end - lines, newSegment.start),
-      }
-    }
-    segmentsRef.current = newSegments;
-    updateViewer({});
-  };
-
-  const onExpandAfter = (segmentIndex: number) => (lines: number) => {
-    const newSegments = [...segmentsRef.current];
-    const newSegment = newSegments[segmentIndex] as HiddenUnchangedLinesInfo;
-    newSegments[segmentIndex] = {
-      ...newSegment,
-      start: Math.min(newSegment.start + lines, newSegment.end),
-    };
-    if (segmentIndex > 1) {
-      newSegments[segmentIndex - 1] = {
-        ...newSegments[segmentIndex - 1],
-        end: Math.min(newSegment.start + lines, newSegment.end),
-      }
-    }
-    segmentsRef.current = newSegments;
-    updateViewer({});
-  };
-
-  const onExpandAll = (segmentIndex: number) => () => {
-    const newSegments = [...segmentsRef.current];
-    const newSegment = newSegments[segmentIndex] as HiddenUnchangedLinesInfo;
-    newSegments[segmentIndex] = {
-      ...newSegment,
-      start: newSegment.start,
-      end: newSegment.start,
-    };
-    if (segmentIndex + 1 < segmentsRef.current.length - 1) {
-      newSegments[segmentIndex + 1] = {
-        ...newSegments[segmentIndex + 1],
-        start: newSegment.start,
-      }
-    } else {
-      newSegments[segmentIndex - 1] = {
-        ...newSegments[segmentIndex - 1],
-        end: newSegment.end,
-      }
-    }
-    segmentsRef.current = newSegments;
-    updateViewer({});
-  };
-
   const renderExpandLine = (
     hasLinesBefore: boolean,
     hasLinesAfter: boolean,
@@ -276,10 +309,17 @@ const Viewer: React.FC<ViewerProps> = props => {
         }
       </>
     );
-  }
+  };
 
-  const renderSegment = (segment: SegmentItem | HiddenUnchangedLinesInfo, index: number) => {
-    const { start, end } = segment;
+  const renderSegment = (
+    segment: SegmentItem | HiddenUnchangedLinesInfo,
+    index: number,
+    renderStart: number,
+    renderEnd: number,
+  ) => {
+    let { start, end } = segment;
+    start = Math.max(start, renderStart);
+    end = Math.min(end, renderEnd);
     if (start === end) {
       return null;
     }
@@ -290,7 +330,7 @@ const Viewer: React.FC<ViewerProps> = props => {
     const expandMoreLinesLimit = typeof hideUnchangedLines === 'boolean'
       ? DEFAULT_EXPAND_MORE_LINES_LIMIT
       : hideUnchangedLines.expandMoreLinesLimit;
-    return (
+    return [
       <tr key={`expand-line-${index}`} className="expand-line">
         <td
           colSpan={4}
@@ -308,9 +348,77 @@ const Viewer: React.FC<ViewerProps> = props => {
             ) : renderExpandLine(hasLinesBefore, hasLinesAfter, expandMoreLinesLimit, index)
           }
         </td>
+      </tr>,
+    ];
+  };
+
+  const renderTbody = () => {
+    if (!props.virtual) {
+      return segmentsRef.current.map((item, index) => renderSegment(item, index, 0, linesLeftRef.current.length));
+    }
+    const totalHeight = segmentsRef.current.reduce((acc, segment) => {
+      if (!('hasLinesBefore' in segment)) {
+        return acc + (segment.end - segment.start) * itemHeight;
+      }
+      return acc + expandLineHeight;
+    }, 0);
+    const containerHeight = (scrollContainer as HTMLElement)?.clientHeight ?? 0;
+    const scrollTop = (scrollContainer as HTMLElement)?.scrollTop ?? 0;
+    const scrollBottom = scrollTop + containerHeight;
+
+    let t: HTMLElement = tbodyRef.current;
+    let firstElementTop = t?.offsetTop ?? 0;
+    while (t?.offsetParent && t?.offsetParent !== scrollContainer) {
+      t = t.offsetParent as HTMLElement;
+      firstElementTop += t.offsetTop;
+    }
+
+    if (firstElementTop > scrollBottom || firstElementTop + totalHeight < scrollTop) {
+      return (
+        <tr>
+          <td colSpan={4} style={{ height: `${totalHeight}px` }} />
+        </tr>
+      );
+    }
+    const start = Math.floor((scrollTop - firstElementTop) / itemHeight);
+    const end = Math.ceil((scrollBottom - firstElementTop) / itemHeight);
+    const visibleSegments = segmentsRef.current.filter((segment) => {
+      if (!('hasLinesBefore' in segment)) {
+        return segment.start < end && segment.end > start;
+      }
+      return true;
+    });
+    return visibleSegments.length ? (
+      <>
+        <tr>
+          <td
+            colSpan={4}
+            style={{ height: `${Math.max(0, visibleSegments[0].start * itemHeight - scrollTop + firstElementTop)}px` }}
+          />
+        </tr>
+        {visibleSegments.map((segment, index) => renderSegment(segment, index, start, end))}
+        <tr>
+          <td
+            colSpan={4}
+            style={{ height: `${Math.max(0, totalHeight - containerHeight - visibleSegments[0].start * itemHeight)}px` }}
+          />
+        </tr>
+      </>
+    ) : (
+      <tr>
+        <td colSpan={4} style={{ height: `${totalHeight}px` }} />
       </tr>
     );
   };
+
+  const renderMeasureLine = () => (
+    <colgroup className="measure-line">
+      {props.lineNumbers && <col style={{ width: `calc(${lineNumberWidth} + 16px)` }} />}
+      <col />
+      {props.lineNumbers && <col style={{ width: `calc(${lineNumberWidth} + 16px)` }} />}
+      <col />
+    </colgroup>
+  );
 
   return (
     <table
@@ -318,8 +426,8 @@ const Viewer: React.FC<ViewerProps> = props => {
       style={props.style}
     >
       {renderMeasureLine()}
-      <tbody>
-        {segmentsRef.current.map(renderSegment)}
+      <tbody ref={tbodyRef}>
+        {renderTbody()}
       </tbody>
     </table>
   );

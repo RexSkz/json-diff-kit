@@ -1,16 +1,16 @@
 import React from 'react';
 import debounce from 'lodash/debounce';
 
-import { Differ, Viewer } from '../src';
+import { Differ, Viewer, ViewerProps } from '../src';
 import type { DifferOptions, InlineDiffOptions } from '../src';
 
 import GeneratedCode from './generated-code';
 import jsStringify from './js-stringify';
+import Label from './label';
 import setInitialValues from './set-initial-values';
 import useInitialValues from './use-initial-values';
 
 import './playground.less';
-import Label from './label';
 
 interface PlaygroundProps {
   onSwitch: () => void;
@@ -32,6 +32,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
   const [inlineDiffMode, setInlineDiffMode] = React.useState<InlineDiffOptions['mode']>('word');
   const [inlineDiffSeparator, setInlineDiffSeparator] = React.useState(' ');
   const [hideUnchangedLines, setHideUnchangedLines] = React.useState(true);
+  const [virtual, setVirtual] = React.useState(false);
 
   const differOptions = React.useMemo(() => ({
     detectCircular,
@@ -73,7 +74,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
     }
   }, 500), [differ]);
 
-  const viewerOptions = {
+  const viewerOptions: Omit<ViewerProps, 'diff'> = {
     indent,
     lineNumbers: true,
     highlightInlineDiff,
@@ -82,6 +83,11 @@ const Playground: React.FC<PlaygroundProps> = props => {
       wordSeparator: inlineDiffSeparator,
     },
     hideUnchangedLines,
+    virtual: virtual && {
+      scrollContainer: '.playground .layout-right .results',
+      itemHeight: 16,
+      expandLineHeight: 27,
+    },
   };
 
   const code = `
@@ -323,6 +329,18 @@ return (
                 id="hide-unchanged-lines"
                 checked={hideUnchangedLines}
                 onChange={e => setHideUnchangedLines(e.target.checked)}
+              />
+            </label>
+            <label htmlFor="use-virtual-scroll">
+              <Label
+                title="Use virtual scroll"
+                tip="Whether to use virtual scroll. This can improve the rendering performance when the data is very large."
+              />
+              <input
+                type="checkbox"
+                id="use-virtual-scroll"
+                checked={virtual}
+                onChange={e => setVirtual(e.target.checked)}
               />
             </label>
           </form>
