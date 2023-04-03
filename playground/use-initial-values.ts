@@ -13,7 +13,12 @@ const useInitialValues = () => {
   const [initialValues, setInitialValues] = React.useState(getValue());
 
   React.useEffect(() => {
-    const hashChange = () => setInitialValues(getValue());
+    const hashChange = () => {
+      const newValue = getValue();
+      if (initialValues.l !== newValue.l || initialValues.r !== newValue.r) {
+        setInitialValues(newValue);
+      }
+    };
     window.addEventListener('hashchange', hashChange);
     return () => {
       window.removeEventListener('hashchange', hashChange);

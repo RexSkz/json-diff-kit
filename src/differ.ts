@@ -263,10 +263,10 @@ class Differ {
       resultRight = concat(resultRight, Array(lLength).fill(EQUAL_EMPTY_LINE), true);
     } else if (typeLeft === 'object') {
       [resultLeft, resultRight] = diffObject(sourceLeft, sourceRight, 1, this.options, this.arrayDiffFunc);
-      resultLeft.unshift(EQUAL_LEFT_BRACKET_LINE);
-      resultLeft.push(EQUAL_RIGHT_BRACKET_LINE);
-      resultRight.unshift(EQUAL_LEFT_BRACKET_LINE);
-      resultRight.push(EQUAL_RIGHT_BRACKET_LINE);
+      resultLeft.unshift({ ...EQUAL_LEFT_BRACKET_LINE });
+      resultLeft.push({ ...EQUAL_RIGHT_BRACKET_LINE });
+      resultRight.unshift({ ...EQUAL_LEFT_BRACKET_LINE });
+      resultRight.push({ ...EQUAL_RIGHT_BRACKET_LINE });
     } else if (typeLeft === 'array') {
       [resultLeft, resultRight] = this.arrayDiffFunc(sourceLeft, sourceRight, '', '', 0, this.options);
     } else if (sourceLeft !== sourceRight) {

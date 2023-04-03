@@ -15,4 +15,4 @@ const Index: React.FC = () => {
     : <Docs onSwitch={() => setUsePlayground(true)} />;
 };
 
-ReactDOM.render(<Index />, document.getElementById('root'));
+ReactDOM.render(<React.StrictMode><Index /></React.StrictMode>, document.getElementById('root'));

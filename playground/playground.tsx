@@ -32,7 +32,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
   const [inlineDiffMode, setInlineDiffMode] = React.useState<InlineDiffOptions['mode']>('word');
   const [inlineDiffSeparator, setInlineDiffSeparator] = React.useState(' ');
   const [hideUnchangedLines, setHideUnchangedLines] = React.useState(true);
-  const [virtual, setVirtual] = React.useState(false);
+  const [virtual, setVirtual] = React.useState(true);
 
   const differOptions = React.useMemo(() => ({
     detectCircular,
@@ -54,12 +54,11 @@ const Playground: React.FC<PlaygroundProps> = props => {
   const differ = React.useMemo(() => new Differ(differOptions), [differOptions]);
   const [diff, setDiff] = React.useState(differ.diff("", ""));
   const [fullscreen, setFullscreen] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
-  const triggerDiff = React.useCallback(debounce((before: string, after: string) => {
+
+  const _triggerDiff = (before: string, after: string) => {
     try {
       setInitialValues(before, after);
-      setLoading(true);
       const result = differ.diff(
         JSON.parse(String(before || 'null')),
         JSON.parse(String(after || 'null')),
@@ -69,25 +68,28 @@ const Playground: React.FC<PlaygroundProps> = props => {
     } catch (e) {
       setError(e.message);
       console.error(e);
-    } finally {
-      setLoading(false);
     }
-  }, 500), [differ]);
+  };
+  const triggerDiff = React.useCallback(debounce(_triggerDiff, 500), [differ]);
 
+  const inlineDiffOptions = React.useMemo(() => ({
+    mode: inlineDiffMode,
+    wordSeparator: inlineDiffSeparator,
+  }), [inlineDiffMode, inlineDiffSeparator]);
+  const virtualOptions = React.useMemo(() => {
+    return virtual && {
+      scrollContainer: '.playground .layout-right .results',
+      itemHeight: 16,
+      expandLineHeight: 27,
+    };
+  }, [virtual]);
   const viewerOptions: Omit<ViewerProps, 'diff'> = {
     indent,
     lineNumbers: true,
     highlightInlineDiff,
-    inlineDiffOptions: {
-      mode: inlineDiffMode,
-      wordSeparator: inlineDiffSeparator,
-    },
+    inlineDiffOptions,
     hideUnchangedLines,
-    virtual: virtual && {
-      scrollContainer: '.playground .layout-right .results',
-      itemHeight: 16,
-      expandLineHeight: 27,
-    },
+    virtual: virtualOptions,
   };
 
   const code = `
@@ -127,7 +129,7 @@ return (
     setAfter(r || '');
   }, [l, r]);
   React.useEffect(() => {
-    triggerDiff(before.current, after.current);
+    _triggerDiff(before.current, after.current);
   }, [differOptions]);
 
   return (
@@ -337,8 +339,8 @@ return (
             </label>
             <label htmlFor="use-virtual-scroll">
               <Label
-                title="Use virtual scroll"
-                tip="Whether to use virtual scroll. This can improve the rendering performance when the data is very large."
+                title="Use virtual scroll (experimental)"
+                tip="Whether to use virtual scroll. This can improve the rendering performance when the data is very large, but it's not well-tested."
               />
               <input
                 type="checkbox"
@@ -389,7 +391,6 @@ return (
         <div className="title">
           DIFF RESULTS
           <span className="control-button" onClick={() => setFullscreen(pre => !pre)}>[{fullscreen ? 'EXIT ' : ''}PAGE FULLSCREEN]</span>
-          {loading && <span className="loading">Loading...</span>}
           {!!error && <span className="error">{error}</span>}
         </div>
         <div className="results">
