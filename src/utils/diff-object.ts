@@ -1,7 +1,8 @@
+import cmp from './cmp';
 import concat from './concat';
 import formatValue from './format-value';
 import getType from './get-type';
-import sortStrings from './sort-strings';
+import sortKeys from './sort-keys';
 import stringify from './stringify';
 
 import type { DifferOptions, DiffResult, ArrayDiffFunc } from '../differ';
@@ -51,14 +52,17 @@ const diffObject = (
 
   const keysLeft = Object.keys(lhs);
   const keysRight = Object.keys(rhs);
-  sortStrings(keysLeft, options);
-  sortStrings(keysRight, options);
+  sortKeys(keysLeft, options);
+  sortKeys(keysRight, options);
 
+  const keysCmpOptions = { ignoreCase: options.ignoreCaseForKey };
+  const valueCmpOptions = { ignoreCase: options.ignoreCase };
   while (keysLeft.length || keysRight.length) {
     const keyLeft = keysLeft[0];
     const keyRight = keysRight[0];
+    const cmpResult = cmp(keyLeft, keyRight, keysCmpOptions);
 
-    if (keyLeft === keyRight) {
+    if (cmpResult === 0) {
       if (getType(lhs[keyLeft]) !== getType(rhs[keyRight])) {
         const _resultLeft = formatValue(lhs[keyLeft], options.maxDepth, true).split('\n');
         const _resultRight = formatValue(rhs[keyRight], options.maxDepth, true).split('\n');
@@ -137,7 +141,7 @@ const diffObject = (
         linesRight = concat(linesRight, result[1]);
         linesRight.push({ level, type: 'equal', text: '}' });
       } else {
-        if (lhs[keyLeft] !== rhs[keyRight]) {
+        if (cmp(lhs[keyLeft], rhs[keyRight], valueCmpOptions) !== 0) {
           if (options.showModifications) {
             linesLeft.push({ level, type: 'modify', text: `"${keyLeft}": ${formatValue(lhs[keyLeft], options.maxDepth)}` });
             linesRight.push({ level, type: 'modify', text: `"${keyRight}": ${formatValue(rhs[keyRight], options.maxDepth)}` });
@@ -204,10 +208,10 @@ const diffObject = (
       keysRight.shift();
     } else if (!keyRight) {
       keysLeft.shift();
-    } else if (keyLeft === keyRight) {
+    } else if (cmpResult === 0) {
       keysLeft.shift();
       keysRight.shift();
-    } else if (keyLeft < keyRight) {
+    } else if (cmpResult < 0) {
       keysLeft.shift();
     } else {
       keysRight.shift();

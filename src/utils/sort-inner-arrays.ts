@@ -8,7 +8,7 @@ const sortInnerArrays = (source: any, options?: DifferOptions) => {
 
   if (Array.isArray(source)) {
     const result = [...source];
-    result.sort((a, b) => cmp(a, b, options));
+    result.sort((a, b) => cmp(a, b, { ignoreCase: options?.ignoreCase }));
     return result.map(item => sortInnerArrays(item, options));
   }
 

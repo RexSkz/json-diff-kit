@@ -6,6 +6,7 @@ import type { DifferOptions, InlineDiffOptions } from '../src';
 
 import GeneratedCode from './generated-code';
 import jsStringify from './js-stringify';
+import setInitialValues from './set-initial-values';
 import useInitialValues from './use-initial-values';
 
 import './playground.less';
@@ -22,6 +23,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
   const [showModifications, setShowModifications] = React.useState(true);
   const [arrayDiffMethod, setArrayDiffMethod] = React.useState<DifferOptions['arrayDiffMethod']>('lcs');
   const [ignoreCase, setIgnoreCase] = React.useState(false);
+  const [ignoreCaseForKey, setIgnoreCaseForKey] = React.useState(false);
   const [recursiveEqual, setRecursiveEqual] = React.useState(true);
 
   // viewer props
@@ -37,28 +39,37 @@ const Playground: React.FC<PlaygroundProps> = props => {
     showModifications,
     arrayDiffMethod,
     ignoreCase,
+    ignoreCaseForKey,
     recursiveEqual,
   }), [
     detectCircular,
     maxDepth,
     showModifications,
     arrayDiffMethod,
+    ignoreCase,
+    ignoreCaseForKey,
     recursiveEqual,
   ]);
   const differ = React.useMemo(() => new Differ(differOptions), [differOptions]);
   const [diff, setDiff] = React.useState(differ.diff("", ""));
   const [fullscreen, setFullscreen] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
   const triggerDiff = React.useCallback(debounce((before: string, after: string) => {
     try {
+      setInitialValues(before, after);
+      setLoading(true);
       const result = differ.diff(
         JSON.parse(String(before || 'null')),
         JSON.parse(String(after || 'null')),
       );
+      setError('');
       setDiff(result);
     } catch (e) {
       setError(e.message);
       console.error(e);
+    } finally {
+      setLoading(false);
     }
   }, 500), [differ]);
 
@@ -211,6 +222,18 @@ return (
                 onChange={e => setIgnoreCase(e.target.checked)}
               />
             </label>
+            <label htmlFor="ignore-case-for-key">
+              <Label
+                title="Ignore case for key"
+                tip="Whether to ignore case when comparing object keys."
+              />
+              <input
+                type="checkbox"
+                id="ignore-case-for-key"
+                checked={ignoreCaseForKey}
+                onChange={e => setIgnoreCaseForKey(e.target.checked)}
+              />
+            </label>
             <label htmlFor="recursive-equal">
               <Label
                 title="Recursive equal"
@@ -344,6 +367,7 @@ return (
         <div className="title">
           DIFF RESULTS
           <span className="control-button" onClick={() => setFullscreen(pre => !pre)}>[{fullscreen ? 'EXIT ' : ''}PAGE FULLSCREEN]</span>
+          {loading && <span className="loading">Loading...</span>}
           {!!error && <span className="error">{error}</span>}
         </div>
         <div className="results">
