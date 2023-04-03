@@ -1,10 +1,11 @@
+import type { DiffResult, DifferOptions } from '../differ';
+
 import concat from './concat';
 import formatValue from './format-value';
 import diffObject from './diff-object';
 import getType from './get-type';
 import isEqual from './is-equal';
-
-import type { DiffResult, DifferOptions } from '../differ';
+import prettyAppendLines from './pretty-append-lines';
 
 const diffArrayNormal = (
   arrLeft: any[],
@@ -37,17 +38,31 @@ const diffArrayNormal = (
       const rightType = getType(itemRight);
       if (arrLeft.length && arrRight.length) {
         if (leftType !== rightType) {
-          linesLeft.push({ level: level + 1, type: 'remove', text: formatValue(itemLeft) });
-          linesLeft.push({ level, type: 'equal', text: '' });
-          linesRight.push({ level, type: 'equal', text: '' });
-          linesRight.push({ level: level + 1, type: 'add', text: formatValue(itemRight) });
+          prettyAppendLines(
+            linesLeft,
+            linesRight,
+            null,
+            null,
+            itemLeft,
+            itemRight,
+            level + 1,
+            options,
+          );
         } else if (
           options.recursiveEqual &&
           ['object', 'array'].includes(leftType) &&
           isEqual(itemLeft, itemRight, options)
         ) {
-          linesLeft.push({ level: level + 1, type: 'equal', text: formatValue(itemLeft) });
-          linesRight.push({ level: level + 1, type: 'equal', text: formatValue(itemRight) });
+          prettyAppendLines(
+            linesLeft,
+            linesRight,
+            null,
+            null,
+            itemLeft,
+            itemRight,
+            level + 1,
+            options,
+          );
         } else if (leftType === 'object') {
           linesLeft.push({ level: level + 1, type: 'equal', text: '{' });
           linesRight.push({ level: level + 1, type: 'equal', text: '{' });
@@ -57,7 +72,7 @@ const diffArrayNormal = (
           linesLeft.push({ level: level + 1, type: 'equal', text: '}' });
           linesRight.push({ level: level + 1, type: 'equal', text: '}' });
         } else if (leftType === 'array') {
-          const [resLeft, resRight] = diffArrayNormal(itemLeft, itemRight, '', '', level + 2, options, [], []);
+          const [resLeft, resRight] = diffArrayNormal(itemLeft, itemRight, '', '', level + 1, options, [], []);
           linesLeft = concat(linesLeft, resLeft);
           linesRight = concat(linesRight, resRight);
         } else if (itemLeft === itemRight) {

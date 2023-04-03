@@ -6,6 +6,7 @@ import { InlineDiffOptions } from '../src/utils/get-inline-diff';
 import type { ViewerProps } from '../src/viewer';
 
 import './docs.less';
+import setInitialValues from './set-initial-values';
 
 interface PropTypes {
   onSwitch: () => void;
@@ -96,6 +97,11 @@ const Docs: React.FC<PropTypes> = props => {
     { text: 'below' },
   ]);
   const diff6 = React.useMemo(() => differ.diff(before6, after6), [differ, before6, after6]);
+
+  const openInPlayground = (l: any, r: any) => {
+    setInitialValues(JSON.stringify(l, null, 2), JSON.stringify(r, null, 2));
+    props.onSwitch();
+  };
 
   const viewerCommonProps: Partial<ViewerProps> = {
     indent: indent,
@@ -282,17 +288,29 @@ const Docs: React.FC<PropTypes> = props => {
       </div>
       <div className="diff-result">
         <h2>Examples</h2>
-        <p>An regular example with 2 objects.</p>
+        <p>
+          <button onClick={() => openInPlayground(before1, after1)}>⬇️ Playground</button> An regular example with 2 objects.
+        </p>
         <Viewer diff={diff1} {...viewerCommonProps} />
-        <p>An example with 2 arrays.</p>
+        <p>
+          <button onClick={() => openInPlayground(before2, after2)}>⬇️ Playground</button> An example with 2 arrays.
+        </p>
         <Viewer diff={diff2} {...viewerCommonProps} />
-        <p>2 variables with different types. The algorithm always returns the result "left is removed, right is added".</p>
+        <p>
+          <button onClick={() => openInPlayground(before3, after3)}>⬇️ Playground</button> 2 variables with different types. The algorithm always returns the result "left is removed, right is added".
+        </p>
         <Viewer diff={diff3} {...viewerCommonProps} />
-        <p>2 variables with the same primitive type. The algorithm always returns the result "left is modified to right" (if <code>showModification</code> is set to <code>false</code>, it will return the result "left is removed, right is added").</p>
+        <p>
+          <button onClick={() => openInPlayground(before4, after4)}>⬇️ Playground</button> 2 variables with the same primitive type. The algorithm always returns the result "left is modified to right" (if <code>showModification</code> is set to <code>false</code>, it will return the result "left is removed, right is added").
+        </p>
         <Viewer diff={diff4} {...viewerCommonProps} />
-        <p>Most of the lines are equal, only small amount of lines are different. You can use the <code>hideUnchangedLines</code> prop to hide the unchanged parts and make the result shorter. Notice: when the <code>diff</code> prop is changed, the expand status will be reset, it's your responsibility to keep the <code>diff</code> props unchanged (you may want to use <code>useState</code> or <code>useMemo</code>).</p>
+        <p>
+          <button onClick={() => openInPlayground(before5, after5)}>⬇️ Playground</button> Most of the lines are equal, only small amount of lines are different. You can use the <code>hideUnchangedLines</code> prop to hide the unchanged parts and make the result shorter. Notice: when the <code>diff</code> prop is changed, the expand status will be reset, it's your responsibility to keep the <code>diff</code> props unchanged (you may want to use <code>useState</code> or <code>useMemo</code>).
+        </p>
         <Viewer diff={diff5} {...viewerCommonProps} />
-        <p>An example for the recursive equal. If the differ option <code>recursiveEqual</code> is set to <code>true</code>, the object items should be treated as equal.</p>
+        <p>
+          <button onClick={() => openInPlayground(before6, after6)}>⬇️ Playground</button> An example for the recursive equal. If the differ option <code>recursiveEqual</code> is set to <code>true</code>, the object items should be treated as equal.
+        </p>
         <Viewer diff={diff6} {...viewerCommonProps} />
       </div>
       <div className="demo-footer">

@@ -7,6 +7,7 @@ import type { DifferOptions, DiffResult } from '../differ';
 import isEqual from './is-equal';
 import shallowSimilarity from './shallow-similarity';
 import concat from './concat';
+import prettyAppendLines from './pretty-append-lines';
 
 const lcs = (
   arrLeft: any[],
@@ -77,10 +78,22 @@ const lcs = (
         (type === 'array' || type === 'object') &&
         isEqual(arrLeft[i - 1], arrRight[j - 1], options)
       ) {
-        tLeft.unshift({ level: level + 1, type: 'equal', text: formatValue(arrLeft[i - 1]) });
-        tRight.unshift({ level: level + 1, type: 'equal', text: formatValue(arrRight[j - 1]) });
+        const reversedLeft = [];
+        const reversedRight = [];
+        prettyAppendLines(
+          reversedLeft,
+          reversedRight,
+          null,
+          null,
+          arrLeft[i - 1],
+          arrRight[j - 1],
+          level + 1,
+          options,
+        );
+        tLeft = concat(tLeft, reversedLeft.reverse(), true);
+        tRight = concat(tRight, reversedRight.reverse(), true);
       } else if (type === 'array') {
-        const [l, r] = diffArrayLCS(arrLeft[i - 1], arrRight[j - 1], keyLeft, keyRight, level + 2, options);
+        const [l, r] = diffArrayLCS(arrLeft[i - 1], arrRight[j - 1], keyLeft, keyRight, level + 1, options);
         tLeft = concat(tLeft, l.reverse(), true);
         tRight = concat(tRight, r.reverse(), true);
       } else if (type === 'object') {
@@ -92,15 +105,60 @@ const lcs = (
         tLeft.unshift({ level: level + 1, type: 'equal', text: '{' });
         tRight.unshift({ level: level + 1, type: 'equal', text: '{' });
       } else {
-        tLeft.unshift({ level: level + 1, type: 'equal', text: formatValue(arrLeft[i - 1]) });
-        tRight.unshift({ level: level + 1, type: 'equal', text: formatValue(arrRight[j - 1]) });
+        const reversedLeft = [];
+        const reversedRight = [];
+        prettyAppendLines(
+          reversedLeft,
+          reversedRight,
+          null,
+          null,
+          arrLeft[i - 1],
+          arrRight[j - 1],
+          level + 1,
+          options,
+        );
+        tLeft = concat(tLeft, reversedLeft.reverse(), true);
+        tRight = concat(tRight, reversedRight.reverse(), true);
       }
       i--;
       j--;
     } else if (backtrack[i][j] === 'up') {
       if (options.showModifications && i > 1 && backtrack[i - 1][j] === 'left') {
-        tLeft.unshift({ level: level + 1, type: 'modify', text: formatValue(arrLeft[i - 1]) });
-        tRight.unshift({ level: level + 1, type: 'modify', text: formatValue(arrRight[j - 1]) });
+        const typeLeft = getType(arrLeft[i - 1]);
+        const typeRight = getType(arrRight[j - 1]);
+        if (typeLeft === typeRight) {
+          if (typeLeft === 'array') {
+            const [l, r] = diffArrayLCS(arrLeft[i - 1], arrRight[j - 1], keyLeft, keyRight, level + 1, options);
+            tLeft = concat(tLeft, l.reverse(), true);
+            tRight = concat(tRight, r.reverse(), true);
+          } else if (typeLeft === 'object') {
+            const [l, r] = diffObject(arrLeft[i - 1], arrRight[j - 1], level + 2, options, diffArrayLCS);
+            tLeft.unshift({ level: level + 1, type: 'equal', text: '}' });
+            tRight.unshift({ level: level + 1, type: 'equal', text: '}' });
+            tLeft = concat(tLeft, l.reverse(), true);
+            tRight = concat(tRight, r.reverse(), true);
+            tLeft.unshift({ level: level + 1, type: 'equal', text: '{' });
+            tRight.unshift({ level: level + 1, type: 'equal', text: '{' });
+          } else {
+            tLeft.unshift({ level: level + 1, type: 'modify', text: formatValue(arrLeft[i - 1]) });
+            tRight.unshift({ level: level + 1, type: 'modify', text: formatValue(arrRight[j - 1]) });
+          }
+        } else {
+          const reversedLeft = [];
+          const reversedRight = [];
+          prettyAppendLines(
+            reversedLeft,
+            reversedRight,
+            null,
+            null,
+            arrLeft[i - 1],
+            arrRight[j - 1],
+            level + 1,
+            options,
+          );
+          tLeft = concat(tLeft, reversedLeft.reverse(), true);
+          tRight = concat(tRight, reversedRight.reverse(), true);
+        }
         i--;
         j--;
       } else {

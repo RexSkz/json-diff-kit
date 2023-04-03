@@ -422,7 +422,7 @@ const Viewer: React.FC<ViewerProps> = props => {
 
   return (
     <table
-      className={`json-diff-viewer ${props.className || ''}`}
+      className={`json-diff-viewer ${props.virtual ? 'json-diff-viewer-virtual' : ''} ${props.className || ''}`}
       style={props.style}
     >
       {renderMeasureLine()}

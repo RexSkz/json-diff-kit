@@ -123,6 +123,10 @@ return (
     forceUpdate(pre => pre + 1);
   };
   React.useEffect(() => {
+    setBefore(l || '');
+    setAfter(r || '');
+  }, [l, r]);
+  React.useEffect(() => {
     triggerDiff(before.current, after.current);
   }, [differOptions]);
 
