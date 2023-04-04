@@ -6,7 +6,7 @@ import { InlineDiffOptions } from '../src/utils/get-inline-diff';
 import type { ViewerProps } from '../src/viewer';
 
 import './docs.less';
-import setInitialValues from './set-initial-values';
+import { updateInitialValues } from './initial-values';
 
 interface PropTypes {
   onSwitch: () => void;
@@ -99,7 +99,7 @@ const Docs: React.FC<PropTypes> = props => {
   const diff6 = React.useMemo(() => differ.diff(before6, after6), [differ, before6, after6]);
 
   const openInPlayground = (l: any, r: any) => {
-    setInitialValues(JSON.stringify(l, null, 2), JSON.stringify(r, null, 2));
+    updateInitialValues(JSON.stringify(l, null, 2), JSON.stringify(r, null, 2));
     props.onSwitch();
   };
 

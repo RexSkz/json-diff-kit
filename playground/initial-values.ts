@@ -9,7 +9,7 @@ const getValue = () => {
   };
 };
 
-const useInitialValues = () => {
+export const useInitialValues = () => {
   const [initialValues, setInitialValues] = React.useState(getValue());
 
   React.useEffect(() => {
@@ -28,4 +28,10 @@ const useInitialValues = () => {
   return initialValues;
 };
 
-export default useInitialValues;
+export const updateInitialValues = (l: string, r: string) => {
+  const hash = window.location.hash ? window.location.hash.slice(1) : '';
+  const query = new URLSearchParams(hash);
+  query.set('l', l);
+  query.set('r', r);
+  window.location.hash = query.toString();
+};

@@ -7,8 +7,7 @@ import type { DifferOptions, InlineDiffOptions } from '../src';
 import GeneratedCode from './generated-code';
 import jsStringify from './js-stringify';
 import Label from './label';
-import setInitialValues from './set-initial-values';
-import useInitialValues from './use-initial-values';
+import { updateInitialValues, useInitialValues } from './initial-values';
 
 import './playground.less';
 
@@ -58,7 +57,6 @@ const Playground: React.FC<PlaygroundProps> = props => {
 
   const _triggerDiff = (before: string, after: string) => {
     try {
-      setInitialValues(before, after);
       const result = differ.diff(
         JSON.parse(String(before || 'null')),
         JSON.parse(String(after || 'null')),
@@ -83,14 +81,20 @@ const Playground: React.FC<PlaygroundProps> = props => {
       expandLineHeight: 27,
     };
   }, [virtual]);
-  const viewerOptions: Omit<ViewerProps, 'diff'> = {
+  const viewerOptions: Omit<ViewerProps, 'diff'> = React.useMemo(() => ({
     indent,
     lineNumbers: true,
     highlightInlineDiff,
     inlineDiffOptions,
     hideUnchangedLines,
     virtual: virtualOptions,
-  };
+  }), [
+    indent,
+    highlightInlineDiff,
+    inlineDiffOptions,
+    hideUnchangedLines,
+    virtualOptions,
+  ]);
 
   const code = `
 const d = new Differ(${jsStringify(differOptions)});
@@ -109,24 +113,31 @@ return (
   const { l, r } = useInitialValues();
   const before = React.useRef(l || '');
   const after = React.useRef(r || '');
-  const [key, forceUpdate] = React.useState(0);
-  const setBefore = (value: string) => {
+  const setBefore = (value: string, diff: boolean) => {
     before.current = value;
-    triggerDiff(before.current, after.current);
+    updateInitialValues(before.current, after.current);
+    if (diff) {
+      triggerDiff(before.current, after.current);
+    }
   };
-  const setAfter = (value: string) => {
+  const setAfter = (value: string, diff: boolean) => {
     after.current = value;
-    triggerDiff(before.current, after.current);
+    updateInitialValues(before.current, after.current);
+    if (diff) {
+      triggerDiff(before.current, after.current);
+    }
   };
   const clearAll = () => {
     before.current = '';
     after.current = '';
-    setDiff(differ.diff('null', 'null'));
-    forceUpdate(pre => pre + 1);
+    updateInitialValues('', '');
   };
   React.useEffect(() => {
-    setBefore(l || '');
-    setAfter(r || '');
+    if (l !== before.current || r !== after.current) {
+      setBefore(l || '', false);
+      setAfter(r || '', false);
+      triggerDiff(l, r);
+    }
   }, [l, r]);
   React.useEffect(() => {
     _triggerDiff(before.current, after.current);
@@ -376,16 +387,14 @@ return (
         </div>
         <div className="inputs">
           <textarea
-            key={`before-${key}`}
             placeholder="before"
             defaultValue={before.current}
-            onChange={e => setBefore(e.target.value)}
+            onChange={e => setBefore(e.target.value, true)}
           />
           <textarea
-            key={`after-${key}`}
             placeholder="after"
             defaultValue={after.current}
-            onChange={e => setAfter(e.target.value)}
+            onChange={e => setAfter(e.target.value, true)}
           />
         </div>
         <div className="title">
