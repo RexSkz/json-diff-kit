@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { CSSProperties, useEffect, useRef, useState } from 'react';
 
 import type { DiffResult } from './differ';
 import calculatePlaceholderHeight from './utils/calculate-placeholder-height';
@@ -97,7 +97,7 @@ export interface ViewerProps {
   /** Extra class names */
   className?: string;
   /** Extra styles */
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }
 
 const DEFAULT_INDENT = 2;
@@ -127,13 +127,13 @@ const Viewer: React.FC<ViewerProps> = props => {
   // Use these refs to keep the diff data and segments sync,
   // or it may cause runtime error because of their mismatch.
   // Do not use the states to render, use the refs to render and use `updateViewer` to update.
-  const linesLeftRef = React.useRef(linesLeft);
-  const linesRightRef = React.useRef(linesRight);
-  const segmentsRef = React.useRef(getSegments(linesLeft, linesRight, hideUnchangedLines));
-  const accTopRef = React.useRef<number[]>([]);
-  const totalHeightRef = React.useRef(0);
-  const tbodyRef = React.useRef<HTMLTableSectionElement>(null);
-  const [, forceUpdate] = React.useState({});
+  const linesLeftRef = useRef(linesLeft);
+  const linesRightRef = useRef(linesRight);
+  const segmentsRef = useRef(getSegments(linesLeft, linesRight, hideUnchangedLines));
+  const accTopRef = useRef<number[]>([]);
+  const totalHeightRef = useRef(0);
+  const tbodyRef = useRef<HTMLTableSectionElement>(null);
+  const [, forceUpdate] = useState({});
 
   const updateViewer = () => {
     accTopRef.current = [];
@@ -158,14 +158,14 @@ const Viewer: React.FC<ViewerProps> = props => {
     forceUpdate({});
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     linesLeftRef.current = linesLeft;
     linesRightRef.current = linesRight;
     segmentsRef.current = getSegments(linesLeft, linesRight, hideUnchangedLines);
     updateViewer();
   }, [hideUnchangedLines, linesLeft, linesRight]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!props.virtual || !scrollContainer) {
       return;
     }
