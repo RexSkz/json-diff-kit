@@ -29,6 +29,8 @@ To generate the diff data:
 
 ```ts
 import { Differ } from 'json-diff-kit';
+// or if you are using vue, you can import the differ only
+import Differ from 'json-diff-kit/dist/differ';
 
 // the two JS objects
 const before = {

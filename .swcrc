@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/swcrc",
+  "jsc": {
+    "parser": {
+      "syntax": "typescript"
+    },
+    "target": "es2016",
+    "loose": true,
+    "keepClassNames": true
+  },
+  "minify": false
+}

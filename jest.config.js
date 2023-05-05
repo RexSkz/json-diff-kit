@@ -1,11 +1,7 @@
 module.exports = {
   transform: {
-    '^.+\\.tsx?$': [
-      'esbuild-jest',
-      {
-        sourcemap: 'inline',
-        target: 'es2017',
-      }
+    '^.+\\.(t|j)sx?$': [
+      '@swc/jest',
     ],
   },
 };

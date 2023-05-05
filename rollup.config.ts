@@ -1,80 +1,43 @@
 import commonjs from '@rollup/plugin-commonjs';
-import esbuild from 'rollup-plugin-esbuild';
-import html from '@rollup/plugin-html';
 import less from 'rollup-plugin-less';
-import livereload from 'rollup-plugin-livereload';
+import replace from '@rollup/plugin-replace';
 import resolve from '@rollup/plugin-node-resolve';
-import serve from 'rollup-plugin-serve';
-import styles from 'rollup-plugin-styles';
+import swc from 'rollup-plugin-swc';
 
 import packageJson from './package.json';
 
-const BASEDIR = process.env.BASEDIR || '.cache';
-
 const plugins = [
-  resolve({ preferBuiltins: true }),
+  less({ output: './dist/viewer.css' }),
+  resolve({
+    preferBuiltins: true,
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
+  }),
   commonjs(),
-  esbuild({
-    exclude: [],
-    minify: process.env.NODE_ENV === 'production',
-    jsxFactory: 'React.createElement',
-    jsxFragment: 'React.Fragment',
-    define: {
+  replace({
+    values: {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       __VERSION__: JSON.stringify(packageJson.version),
     },
-    loaders: {
-      '.json': 'json', // require @rollup/plugin-commonjs
-      '.js': 'jsx',
-    },
+    preventAssignment: true,
   }),
-  less({
-    output: `${BASEDIR}/index.css`,
-    insert: true,
-  }),
-  styles(),
-  html({
-    template: ({ files }) => {
-      return `<!DOCTYPE html>
-<html>
-<head>
-  <title>JSON Diff Kit Playground</title>
-</head>
-<body>
-  <div id="root"></div>
-  ${files.js.map(({ fileName }) => `<script src="${fileName}"></script>`)}
-</body>
-</html>
-`;
-    },
-  }),
+  swc(),
 ];
 
-if (process.env.NODE_ENV !== 'production') {
-  plugins.push(
-    serve({
-      contentBase: BASEDIR,
-      open: true,
-      openPage: '/index.html',
-      port: 3000,
-    }),
-    livereload({
-      watch: BASEDIR,
-      delay: 300,
-    }),
-  );
-}
+const globals = {
+  react: 'React',
+  'react-dom': 'ReactDOM',
+};
 
 export default {
-  input: 'playground/index.tsx',
-  output: {
-    file: `${BASEDIR}/index.js`,
-    format: 'umd',
-    name: 'JSONDiffKit',
-    globals: {
-      react: 'React',
-      'react-dom': 'ReactDOM',
-    },
+  input: {
+    index: 'src/index.ts',
+    differ: 'src/differ.ts',
+    viewer: 'src/viewer.tsx',
   },
+  output: [
+    { dir: './dist', format: 'esm', globals, exports: 'auto' },
+    { dir: './dist/cjs', format: 'cjs', globals, exports: 'auto' },
+  ],
+  external: ['react', 'react-dom'],
   plugins,
 };
