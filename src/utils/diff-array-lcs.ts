@@ -83,8 +83,8 @@ const lcs = (
         prettyAppendLines(
           reversedLeft,
           reversedRight,
-          null,
-          null,
+          '',
+          '',
           arrLeft[i - 1],
           arrRight[j - 1],
           level + 1,
@@ -110,8 +110,8 @@ const lcs = (
         prettyAppendLines(
           reversedLeft,
           reversedRight,
-          null,
-          null,
+          '',
+          '',
           arrLeft[i - 1],
           arrRight[j - 1],
           level + 1,
@@ -149,8 +149,8 @@ const lcs = (
           prettyAppendLines(
             reversedLeft,
             reversedRight,
-            null,
-            null,
+            '',
+            '',
             arrLeft[i - 1],
             arrRight[j - 1],
             level + 1,
@@ -162,7 +162,7 @@ const lcs = (
         i--;
         j--;
       } else {
-        const addedLines = stringify(arrLeft[i - 1], null, 1).split('\n');
+        const addedLines = stringify(arrLeft[i - 1], undefined, 1).split('\n');
         for (let i = addedLines.length - 1; i >= 0; i--) {
           tLeft.unshift({
             level: level + 1 + (addedLines[i].match(/^\s+/)?.[0]?.length || 0),
@@ -174,7 +174,7 @@ const lcs = (
         i--;
       }
     } else {
-      const addedLines = stringify(arrRight[j - 1], null, 1).split('\n');
+      const addedLines = stringify(arrRight[j - 1], undefined, 1).split('\n');
       for (let i = addedLines.length - 1; i >= 0; i--) {
         tLeft.unshift({ level: level + 1, type: 'equal', text: '' });
         tRight.unshift({
@@ -208,7 +208,7 @@ const diffArrayLCS = (
     linesRight.push({ level, type: 'equal', text: '[' });
   }
 
-  if (level >= options.maxDepth) {
+  if (level >= (options.maxDepth || Infinity)) {
     linesLeft.push({ level: level + 1, type: 'equal', text: '...' });
     linesRight.push({ level: level + 1, type: 'equal', text: '...' });
   } else {

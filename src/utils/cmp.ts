@@ -21,6 +21,7 @@ const getOrderByType = (value: any) => {
   if (typeof value === 'object') {
     return 5;
   }
+  return -1;
 };
 
 /**
@@ -54,6 +55,8 @@ const cmp = (a: any, b: any, options: CmpOptions) => {
     case 'boolean':
       return (+a) - (+b);
   }
+
+  return 0;
 };
 
 export default cmp;

@@ -11,7 +11,7 @@
     "test": "cross-env jest --coverage",
     "build": "cross-env pnpm build:ts && pnpm build:less",
     "build:ts": "cross-env rollup -c",
-    "build:less": "cross-env lessc src/viewer.less dist/viewer.css",
+    "build:less": "cross-env lessc src/viewer.less dist/viewer.css && lessc src/viewer-monokai.less dist/viewer-monokai.css",
     "build:pages": "cross-env NODE_ENV=production BASEDIR=docs rollup -c rollup.config.pages.ts",
     "prepublish": "cross-env pnpm build"
   },

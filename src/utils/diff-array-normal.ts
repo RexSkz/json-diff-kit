@@ -27,7 +27,7 @@ const diffArrayNormal = (
     linesRight.push({ level, type: 'equal', text: '[' });
   }
 
-  if (level >= options.maxDepth) {
+  if (level >= (options.maxDepth || Infinity)) {
     linesLeft.push({ level: level + 1, type: 'equal', text: '...' });
     linesRight.push({ level: level + 1, type: 'equal', text: '...' });
   } else {
@@ -41,8 +41,8 @@ const diffArrayNormal = (
           prettyAppendLines(
             linesLeft,
             linesRight,
-            null,
-            null,
+            '',
+            '',
             itemLeft,
             itemRight,
             level + 1,
@@ -56,8 +56,8 @@ const diffArrayNormal = (
           prettyAppendLines(
             linesLeft,
             linesRight,
-            null,
-            null,
+            '',
+            '',
             itemLeft,
             itemRight,
             level + 1,

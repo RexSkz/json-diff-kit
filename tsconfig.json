@@ -11,6 +11,7 @@
     "outDir": "typings",
     "resolveJsonModule": true,
     "sourceMap": true,
+    "strictNullChecks": true,
     "target": "esnext",
   },
   "include": ["src"],

@@ -1,13 +1,15 @@
 import * as React from 'react';
 
 import type { DiffResult } from './differ';
+
 import calculatePlaceholderHeight from './utils/calculate-placeholder-height';
 import findVisibleLines from './utils/find-visible-lines';
 import getInlineDiff from './utils/get-inline-diff';
-import type { InlineDiffResult, InlineDiffOptions } from './utils/get-inline-diff';
+import type { InlineDiffOptions } from './utils/get-inline-diff';
+import getInlineSyntaxHighlight from './utils/get-inline-syntax-highlight';
 import getSegments from './utils/get-segments';
 import type { HiddenUnchangedLinesInfo, SegmentItem } from './utils/get-segments';
-import { isExpandLine } from './utils/segment-util';
+import { isExpandLine, mergeSegments, type InlineRenderInfo } from './utils/segment-util';
 
 interface ExpandLineRendererOptions {
   /**
@@ -93,6 +95,19 @@ export interface ViewerProps {
     itemHeight?: number;
     /** @default 26 */
     expandLineHeight?: number;
+  };
+  /**
+   * Enable the syntax highlight feature, default is `false`.
+   */
+  syntaxHighlight?: false | {
+    /**
+     * The syntax highlighting theme; it will add a className to `table`.
+     *
+     * NOTICE:
+     * - You need to import the corresponding CSS file manually.
+     * @default 'monokai'
+     */
+    theme?: string;
   };
   /** Extra class names */
   className?: string;
@@ -233,38 +248,50 @@ const Viewer: React.FC<ViewerProps> = props => {
     updateViewer();
   };
 
-  const renderInlineDiffResult = (arr: InlineDiffResult[][]) => {
-    return arr.map(result => (
-      result.map((item, index) => {
-        if (item.type === 'equal') {
+  const renderInlineResult = (
+    text: string,
+    info: InlineRenderInfo[] = [],
+    comma = false,
+    syntaxHighlightEnabled = false,
+  ) => (
+    <>
+      {
+        info.map((item, index) => {
+          const frag = text.slice(item.start, item.end);
+
+          if (!item.type && !item.token) {
+            return frag;
+          }
+
+          const className = [
+            item.type ? `inline-diff-${item.type}` : '',
+            item.token ? `token ${item.token}` : '',
+          ].filter(Boolean).join(' ');
           return (
-            <span key={`${index}-${item.type}-${item.text}`}>
-              {item.text}
+            <span key={`${index}-${item.type}-${frag}`} className={className}>
+              {frag}
             </span>
           );
-        }
-        return (
-          <span
-            key={`${index}-${item.type}-${item.text}`}
-            className={`inline-diff-${item.type}`}
-          >
-            {item.text}
-          </span>
-        )
-      })
-    ));
-  };
+        })
+      }
+      {comma && (syntaxHighlightEnabled ? <span className="token punctuation">,</span> : ',')}
+    </>
+  );
 
-  const renderLine = (index: number) => {
+  const renderLine = (index: number, syntaxHighlightEnabled: boolean) => {
     const l = linesLeftRef.current[index];
     const r = linesRightRef.current[index];
 
-    const [lText, rText] = props.highlightInlineDiff && l.type === 'modify' && r.type === 'modify'
-      ? renderInlineDiffResult(getInlineDiff(l.text, r.text, inlineDiffOptions))
-      : [l.text, r.text];
+    const [lDiff, rDiff] = props.highlightInlineDiff && l.type === 'modify' && r.type === 'modify'
+      ? getInlineDiff(l.text, r.text, inlineDiffOptions)
+      : [[], []];
+    const lTokens = getInlineSyntaxHighlight(syntaxHighlightEnabled, l.text, 0);
+    const rTokens = getInlineSyntaxHighlight(syntaxHighlightEnabled, r.text, 0);
+    const lResult = mergeSegments(lTokens, lDiff);
+    const rResult = mergeSegments(rTokens, rDiff);
 
-    const bgColourL = l.type !== 'equal' ? props.bgColour?.[l.type] ?? '' : '';
-    const bgColourR = r.type !== 'equal' ? props.bgColour?.[r.type] ?? '' : '';
+    const bgLeft = l.type !== 'equal' ? props.bgColour?.[l.type] ?? '' : '';
+    const bgRight = r.type !== 'equal' ? props.bgColour?.[r.type] ?? '' : '';
 
     return (
       // eslint-disable-next-line react/no-array-index-key
@@ -273,27 +300,27 @@ const Viewer: React.FC<ViewerProps> = props => {
           props.lineNumbers && (
             <td
               className={`line-${l.type} line-number`}
-              style={{ backgroundColor: bgColourL }}
+              style={{ backgroundColor: bgLeft }}
             >
               {l.lineNumber}
             </td>
           )
         }
-        <td className={`line-${l.type}`} style={{ backgroundColor: bgColourL }}>
-          <pre>{l.text && indentChar.repeat(l.level * indentSize)}{lText}{l.comma && ','}</pre>
+        <td className={`line-${l.type}`} style={{ backgroundColor: bgLeft }}>
+          <pre>{l.text && indentChar.repeat(l.level * indentSize)}{renderInlineResult(l.text, lResult, l.comma, syntaxHighlightEnabled)}</pre>
         </td>
         {
           props.lineNumbers && (
             <td
               className={`line-${r.type} line-number`}
-              style={{ backgroundColor: bgColourR }}
+              style={{ backgroundColor: bgRight }}
             >
               {r.lineNumber}
             </td>
           )
         }
-        <td className={`line-${r.type}`} style={{ backgroundColor: bgColourR }}>
-          <pre>{r.text && indentChar.repeat(r.level * indentSize)}{rText}{r.comma && ','}</pre>
+        <td className={`line-${r.type}`} style={{ backgroundColor: bgRight }}>
+          <pre>{r.text && indentChar.repeat(r.level * indentSize)}{renderInlineResult(r.text, rResult, r.comma, syntaxHighlightEnabled)}</pre>
         </td>
       </tr>
     );
@@ -333,6 +360,7 @@ const Viewer: React.FC<ViewerProps> = props => {
     index: number,
     renderStart: number,
     renderEnd: number,
+    syntaxHighlightEnabled: boolean,
   ) => {
     let { start, end } = segment;
     start = Math.max(start, renderStart);
@@ -341,12 +369,12 @@ const Viewer: React.FC<ViewerProps> = props => {
       return null;
     }
     if (!isExpandLine(segment)) {
-      return Array(end - start).fill(0).map((_, index) => renderLine(start + index));
+      return Array(end - start).fill(0).map((_, index) => renderLine(start + index, syntaxHighlightEnabled));
     }
     const { hasLinesBefore, hasLinesAfter } = segment;
     const expandMoreLinesLimit = typeof hideUnchangedLines === 'boolean'
       ? DEFAULT_EXPAND_MORE_LINES_LIMIT
-      : hideUnchangedLines.expandMoreLinesLimit;
+      : hideUnchangedLines.expandMoreLinesLimit || DEFAULT_EXPAND_MORE_LINES_LIMIT;
     return [
       <tr key={`expand-line-${index}`} className="expand-line">
         <td
@@ -369,15 +397,15 @@ const Viewer: React.FC<ViewerProps> = props => {
     ];
   };
 
-  const renderTbody = () => {
+  const renderTbody = (syntaxHighlightEnabled: boolean) => {
     if (!props.virtual) {
-      return segmentsRef.current.map((item, index) => renderSegment(item, index, 0, linesLeftRef.current.length));
+      return segmentsRef.current.map((item, index) => renderSegment(item, index, 0, linesLeftRef.current.length, syntaxHighlightEnabled));
     }
     const containerHeight = (scrollContainer as HTMLElement)?.clientHeight ?? 0;
     const scrollTop = (scrollContainer as HTMLElement)?.scrollTop ?? 0;
     const scrollBottom = scrollTop + containerHeight;
 
-    let t: HTMLElement = tbodyRef.current;
+    let t: HTMLElement = tbodyRef.current!;
     let firstElementTop = t?.offsetTop ?? 0;
     while (t?.offsetParent && t?.offsetParent !== scrollContainer) {
       t = t.offsetParent as HTMLElement;
@@ -414,7 +442,7 @@ const Viewer: React.FC<ViewerProps> = props => {
     return visibleSegments.length ? (
       <>
         <tr><td colSpan={4} style={{ height: topHeight, padding: 0 }} /></tr>
-        {visibleSegments.map((segment, index) => renderSegment(segment, index, startLine, endLine))}
+        {visibleSegments.map((segment, index) => renderSegment(segment, index, startLine, endLine, syntaxHighlightEnabled))}
         <tr><td colSpan={4} style={{ height: bottomHeight, padding: 0 }} /></tr>
       </>
     ) : (
@@ -433,14 +461,19 @@ const Viewer: React.FC<ViewerProps> = props => {
     </colgroup>
   );
 
+  const classes = [
+    'json-diff-viewer',
+    props.virtual && 'json-diff-viewer-virtual',
+    props.syntaxHighlight && `json-diff-viewer-theme-${props.syntaxHighlight.theme || 'monokai'}`,
+    props.className,
+  ].filter(Boolean).join(' ');
+
+  const syntaxHighlightEnabled = !!props.syntaxHighlight;
   return (
-    <table
-      className={`json-diff-viewer ${props.virtual ? 'json-diff-viewer-virtual' : ''} ${props.className || ''}`}
-      style={props.style}
-    >
+    <table className={classes} style={props.style}>
       {renderMeasureLine()}
       <tbody ref={tbodyRef}>
-        {renderTbody()}
+        {renderTbody(syntaxHighlightEnabled)}
       </tbody>
     </table>
   );

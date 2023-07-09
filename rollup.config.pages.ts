@@ -46,7 +46,10 @@ const plugins = [
     },
     preventAssignment: true,
   }),
-  swc({ minify: process.env.NODE_ENV === 'production' }),
+  swc({
+    minify: process.env.NODE_ENV === 'production',
+    sourceMaps: process.env.NODE_ENV !== 'production',
+  }),
 ];
 
 if (process.env.NODE_ENV !== 'production') {
@@ -74,6 +77,7 @@ export default {
       react: 'React',
       'react-dom': 'ReactDOM',
     },
+    sourcemap: process.env.NODE_ENV !== 'production',
   },
   plugins,
 };

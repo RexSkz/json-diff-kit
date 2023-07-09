@@ -112,6 +112,11 @@ export interface DifferOptions {
   recursiveEqual?: boolean;
 }
 
+interface Token {
+  value: string;
+  type?: 'punctuation' | 'property' | 'operator' | 'string' | 'number' | 'keyword';
+}
+
 export interface DiffResult {
   level: number;
   type: 'modify' | 'add' | 'remove' | 'equal';
@@ -245,13 +250,13 @@ class Differ {
     const typeLeft = getType(sourceLeft);
     const typeRight = getType(sourceRight);
     if (typeLeft !== typeRight) {
-      resultLeft = stringify(sourceLeft, null, 1, this.options.maxDepth).split('\n').map(line => ({
+      resultLeft = stringify(sourceLeft, undefined, 1, this.options.maxDepth).split('\n').map(line => ({
         level: line.match(/^\s+/)?.[0]?.length || 0,
         type: 'remove',
         text: line.replace(/^\s+/, '').replace(/,$/g, ''),
         comma: line.endsWith(','),
       }));
-      resultRight = stringify(sourceRight, null, 1, this.options.maxDepth).split('\n').map(line => ({
+      resultRight = stringify(sourceRight, undefined, 1, this.options.maxDepth).split('\n').map(line => ({
         level: line.match(/^\s+/)?.[0]?.length || 0,
         type: 'add',
         text: line.replace(/^\s+/, '').replace(/,$/g, ''),
@@ -263,10 +268,10 @@ class Differ {
       resultRight = concat(resultRight, Array(lLength).fill(EQUAL_EMPTY_LINE), true);
     } else if (typeLeft === 'object') {
       [resultLeft, resultRight] = diffObject(sourceLeft, sourceRight, 1, this.options, this.arrayDiffFunc);
-      resultLeft.unshift({ ...EQUAL_LEFT_BRACKET_LINE });
-      resultLeft.push({ ...EQUAL_RIGHT_BRACKET_LINE });
-      resultRight.unshift({ ...EQUAL_LEFT_BRACKET_LINE });
-      resultRight.push({ ...EQUAL_RIGHT_BRACKET_LINE });
+      resultLeft.unshift(EQUAL_LEFT_BRACKET_LINE);
+      resultLeft.push(EQUAL_RIGHT_BRACKET_LINE);
+      resultRight.unshift(EQUAL_LEFT_BRACKET_LINE);
+      resultRight.push(EQUAL_RIGHT_BRACKET_LINE);
     } else if (typeLeft === 'array') {
       [resultLeft, resultRight] = this.arrayDiffFunc(sourceLeft, sourceRight, '', '', 0, this.options);
     } else if (sourceLeft !== sourceRight) {
@@ -280,21 +285,21 @@ class Differ {
           resultRight = [{ level: 0, type: 'equal', text: sourceRight }];
         }
       } else if (this.options.showModifications) {
-        resultLeft = [{ level: 0, type: 'modify', text: stringify(sourceLeft, null, null, this.options.maxDepth) }];
-        resultRight = [{ level: 0, type: 'modify', text: stringify(sourceRight, null, null, this.options.maxDepth) }];
+        resultLeft = [{ level: 0, type: 'modify', text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth) }];
+        resultRight = [{ level: 0, type: 'modify', text: stringify(sourceRight, undefined, undefined, this.options.maxDepth) }];
       } else {
         resultLeft = [
-          { level: 0, type: 'remove', text: stringify(sourceLeft, null, null, this.options.maxDepth) },
+          { level: 0, type: 'remove', text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth) },
           EQUAL_EMPTY_LINE,
         ];
         resultRight = [
           EQUAL_EMPTY_LINE,
-          { level: 0, type: 'add', text: stringify(sourceRight, null, null, this.options.maxDepth) },
+          { level: 0, type: 'add', text: stringify(sourceRight, undefined, undefined, this.options.maxDepth) },
         ];
       }
     } else {
-      resultLeft = [{ level: 0, type: 'equal', text: stringify(sourceLeft, null, null, this.options.maxDepth) }];
-      resultRight = [{ level: 0, type: 'equal', text: stringify(sourceRight, null, null, this.options.maxDepth) }];
+      resultLeft = [{ level: 0, type: 'equal', text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth) }];
+      resultRight = [{ level: 0, type: 'equal', text: stringify(sourceRight, undefined, undefined, this.options.maxDepth) }];
     }
 
     this.sortResultLines(resultLeft, resultRight);
