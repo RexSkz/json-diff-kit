@@ -9,6 +9,7 @@ import jsStringify from './js-stringify';
 import Label from './label';
 import { updateInitialValues, useInitialValues } from './initial-values';
 
+import '../src/viewer-monokai.less';
 import './playground.less';
 
 interface PlaygroundProps {
@@ -31,6 +32,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
   const [inlineDiffMode, setInlineDiffMode] = React.useState<InlineDiffOptions['mode']>('word');
   const [inlineDiffSeparator, setInlineDiffSeparator] = React.useState(' ');
   const [hideUnchangedLines, setHideUnchangedLines] = React.useState(true);
+  const [syntaxHighlight, setSyntaxHighlight] = React.useState(false);
   const [virtual, setVirtual] = React.useState(true);
 
   const differOptions = React.useMemo(() => ({
@@ -87,12 +89,14 @@ const Playground: React.FC<PlaygroundProps> = props => {
     highlightInlineDiff,
     inlineDiffOptions,
     hideUnchangedLines,
+    syntaxHighlight: syntaxHighlight ? { theme: 'monokai' } : false,
     virtual: virtualOptions,
   }), [
     indent,
     highlightInlineDiff,
     inlineDiffOptions,
     hideUnchangedLines,
+    syntaxHighlight,
     virtualOptions,
   ]);
 
@@ -334,6 +338,18 @@ return (
                 value={inlineDiffSeparator}
                 onChange={e => setInlineDiffSeparator(e.target.value)}
                 placeholder="Works when mode = char"
+              />
+            </label>
+            <label htmlFor="syntax-highlight">
+              <Label
+                title="Syntax highlight"
+                tip="Support syntax highlight. The viewer component will render like prismjs, and you can write your own style. Please don't forget to import the corresponding CSS file, e.g. import 'json-diff-kit/viewer-monokai.less';"
+              />
+              <input
+                type="checkbox"
+                id="syntax-highlight"
+                checked={syntaxHighlight}
+                onChange={e => setSyntaxHighlight(e.target.checked)}
               />
             </label>
             <label htmlFor="hide-unchanged-lines">
