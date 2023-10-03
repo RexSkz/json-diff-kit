@@ -264,14 +264,14 @@ class Differ {
       }));
       const lLength = resultLeft.length;
       const rLength = resultRight.length;
-      resultLeft = concat(resultLeft, Array(rLength).fill(EQUAL_EMPTY_LINE));
-      resultRight = concat(resultRight, Array(lLength).fill(EQUAL_EMPTY_LINE), true);
+      resultLeft = concat(resultLeft, Array(rLength).fill(0).map(() => ({ ...EQUAL_EMPTY_LINE })));
+      resultRight = concat(resultRight, Array(lLength).fill(0).map(() => ({ ...EQUAL_EMPTY_LINE })), true);
     } else if (typeLeft === 'object') {
       [resultLeft, resultRight] = diffObject(sourceLeft, sourceRight, 1, this.options, this.arrayDiffFunc);
-      resultLeft.unshift(EQUAL_LEFT_BRACKET_LINE);
-      resultLeft.push(EQUAL_RIGHT_BRACKET_LINE);
-      resultRight.unshift(EQUAL_LEFT_BRACKET_LINE);
-      resultRight.push(EQUAL_RIGHT_BRACKET_LINE);
+      resultLeft.unshift({ ...EQUAL_LEFT_BRACKET_LINE });
+      resultLeft.push({ ...EQUAL_RIGHT_BRACKET_LINE });
+      resultRight.unshift({ ...EQUAL_LEFT_BRACKET_LINE });
+      resultRight.push({ ...EQUAL_RIGHT_BRACKET_LINE });
     } else if (typeLeft === 'array') {
       [resultLeft, resultRight] = this.arrayDiffFunc(sourceLeft, sourceRight, '', '', 0, this.options);
     } else if (sourceLeft !== sourceRight) {
@@ -290,10 +290,10 @@ class Differ {
       } else {
         resultLeft = [
           { level: 0, type: 'remove', text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth) },
-          EQUAL_EMPTY_LINE,
+          { ...EQUAL_EMPTY_LINE },
         ];
         resultRight = [
-          EQUAL_EMPTY_LINE,
+          { ...EQUAL_EMPTY_LINE },
           { level: 0, type: 'add', text: stringify(sourceRight, undefined, undefined, this.options.maxDepth) },
         ];
       }
