@@ -80,6 +80,9 @@ const diffObject = (
         const [resLeft, resRight] = arrayDiffFunc(arrLeft, arrRight, keyLeft, keyRight, level, options, [], []);
         linesLeft = concat(linesLeft, resLeft);
         linesRight = concat(linesRight, resRight);
+      } else if (lhs[keyLeft] === null) {
+        linesLeft.push({ level, type: 'equal', text: `"${keyLeft}": null` });
+        linesRight.push({ level, type: 'equal', text: `"${keyRight}": null` });
       } else if (typeof lhs[keyLeft] === 'object') {
         const result = diffObject(
           lhs[keyLeft],
