@@ -33,7 +33,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
   const [inlineDiffSeparator, setInlineDiffSeparator] = React.useState(' ');
   const [hideUnchangedLines, setHideUnchangedLines] = React.useState(true);
   const [syntaxHighlight, setSyntaxHighlight] = React.useState(false);
-  const [virtual, setVirtual] = React.useState(true);
+  const [virtual, setVirtual] = React.useState(false);
 
   const differOptions = React.useMemo(() => ({
     detectCircular,

@@ -92,12 +92,26 @@ const diffArrayNormal = (
         arrLeft.shift();
         arrRight.shift();
       } else if (arrLeft.length) {
-        linesLeft.push({ level: level + 1, type: 'remove', text: formatValue(itemLeft) });
-        linesRight.push({ level: level + 1, type: 'equal', text: '' });
+        const removedLines = formatValue(itemLeft, undefined, true).split('\n');
+        for (let i = 0; i < removedLines.length; i++) {
+          linesLeft.push({
+            level: level + 1 + (removedLines[i].match(/^\s+/)?.[0]?.length || 0),
+            type: 'remove',
+            text: removedLines[i].replace(/^\s+/, '').replace(/,$/g, ''),
+          });
+          linesRight.push({ level: level + 1, type: 'equal', text: '' });
+        }
         arrLeft.shift();
       } else if (arrRight.length) {
-        linesLeft.push({ level: level + 1, type: 'equal', text: '' });
-        linesRight.push({ level: level + 1, type: 'add', text: formatValue(itemRight) });
+        const addedLines = formatValue(itemRight, undefined, true).split('\n');
+        for (let i = 0; i < addedLines.length; i++) {
+          linesLeft.push({ level: level + 1, type: 'equal', text: '' });
+          linesRight.push({
+            level: level + 1 + (addedLines[i].match(/^\s+/)?.[0]?.length || 0),
+            type: 'add',
+            text: addedLines[i].replace(/^\s+/, '').replace(/,$/g, ''),
+          });
+        }
         arrRight.shift();
       }
     }

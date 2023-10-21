@@ -162,12 +162,12 @@ const lcs = (
         i--;
         j--;
       } else {
-        const addedLines = stringify(arrLeft[i - 1], undefined, 1).split('\n');
-        for (let i = addedLines.length - 1; i >= 0; i--) {
+        const removedLines = stringify(arrLeft[i - 1], undefined, 1).split('\n');
+        for (let i = removedLines.length - 1; i >= 0; i--) {
           tLeft.unshift({
-            level: level + 1 + (addedLines[i].match(/^\s+/)?.[0]?.length || 0),
+            level: level + 1 + (removedLines[i].match(/^\s+/)?.[0]?.length || 0),
             type: 'remove',
-            text: addedLines[i].replace(/^\s+/, '').replace(/,$/g, ''),
+            text: removedLines[i].replace(/^\s+/, '').replace(/,$/g, ''),
           });
           tRight.unshift({ level: level + 1, type: 'equal', text: '' });
         }
