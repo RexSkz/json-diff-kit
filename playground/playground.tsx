@@ -115,36 +115,60 @@ return (
 
   // inputs
   const { l, r } = useInitialValues();
-  const before = React.useRef(l || '');
-  const after = React.useRef(r || '');
+  const beforeRef = React.useRef(l || '');
+  const afterRef = React.useRef(r || '');
+  const beforeInputRef = React.useRef<HTMLTextAreaElement>(null);
+  const afterInputRef = React.useRef<HTMLTextAreaElement>(null);
   const setBefore = (value: string, diff: boolean) => {
-    before.current = value;
-    updateInitialValues(before.current, after.current);
+    beforeRef.current = value;
+    updateInitialValues(beforeRef.current, afterRef.current);
     if (diff) {
-      triggerDiff(before.current, after.current);
+      triggerDiff(beforeRef.current, afterRef.current);
     }
   };
   const setAfter = (value: string, diff: boolean) => {
-    after.current = value;
-    updateInitialValues(before.current, after.current);
+    afterRef.current = value;
+    updateInitialValues(beforeRef.current, afterRef.current);
     if (diff) {
-      triggerDiff(before.current, after.current);
+      triggerDiff(beforeRef.current, afterRef.current);
     }
   };
   const clearAll = () => {
-    before.current = '';
-    after.current = '';
+    beforeRef.current = '';
+    afterRef.current = '';
     updateInitialValues('', '');
   };
+  const beautify = () => {
+    let before = '';
+    let after = '';
+    try {
+      if (beforeRef) {
+        before = JSON.stringify(JSON.parse(beforeRef.current || 'null'), null, 2);
+      }
+      if (afterRef) {
+        after = JSON.stringify(JSON.parse(afterRef.current || 'null'), null, 2);
+      }
+    } catch (e) {
+      setError(e.message);
+      console.error(e);
+    }
+    if (before || after) {
+      beforeInputRef.current!.value = before;
+      afterInputRef.current!.value = after;
+      setBefore(before, false);
+      setAfter(after, false);
+      updateInitialValues(before, after);
+    }
+  };
   React.useEffect(() => {
-    if (l !== before.current || r !== after.current) {
+    if (l !== beforeRef.current || r !== afterRef.current) {
       setBefore(l || '', false);
       setAfter(r || '', false);
       triggerDiff(l, r);
     }
   }, [l, r]);
   React.useEffect(() => {
-    _triggerDiff(before.current, after.current);
+    _triggerDiff(beforeRef.current, afterRef.current);
   }, [differOptions]);
 
   return (
@@ -399,17 +423,20 @@ return (
       <div className={`layout-right${fullscreen ? ' layout-right-fullscreen' : ''}`}>
         <div className="title">
           INPUTS
-          <span className="control-button" onClick={() => clearAll()}>[CLEAR ALL]</span>
+          <span className="control-button" onClick={clearAll}>[CLEAR ALL]</span>
+          <span className="control-button" onClick={beautify}>[BEAUTIFY]</span>
         </div>
         <div className="inputs">
           <textarea
+            ref={beforeInputRef}
             placeholder="before"
-            defaultValue={before.current}
+            defaultValue={beforeRef.current}
             onChange={e => setBefore(e.target.value, true)}
           />
           <textarea
+            ref={afterInputRef}
             placeholder="after"
-            defaultValue={after.current}
+            defaultValue={afterRef.current}
             onChange={e => setAfter(e.target.value, true)}
           />
         </div>
