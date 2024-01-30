@@ -110,6 +110,11 @@ export interface DifferOptions {
    * This comparation process is slow in huge objects.
   */
   recursiveEqual?: boolean;
+  /**
+   * If the value is set, differ will make sure the key order of results is the same as inputs
+   * ("before" or "after"). Otherwise, differ will sort the keys of results.
+   */
+  preserveKeyOrder?: 'before' | 'after';
 }
 
 interface Token {
@@ -151,6 +156,7 @@ class Differ {
     ignoreCase = false,
     ignoreCaseForKey = false,
     recursiveEqual = false,
+    preserveKeyOrder,
   }: DifferOptions = {}) {
     this.options = {
       detectCircular,
@@ -160,6 +166,7 @@ class Differ {
       ignoreCase,
       ignoreCaseForKey,
       recursiveEqual,
+      preserveKeyOrder,
     };
     this.arrayDiffFunc = arrayDiffMethod === 'lcs' || arrayDiffMethod === 'unorder-lcs'
       ? diffArrayLCS

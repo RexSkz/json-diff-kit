@@ -52,11 +52,36 @@ const diffObject = (
 
   const keysLeft = Object.keys(lhs);
   const keysRight = Object.keys(rhs);
-  sortKeys(keysLeft, options);
-  sortKeys(keysRight, options);
+  const keyOrdersMap = new Map<string, number>();
+  if (!options.preserveKeyOrder) {
+    sortKeys(keysLeft, options);
+    sortKeys(keysRight, options);
+  } else if (options.preserveKeyOrder === 'before') {
+    for (let i = 0; i < keysLeft.length; i++) {
+      keyOrdersMap.set(keysLeft[i], i);
+    }
+    for (let i = 0; i < keysRight.length; i++) {
+      if (!keyOrdersMap.has(keysRight[i])) {
+        keyOrdersMap.set(keysRight[i], keysLeft.length + i);
+      }
+    }
+    keysRight.sort((a, b) => keyOrdersMap.get(a)! - keyOrdersMap.get(b)!);
+  } else if (options.preserveKeyOrder === 'after') {
+    for (let i = 0; i < keysRight.length; i++) {
+      keyOrdersMap.set(keysRight[i], i);
+    }
+    for (let i = 0; i < keysLeft.length; i++) {
+      if (!keyOrdersMap.has(keysLeft[i])) {
+        keyOrdersMap.set(keysLeft[i], keysRight.length + i);
+      }
+    }
+    keysLeft.sort((a, b) => keyOrdersMap.get(a)! - keyOrdersMap.get(b)!);
+  }
 
-  const keysCmpOptions = { ignoreCase: options.ignoreCaseForKey };
-  const valueCmpOptions = { ignoreCase: options.ignoreCase };
+  const keysCmpOptions = {
+    ignoreCase: options.ignoreCaseForKey,
+    keyOrdersMap,
+  };
   while (keysLeft.length || keysRight.length) {
     const keyLeft = keysLeft[0];
     const keyRight = keysRight[0];

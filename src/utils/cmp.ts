@@ -1,5 +1,6 @@
 interface CmpOptions {
   ignoreCase?: boolean;
+  keyOrdersMap?: Map<string, number>;
 }
 
 const getOrderByType = (value: any) => {
@@ -32,6 +33,12 @@ const getOrderByType = (value: any) => {
  *   - For array and object: preserve the original order (or do we have a better idea?)
  */
 const cmp = (a: any, b: any, options: CmpOptions) => {
+  const orderByMapA = options.keyOrdersMap?.get(a);
+  const orderByMapB = options.keyOrdersMap?.get(b);
+  if (orderByMapA !== undefined && orderByMapB !== undefined) {
+    return orderByMapA - orderByMapB;
+  }
+
   const orderByTypeA = getOrderByType(a);
   const orderByTypeB = getOrderByType(b);
 
@@ -47,7 +54,7 @@ const cmp = (a: any, b: any, options: CmpOptions) => {
     case 'number':
       return a - b;
     case 'string':
-      if (options?.ignoreCase) {
+      if (options.ignoreCase) {
         a = a.toLowerCase();
         b = b.toLowerCase();
       }

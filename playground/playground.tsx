@@ -25,6 +25,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
   const [ignoreCase, setIgnoreCase] = React.useState(false);
   const [ignoreCaseForKey, setIgnoreCaseForKey] = React.useState(false);
   const [recursiveEqual, setRecursiveEqual] = React.useState(true);
+  const [preserveKeyOrder, setPreserveKeyOrder] = React.useState<DifferOptions['preserveKeyOrder']>(undefined);
 
   // viewer props
   const [indent, setIndent] = React.useState(4);
@@ -43,6 +44,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
     ignoreCase,
     ignoreCaseForKey,
     recursiveEqual,
+    preserveKeyOrder,
   }), [
     detectCircular,
     maxDepth,
@@ -51,6 +53,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
     ignoreCase,
     ignoreCaseForKey,
     recursiveEqual,
+    preserveKeyOrder,
   ]);
   const differ = React.useMemo(() => new Differ(differOptions), [differOptions]);
   const [diff, setDiff] = React.useState(differ.diff("", ""));
@@ -296,6 +299,25 @@ return (
                 checked={recursiveEqual}
                 onChange={e => setRecursiveEqual(e.target.checked)}
               />
+            </label>
+            <label htmlFor="preserve-key-order">
+              <Label
+                title="Preserve key order"
+                tip={
+                  <>
+                    Sometimes you do not want the keys in result be sorted, for example <code>start_time</code> and <code>end_time</code> will be swapped by default. You can set this option to let the differ preserve the key order according to <code>before</code> or <code>after</code>.
+                  </>
+                }
+              />
+              <select
+                id="preserve-key-order"
+                value={preserveKeyOrder}
+                onChange={e => setPreserveKeyOrder((e.target.value === 'sort' ? undefined : e.target.value) as DifferOptions['preserveKeyOrder'])}
+              >
+                <option value="sort">sort (default)</option>
+                <option value="before">by "before"</option>
+                <option value="after">by "after"</option>
+              </select>
             </label>
           </form>
         </div>
