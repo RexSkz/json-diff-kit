@@ -135,7 +135,7 @@ const diffObject = (
         );
       }
     } else if (keysLeft.length && keysRight.length) {
-      if (keyLeft < keyRight) {
+      if (keyCmpResult < 0) {
         const addedLines = stringify(lhs[keyLeft], undefined, 1).split('\n');
         for (let i = 0; i < addedLines.length; i++) {
           const text = addedLines[i].replace(/^\s+/, '').replace(/,$/g, '');
