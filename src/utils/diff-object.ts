@@ -27,7 +27,7 @@ const diffObject = (
   if (lhs === null && rhs === null || lhs === undefined && rhs === undefined) {
     return [linesLeft, linesRight];
   } else if (lhs === null || lhs === undefined) {
-    const addedLines = stringify(rhs, undefined, 1).split('\n');
+    const addedLines = stringify(rhs, undefined, 1, undefined, options.undefinedBehavior).split('\n');
     for (let i = 0; i < addedLines.length; i++) {
       linesLeft.push({ level, type: 'equal', text: '' });
       linesRight.push({
@@ -38,7 +38,7 @@ const diffObject = (
     }
     return [linesLeft, linesRight];
   } else if (rhs === null || rhs === undefined) {
-    const addedLines = stringify(lhs, undefined, 1).split('\n');
+    const addedLines = stringify(lhs, undefined, 1, undefined, options.undefinedBehavior).split('\n');
     for (let i = 0; i < addedLines.length; i++) {
       linesLeft.push({
         level: level + (addedLines[i].match(/^\s+/)?.[0]?.length || 0),
@@ -136,7 +136,7 @@ const diffObject = (
       }
     } else if (keysLeft.length && keysRight.length) {
       if (keyCmpResult < 0) {
-        const addedLines = stringify(lhs[keyLeft], undefined, 1).split('\n');
+        const addedLines = stringify(lhs[keyLeft], undefined, 1, undefined, options.undefinedBehavior).split('\n');
         for (let i = 0; i < addedLines.length; i++) {
           const text = addedLines[i].replace(/^\s+/, '').replace(/,$/g, '');
           linesLeft.push({
@@ -147,7 +147,7 @@ const diffObject = (
           linesRight.push({ level, type: 'equal', text: '' });
         }
       } else {
-        const addedLines = stringify(rhs[keyRight], undefined, 1).split('\n');
+        const addedLines = stringify(rhs[keyRight], undefined, 1, undefined, options.undefinedBehavior).split('\n');
         for (let i = 0; i < addedLines.length; i++) {
           const text = addedLines[i].replace(/^\s+/, '').replace(/,$/g, '');
           linesLeft.push({ level, type: 'equal', text: '' });
@@ -159,7 +159,7 @@ const diffObject = (
         }
       }
     } else if (keysLeft.length) {
-      const addedLines = stringify(lhs[keyLeft], undefined, 1).split('\n');
+      const addedLines = stringify(lhs[keyLeft], undefined, 1, undefined, options.undefinedBehavior).split('\n');
       for (let i = 0; i < addedLines.length; i++) {
         const text = addedLines[i].replace(/^\s+/, '').replace(/,$/g, '');
         linesLeft.push({
@@ -170,7 +170,7 @@ const diffObject = (
         linesRight.push({ level, type: 'equal', text: '' });
       }
     } else if (keysRight.length) {
-      const addedLines = stringify(rhs[keyRight], undefined, 1).split('\n');
+      const addedLines = stringify(rhs[keyRight], undefined, 1, undefined, options.undefinedBehavior).split('\n');
       for (let i = 0; i < addedLines.length; i++) {
         const text = addedLines[i].replace(/^\s+/, '').replace(/,$/g, '');
         linesLeft.push({ level, type: 'equal', text: '' });

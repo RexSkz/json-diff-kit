@@ -140,8 +140,8 @@ const lcs = (
             tLeft.unshift({ level: level + 1, type: 'equal', text: '{' });
             tRight.unshift({ level: level + 1, type: 'equal', text: '{' });
           } else {
-            tLeft.unshift({ level: level + 1, type: 'modify', text: formatValue(arrLeft[i - 1]) });
-            tRight.unshift({ level: level + 1, type: 'modify', text: formatValue(arrRight[j - 1]) });
+            tLeft.unshift({ level: level + 1, type: 'modify', text: formatValue(arrLeft[i - 1], undefined, undefined, options.undefinedBehavior) });
+            tRight.unshift({ level: level + 1, type: 'modify', text: formatValue(arrRight[j - 1], undefined, undefined, options.undefinedBehavior) });
           }
         } else {
           const reversedLeft = [];
@@ -162,7 +162,7 @@ const lcs = (
         i--;
         j--;
       } else {
-        const removedLines = stringify(arrLeft[i - 1], undefined, 1).split('\n');
+        const removedLines = stringify(arrLeft[i - 1], undefined, 1, undefined, options.undefinedBehavior).split('\n');
         for (let i = removedLines.length - 1; i >= 0; i--) {
           tLeft.unshift({
             level: level + 1 + (removedLines[i].match(/^\s+/)?.[0]?.length || 0),
@@ -174,7 +174,7 @@ const lcs = (
         i--;
       }
     } else {
-      const addedLines = stringify(arrRight[j - 1], undefined, 1).split('\n');
+      const addedLines = stringify(arrRight[j - 1], undefined, 1, undefined, options.undefinedBehavior).split('\n');
       for (let i = addedLines.length - 1; i >= 0; i--) {
         tLeft.unshift({ level: level + 1, type: 'equal', text: '' });
         tRight.unshift({

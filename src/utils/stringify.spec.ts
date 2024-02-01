@@ -7,7 +7,6 @@ describe('Utility function: stringify', () => {
       1,
       '2',
       true,
-      NaN,
       [],
       [1, '2', true],
       {},

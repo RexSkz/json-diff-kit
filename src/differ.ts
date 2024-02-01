@@ -1,3 +1,4 @@
+import cleanFields from './utils/clean-fields';
 import concat from './utils/concat';
 import detectCircular from './utils/detect-circular';
 import diffArrayLCS from './utils/diff-array-lcs';
@@ -115,11 +116,22 @@ export interface DifferOptions {
    * ("before" or "after"). Otherwise, differ will sort the keys of results.
    */
   preserveKeyOrder?: 'before' | 'after';
+  /**
+   * The behavior when encountering values that are not part of the JSON spec, e.g. `undefined`, `NaN`, `Infinity`, `123n`, `() => alert(1)`, `Symbol.iterator`.
+   *
+   * - `UndefinedBehavior.throw`: throw an error
+   * - `UndefinedBehavior.ignore`: ignore the key-value pair
+   * - `UndefinedBehavior.stringify`: try to stringify the value
+   *
+   * Default is `UndefinedBehavior.stringify`.
+   */
+  undefinedBehavior?: UndefinedBehavior;
 }
 
-interface Token {
-  value: string;
-  type?: 'punctuation' | 'property' | 'operator' | 'string' | 'number' | 'keyword';
+export enum UndefinedBehavior {
+  stringify = 'stringify',
+  ignore = 'ignore',
+  throw = 'throw',
 }
 
 export interface DiffResult {
@@ -157,6 +169,7 @@ class Differ {
     ignoreCaseForKey = false,
     recursiveEqual = false,
     preserveKeyOrder,
+    undefinedBehavior = UndefinedBehavior.stringify,
   }: DifferOptions = {}) {
     this.options = {
       detectCircular,
@@ -167,6 +180,7 @@ class Differ {
       ignoreCaseForKey,
       recursiveEqual,
       preserveKeyOrder,
+      undefinedBehavior,
     };
     this.arrayDiffFunc = arrayDiffMethod === 'lcs' || arrayDiffMethod === 'unorder-lcs'
       ? diffArrayLCS
@@ -251,19 +265,24 @@ class Differ {
       sourceRight = sortInnerArrays(sourceRight, this.options);
     }
 
+    if (this.options.undefinedBehavior === UndefinedBehavior.ignore) {
+      sourceLeft = cleanFields(sourceLeft) ?? null;
+      sourceRight = cleanFields(sourceRight) ?? null;
+    }
+
     let resultLeft: DiffResult[] = [];
     let resultRight: DiffResult[] = [];
 
     const typeLeft = getType(sourceLeft);
     const typeRight = getType(sourceRight);
     if (typeLeft !== typeRight) {
-      resultLeft = stringify(sourceLeft, undefined, 1, this.options.maxDepth).split('\n').map(line => ({
+      resultLeft = stringify(sourceLeft, undefined, 1, this.options.maxDepth, this.options.undefinedBehavior).split('\n').map(line => ({
         level: line.match(/^\s+/)?.[0]?.length || 0,
         type: 'remove',
         text: line.replace(/^\s+/, '').replace(/,$/g, ''),
         comma: line.endsWith(','),
       }));
-      resultRight = stringify(sourceRight, undefined, 1, this.options.maxDepth).split('\n').map(line => ({
+      resultRight = stringify(sourceRight, undefined, 1, this.options.maxDepth, this.options.undefinedBehavior).split('\n').map(line => ({
         level: line.match(/^\s+/)?.[0]?.length || 0,
         type: 'add',
         text: line.replace(/^\s+/, '').replace(/,$/g, ''),
@@ -292,21 +311,21 @@ class Differ {
           resultRight = [{ level: 0, type: 'equal', text: sourceRight }];
         }
       } else if (this.options.showModifications) {
-        resultLeft = [{ level: 0, type: 'modify', text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth) }];
-        resultRight = [{ level: 0, type: 'modify', text: stringify(sourceRight, undefined, undefined, this.options.maxDepth) }];
+        resultLeft = [{ level: 0, type: 'modify', text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior) }];
+        resultRight = [{ level: 0, type: 'modify', text: stringify(sourceRight, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior) }];
       } else {
         resultLeft = [
-          { level: 0, type: 'remove', text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth) },
+          { level: 0, type: 'remove', text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior) },
           { ...EQUAL_EMPTY_LINE },
         ];
         resultRight = [
           { ...EQUAL_EMPTY_LINE },
-          { level: 0, type: 'add', text: stringify(sourceRight, undefined, undefined, this.options.maxDepth) },
+          { level: 0, type: 'add', text: stringify(sourceRight, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior) },
         ];
       }
     } else {
-      resultLeft = [{ level: 0, type: 'equal', text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth) }];
-      resultRight = [{ level: 0, type: 'equal', text: stringify(sourceRight, undefined, undefined, this.options.maxDepth) }];
+      resultLeft = [{ level: 0, type: 'equal', text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior) }];
+      resultRight = [{ level: 0, type: 'equal', text: stringify(sourceRight, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior) }];
     }
 
     this.sortResultLines(resultLeft, resultRight);
