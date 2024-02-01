@@ -118,9 +118,9 @@ Please refer to the article [JSON Diff Kit: A Combination of Several Simple Algo
 - [x] Merge "remove & add" at the same place as a modification
 - [x] Support inline diffing by word instead of by character
 - [x] Generate code directly in the demo page (covered by playground)
+- [x] Optimise `Viewer` performance by adding virtual scrolling
 - [ ] Add CLI tool
 - [ ] Improve unit tests
-- [ ] Optimise `Viewer` performance by adding virtual scrolling
 - [ ] Provide a Vue version of `Viewer`
 
 ## License

@@ -21,6 +21,7 @@ const Docs: React.FC<PropTypes> = props => {
   const [arrayDiffMethod, setArrayDiffMethod] = React.useState<DifferOptions['arrayDiffMethod']>('lcs');
   const [ignoreCase, setIgnoreCase] = React.useState(false);
   const [recursiveEqual, setRecursiveEqual] = React.useState(true);
+  const [preserveKeyOrder, setPreserveKeyOrder] = React.useState<DifferOptions['preserveKeyOrder']>(undefined);
 
   // viewer props
   const [indent, setIndent] = React.useState(4);
@@ -28,6 +29,7 @@ const Docs: React.FC<PropTypes> = props => {
   const [inlineDiffMode, setInlineDiffMode] = React.useState<InlineDiffOptions['mode']>('word');
   const [inlineDiffSeparator, setInlineDiffSeparator] = React.useState(' ');
   const [hideUnchangedLines, setHideUnchangedLines] = React.useState(true);
+  const [syntaxHighlight, setSyntaxHighlight] = React.useState(true);
   const [useVirtual, setUseVirtual] = React.useState(false);
 
   const differOptions = React.useMemo(() => ({
@@ -37,6 +39,7 @@ const Docs: React.FC<PropTypes> = props => {
     arrayDiffMethod,
     ignoreCase,
     recursiveEqual,
+    preserveKeyOrder,
   }), [
     detectCircular,
     maxDepth,
@@ -44,6 +47,7 @@ const Docs: React.FC<PropTypes> = props => {
     arrayDiffMethod,
     ignoreCase,
     recursiveEqual,
+    preserveKeyOrder,
   ]);
   const differ = React.useMemo(() => new Differ(differOptions), [differOptions]);
 
@@ -99,6 +103,33 @@ const Docs: React.FC<PropTypes> = props => {
   ]);
   const diff6 = React.useMemo(() => differ.diff(before6, after6), [differ, before6, after6]);
 
+  const [before7] = React.useState({
+    a: undefined,
+    b: 123n,
+    c: {
+      c1: Symbol('foo'),
+      c2: Symbol('bar'),
+    },
+    d: () => alert(1),
+    e: Infinity,
+    f: NaN,
+    h: [undefined, 123n, Symbol('foo'), Symbol('bar'), () => alert(1), Infinity, NaN, -Infinity],
+  });
+  const [after7] = React.useState({
+    a: undefined,
+    b: 123n,
+    c: {
+      c1: Symbol('foo'),
+      c3: Symbol('baz'),
+    },
+    d: () => alert(2),
+    e: Infinity,
+    f: NaN,
+    g: -Infinity,
+    h: [undefined, 123n, Symbol('foo'), Symbol('baz'), () => alert(2), Infinity, NaN, -Infinity],
+  });
+  const diff7 = React.useMemo(() => differ.diff(before7, after7), [differ, before7, after7]);
+
   const openInPlayground = (l: any, r: any) => {
     updateInitialValues(JSON.stringify(l, null, 2), JSON.stringify(r, null, 2));
     props.onSwitch();
@@ -113,6 +144,7 @@ const Docs: React.FC<PropTypes> = props => {
       wordSeparator: inlineDiffSeparator || '',
     },
     hideUnchangedLines,
+    syntaxHighlight: syntaxHighlight ? { theme: 'monokai' } : false,
     virtual: useVirtual ? {} : false,
   };
 
@@ -218,6 +250,19 @@ const Docs: React.FC<PropTypes> = props => {
             />
           </label>
           <blockquote>Whether to use recursive equal to compare objects. This can provide a better output when there are unchanged object items in an array, but it may cause performance issues when the data is very large.</blockquote>
+          <label htmlFor="preserve-key-order">
+            Preserve key order:
+            <select
+              id="preserve-key-order"
+              value={preserveKeyOrder}
+              onChange={e => setPreserveKeyOrder((e.target.value === 'sort' ? undefined : e.target.value) as DifferOptions['preserveKeyOrder'])}
+            >
+              <option value="sort">sort (default)</option>
+              <option value="before">by "before"</option>
+              <option value="after">by "after"</option>
+            </select>
+          </label>
+          <blockquote>Sometimes you do not want the keys in result be sorted, for example <code>start_time</code> and <code>end_time</code> will be swapped by default. You can set this option to let the differ preserve the key order according to <code>before</code> or <code>after</code>.</blockquote>
         </form>
       </div>
       <h2>Viewer Configuration</h2>
@@ -236,7 +281,7 @@ const Docs: React.FC<PropTypes> = props => {
           </label>
           <blockquote>Controls the indent in the <code>&lt;Viewer&gt;</code> component.</blockquote>
           <label htmlFor="highlight-inline-diff">
-            Highlight Inline Diff:
+            Highlight inline diff:
             <input
               type="checkbox"
               id="highlight-inline-diff"
@@ -246,7 +291,7 @@ const Docs: React.FC<PropTypes> = props => {
           </label>
           <blockquote>Whether to show the inline diff highlight. For example, if the left value <code>"JSON diff can't be possible"</code> is changed to the right value <code>"JSON diff is possible"</code>, it will be recognized as we first remove <code>can't be</code> and then add <code>is</code>. This feature is powered by <a href="https://github.com/gliese1337/fast-myers-diff" target="_blank">gliese1337/fast-myers-diff</a>. Note: the <code>showModification</code> must be enabled, or you will not see modified lines.</blockquote>
           <label htmlFor="inline-diff-options">
-            Inline Diff Options:
+            Inline diff options:
             <span>Diff method</span>
             <select
               id="inline-diff-mode"
@@ -275,6 +320,16 @@ const Docs: React.FC<PropTypes> = props => {
             />
           </label>
           <blockquote>Whether to hide the unchanged lines (like what GitHub and GitLab does).</blockquote>
+          <label htmlFor="syntax-highlight">
+            Syntax highlight:
+            <input
+              type="checkbox"
+              id="syntax-highlight"
+              checked={syntaxHighlight}
+              onChange={e => setSyntaxHighlight(e.target.checked)}
+            />
+          </label>
+          <blockquote>Support syntax highlight. The viewer component will render like prismjs, and you can write your own style. Please don't forget to import the corresponding CSS file, e.g. <code>import 'json-diff-kit/viewer-monokai.less';</code></blockquote>
           <label htmlFor="use-virtual">
             Use virtual:
             <input
@@ -313,6 +368,10 @@ const Docs: React.FC<PropTypes> = props => {
           <button onClick={() => openInPlayground(before6, after6)}>⬇️ Playground</button> An example for the recursive equal. If the differ option <code>recursiveEqual</code> is set to <code>true</code>, the object items should be treated as equal.
         </p>
         <Viewer diff={diff6} {...viewerCommonProps} />
+        <p>
+          <button disabled>⚠️ Playground not available</button> Sometimes there may be values that can't be serialized to JSON, like <code>undefined</code>, <code>BigInt</code>, <code>Symbol</code>, <code>function</code>, <code>Infinity</code>, <code>-Infinity</code> and <code>NaN</code>. The differ and viewer can handle them correctly.
+        </p>
+        <Viewer diff={diff7} {...viewerCommonProps} />
       </div>
       <div className="demo-footer">
         <p>Made with ♥ by Rex Zeng</p>

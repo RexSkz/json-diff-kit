@@ -14,8 +14,8 @@ const prettyAppendLines = (
   options: DifferOptions,
 ) => {
   const valueCmpOptions = { ignoreCase: options.ignoreCase };
-  const _resultLeft = formatValue(valueLeft, options.maxDepth, true).split('\n');
-  const _resultRight = formatValue(valueRight, options.maxDepth, true).split('\n');
+  const _resultLeft = formatValue(valueLeft, options.maxDepth, true, options.undefinedBehavior).split('\n');
+  const _resultRight = formatValue(valueRight, options.maxDepth, true, options.undefinedBehavior).split('\n');
   if (cmp(valueLeft, valueRight, valueCmpOptions) !== 0) {
     if (options.showModifications) {
       const maxLines = Math.max(_resultLeft.length, _resultRight.length);

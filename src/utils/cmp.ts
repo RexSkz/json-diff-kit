@@ -22,6 +22,15 @@ const getOrderByType = (value: any) => {
   if (typeof value === 'object') {
     return 5;
   }
+  if (typeof value === 'symbol') {
+    return 6;
+  }
+  if (typeof value === 'function') {
+    return 7;
+  }
+  if (typeof value === 'bigint') {
+    return 8;
+  }
   return -1;
 };
 
@@ -52,6 +61,13 @@ const cmp = (a: any, b: any, options: CmpOptions) => {
 
   switch (typeof a) {
     case 'number':
+      if (
+        Number.isNaN(a) && Number.isNaN(b) ||
+        a === Infinity && b === Infinity ||
+        a === -Infinity && b === -Infinity
+      ) {
+        return 0;
+      }
       return a - b;
     case 'string':
       if (options.ignoreCase) {
@@ -61,9 +77,17 @@ const cmp = (a: any, b: any, options: CmpOptions) => {
       return a < b ? -1 : a > b ? 1 : 0;
     case 'boolean':
       return (+a) - (+b);
+    case 'symbol':
+    case 'function':
+      return String(a).localeCompare(String(b));
   }
 
-  return 0;
+  if (typeof a === 'bigint' && typeof b === 'bigint') {
+    const result = BigInt(a) - BigInt(b);
+    return result < 0 ? -1 : result > 0 ? 1 : 0;
+  }
+
+  return String(a).localeCompare(String(b));
 };
 
 export default cmp;

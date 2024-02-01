@@ -1,12 +1,24 @@
 export interface InlineHighlightResult {
   start: number;
   end: number;
-  token: 'plain' | 'number' | 'boolean' | 'null' | 'key' | 'punctuation' | 'string';
+  token: 'plain' | 'number' | 'boolean' | 'null' | 'key' | 'punctuation' | 'string' | 'invalid';
 }
 
 const syntaxHighlightLine = (enabled: boolean, text: string, offset: number): InlineHighlightResult[] => {
   if (!enabled) {
     return [{ token: 'plain', start: offset, end: text.length + offset }];
+  }
+  if (
+    text === 'undefined' ||
+    text === 'Infinity' ||
+    text === '-Infinity' ||
+    text === 'NaN' ||
+    /^\d+n$/i.test(text) ||
+    text.startsWith('Symbol(') ||
+    text.startsWith('function') ||
+    text.startsWith('(')
+  ) {
+    return [{ token: 'invalid', start: offset, end: text.length + offset }];
   }
   if (!Number.isNaN(Number(text))) {
     return [{ token: 'number', start: offset, end: text.length + offset }];

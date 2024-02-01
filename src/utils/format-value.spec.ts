@@ -8,9 +8,13 @@ describe('Utility function: formatValue', () => {
     expect(formatValue(true)).toBe('true');
   });
 
-  it('should return "null" for null & NaN', () => {
+  it('should handle invalid values correctly', () => {
     expect(formatValue(null)).toBe('null');
-    expect(formatValue(NaN)).toBe('null');
+    expect(formatValue(NaN)).toBe('NaN');
+    expect(formatValue(Infinity)).toBe('Infinity');
+    expect(formatValue(-Infinity)).toBe('-Infinity');
+    expect(formatValue(undefined)).toBe('undefined');
+    expect(formatValue(Symbol.iterator)).toBe('Symbol(Symbol.iterator)');
   });
 
   it('should work for array & object', () => {

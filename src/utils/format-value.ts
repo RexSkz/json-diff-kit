@@ -1,16 +1,19 @@
+import { UndefinedBehavior } from '../differ';
 import stringify from './stringify';
 
-const formatValue = (value: any, depth = Infinity, pretty = false) => {
-  if (Number.isNaN(value) || value === null) {
+const formatValue = (
+  value: any,
+  depth = Infinity,
+  pretty = false,
+  undefinedBehavior = UndefinedBehavior.stringify,
+) => {
+  if (value === null) {
     return 'null';
   }
   if (Array.isArray(value) || typeof value === 'object') {
-    return stringify(value, undefined, pretty ? 1 : undefined, depth);
+    return stringify(value, undefined, pretty ? 1 : undefined, depth, undefinedBehavior);
   }
-  if (typeof value === 'string') {
-    return stringify(value);
-  }
-  return stringify(value);
+  return stringify(value, undefined, undefined, undefined, undefinedBehavior);
 };
 
 export default formatValue;
