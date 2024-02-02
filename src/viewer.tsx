@@ -109,6 +109,13 @@ export interface ViewerProps {
      */
     theme?: string;
   };
+  /**
+   * Configure the texts in the viewer, you can use it to implement i18n.
+   */
+  texts?: {
+    /** @default 'No change detected' */
+    noChangeDetected?: string;
+  };
   /** Extra class names */
   className?: string;
   /** Extra styles */
@@ -117,9 +124,21 @@ export interface ViewerProps {
 
 const DEFAULT_INDENT = 2;
 const DEFAULT_EXPAND_MORE_LINES_LIMIT = 20;
+const DEFAULT_TEXTS = {
+  noChangeDetected: 'No change detected',
+};
 
 const Viewer: React.FC<ViewerProps> = props => {
   const [linesLeft, linesRight] = props.diff;
+  const jsonsAreEqual = React.useMemo(() => {
+    return (
+      linesLeft.length === linesRight.length &&
+      linesLeft.every(item => item.type === 'equal') &&
+      linesRight.every(item => item.type === 'equal')
+    );
+  }, [linesLeft, linesRight]);
+
+  const mergedTexts = { ...DEFAULT_TEXTS, ...props.texts };
 
   const lineNumberWidth = props.lineNumbers ? `calc(${String(linesLeft.length).length}ch + 16px)` : 0;
   const indent = props.indent ?? DEFAULT_INDENT;
@@ -144,7 +163,7 @@ const Viewer: React.FC<ViewerProps> = props => {
   // Do not use the states to render, use the refs to render and use `updateViewer` to update.
   const linesLeftRef = React.useRef(linesLeft);
   const linesRightRef = React.useRef(linesRight);
-  const segmentsRef = React.useRef(getSegments(linesLeft, linesRight, hideUnchangedLines));
+  const segmentsRef = React.useRef(getSegments(linesLeft, linesRight, hideUnchangedLines, jsonsAreEqual));
   const accTopRef = React.useRef<number[]>([]);
   const totalHeightRef = React.useRef(0);
   const tbodyRef = React.useRef<HTMLTableSectionElement>(null);
@@ -176,7 +195,7 @@ const Viewer: React.FC<ViewerProps> = props => {
   React.useEffect(() => {
     linesLeftRef.current = linesLeft;
     linesRightRef.current = linesRight;
-    segmentsRef.current = getSegments(linesLeft, linesRight, hideUnchangedLines);
+    segmentsRef.current = getSegments(linesLeft, linesRight, hideUnchangedLines, jsonsAreEqual);
     updateViewer();
   }, [hideUnchangedLines, linesLeft, linesRight]);
 
@@ -337,17 +356,17 @@ const Viewer: React.FC<ViewerProps> = props => {
         {
           hasLinesBefore && (
             <button onClick={() => onExpandBefore(index)(expandMoreLinesLimit)}>
-              ⬆️ Show {expandMoreLinesLimit} lines before
+              ⭡ Show {expandMoreLinesLimit} lines before
             </button>
           )
         }
         <button onClick={() => onExpandAll(index)()}>
-          ↕️ Show all unchanged lines
+          ⭥ Show all unchanged lines
         </button>
         {
           hasLinesAfter && (
             <button onClick={() => onExpandAfter(index)(expandMoreLinesLimit)}>
-              ⬇️ Show {expandMoreLinesLimit} lines after
+              ⭣ Show {expandMoreLinesLimit} lines after
             </button>
           )
         }
@@ -398,6 +417,15 @@ const Viewer: React.FC<ViewerProps> = props => {
   };
 
   const renderTbody = (syntaxHighlightEnabled: boolean) => {
+    if (jsonsAreEqual && hideUnchangedLines) {
+      return (
+        <tr key="message-line" className="message-line">
+          <td colSpan={4}>
+            {mergedTexts.noChangeDetected}
+          </td>
+        </tr>
+      );
+    }
     if (!props.virtual) {
       return segmentsRef.current.map((item, index) => renderSegment(item, index, 0, linesLeftRef.current.length, syntaxHighlightEnabled));
     }
