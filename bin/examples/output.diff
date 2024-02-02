@@ -1,0 +1,54 @@
+  {
+-   "a": 1,
+    "b": 2,
++   "c": 3,
+    "d": [
+      1,
+-     5,
++     3,
+      4
++     6
+    ],
+    "e": [
+      "1",
+      2,
+-     {
+-       "f": 3,
+-       "g": null,
+-       "h": [
+-         5
+-       ],
+-       "i": []
+-     },
+-     9
++     3,
++     {
++       "f": 4,
++       "g": false,
++       "i": [
++         7,
++         8
++       ]
++     },
++     10
+    ],
++   "j": {
++     "k": 11,
++     "l": 12
++   },
+    "m": [
++     {
++       "n": 1,
++       "o": 2
++     },
++     {
++       "p": 3
++     }
+    ],
+-   "q": "JSON diff can't be possible",
+-   "r": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+-   "s": 1024
++   "q": "JSON diff is possible!",
++   "r": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed quasi architecto beatae incididunt ut labore et dolore magna aliqua.",
++   "s": "1024"
+  }

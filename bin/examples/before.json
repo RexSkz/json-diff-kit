@@ -1,0 +1,26 @@
+{
+  "a": 1,
+  "b": 2,
+  "d": [
+    1,
+    5,
+    4
+  ],
+  "e": [
+    "1",
+    2,
+    {
+      "f": 3,
+      "g": null,
+      "h": [
+        5
+      ],
+      "i": []
+    },
+    9
+  ],
+  "m": [],
+  "q": "JSON diff can't be possible",
+  "r": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+  "s": 1024
+}
