@@ -5,12 +5,15 @@
   "main": "dist/cjs/index.js",
   "module": "dist/index.js",
   "typings": "typings",
+  "bin": {
+    "jsondiff": "bin/jsondiff.cjs"
+  },
   "scripts": {
     "start": "cross-env rollup -c rollup.config.pages.ts -w",
     "dev": "cross-env pnpm start",
     "test": "cross-env jest --coverage",
     "build": "cross-env pnpm build:ts && pnpm build:less",
-    "build:ts": "cross-env rollup -c",
+    "build:ts": "cross-env rollup -c && rollup -c rollup.config.cli.ts",
     "build:less": "cross-env lessc src/viewer.less dist/viewer.css && lessc src/viewer-monokai.less dist/viewer-monokai.css",
     "build:pages": "cross-env NODE_ENV=production BASEDIR=docs rollup -c rollup.config.pages.ts",
     "prepublish": "cross-env pnpm build"
@@ -41,9 +44,11 @@
     "@swc/jest": "^0.2.26",
     "@types/jest": "^27.4.1",
     "@types/lodash": "^4.14.191",
+    "@types/node": "^20.11.16",
     "@types/prismjs": "^1.26.0",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
+    "@types/terminal-kit": "^2.5.6",
     "cross-env": "^7.0.3",
     "fork-me-on-github": "^1.0.6",
     "jest": "^27.4.7",
@@ -60,7 +65,10 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
+    "commander": "^11.1.0",
     "fast-myers-diff": "^3.0.1",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "prompts": "^2.4.2",
+    "terminal-kit": "^3.0.1"
   }
 }
