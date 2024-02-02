@@ -17,8 +17,8 @@ export interface HiddenUnchangedLinesInfo extends SegmentItem {
   hasLinesAfter: boolean;
 }
 
-const getSegments = (l: DiffResult[], r: DiffResult[], options: HideUnchangedLinesOptions) => {
-  if (!options) {
+const getSegments = (l: DiffResult[], r: DiffResult[], options: HideUnchangedLinesOptions, jsonsAreEqual: boolean) => {
+  if (!options || jsonsAreEqual) {
     return [{ start: 0, end: l.length, isEqual: false }];
   }
 
