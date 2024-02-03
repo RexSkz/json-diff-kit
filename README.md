@@ -4,9 +4,7 @@
 [![Downloads][download-badge]][npm-url]
 [![Codecov](https://codecov.io/gh/RexSkz/json-diff-kit/branch/master/graph/badge.svg?token=8YRG3M4WTO)](https://codecov.io/gh/RexSkz/json-diff-kit)
 
-A better JSON differ & viewer library written in TypeScript. [DEMO here!](https://json-diff-kit.js.org/)
-
-> Notice: considering most of the browsers now support ES6, this library has only the ES6 version. If you need the compatibility with older browsers, please configure the compiler in your project (e.g. add this library to the `include` field in `babel.config.js`).
+A better JSON differ & viewer library written in TypeScript. [Try it out in the playground!](https://json-diff-kit.js.org/)
 
 ## Install
 
@@ -108,16 +106,17 @@ The result is here:
 
 Please check the [playground page](https://json-diff-kit.js.org/), where you can adjust nearly all parameters and see the result.
 
-## Using in CLI
+## CLI Tool
 
 You can use the CLI tool to generate the diff data from two JSON files.
 
 ```bash
-# Compare two JSON files, output the diff data to the console.
+# Compare two JSON files, output the diff data to the terminal.
 # You can navigate it using keyboard like `less`.
 jsondiff run path/to/before.json path/to/after.json
 
 # Output the diff data to a file.
+# Notice there will be no side-by-side view since it's not a TTY.
 jsondiff run path/to/before.json path/to/after.json -o path/to/result.diff
 
 # Use a custom configuration file and output the diff data to a file.
