@@ -56,6 +56,15 @@ let columns = terminal.width;
 let rows = terminal.height;
 
 const showInTerminal = ([leftResult, rightResult]: readonly [DiffResult[], DiffResult[]]) => {
+  // Swap to an alternate screen buffer
+  // https://github.com/vadimdemedes/ink/issues/263#issuecomment-600927688
+  const enterAltScreenCommand = '\x1b[?1049h';
+  const leaveAltScreenCommand = '\x1b[?1049l';
+  process.stdout.write(enterAltScreenCommand);
+  process.on('exit', () => {
+    process.stdout.write(leaveAltScreenCommand);
+  });
+
   showContent(leftResult, rightResult, columns, rows);
 
   terminal.on('resize', (newColumns: number, newRows: number) => {
