@@ -108,6 +108,28 @@ The result is here:
 
 Please check the [playground page](https://json-diff-kit.js.org/), where you can adjust nearly all parameters and see the result.
 
+## Using in CLI
+
+You can use the CLI tool to generate the diff data from two JSON files.
+
+```bash
+# Compare two JSON files, output the diff data to the console.
+# You can navigate it using keyboard like `less`.
+jsondiff run path/to/before.json path/to/after.json
+
+# Output the diff data to a file.
+jsondiff run path/to/before.json path/to/after.json -o path/to/result.diff
+
+# Use a custom configuration file and output the diff data to a file.
+jsondiff run path/to/before.json path/to/after.json -c path/to/config.json -o path/to/result.diff
+
+# Print the help message.
+jsondiff --help
+jsondiff run --help
+```
+
+![A screenshot when using CLI.](./preview-cli.png)
+
 ## Algorithm Details
 
 Please refer to the article [JSON Diff Kit: A Combination of Several Simple Algorithms](https://blog.rexskz.info/json-diff-kit-a-combination-of-several-simple-algorithms.html).
@@ -119,7 +141,7 @@ Please refer to the article [JSON Diff Kit: A Combination of Several Simple Algo
 - [x] Support inline diffing by word instead of by character
 - [x] Generate code directly in the demo page (covered by playground)
 - [x] Optimise `Viewer` performance by adding virtual scrolling
-- [ ] Add CLI tool
+- [x] Add CLI tool
 - [ ] Improve unit tests
 - [ ] Provide a Vue version of `Viewer`
 
