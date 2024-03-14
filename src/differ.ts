@@ -35,7 +35,7 @@ export interface DifferOptions {
    * When using `normal`, the differ will compare the items in the same index one by one.
    * The time complexity is faster (`O(LEN)`). The output will be:
    *
-   * ```text
+   * ```diff
    *   a b
    * * 1 2
    * * 2 3
@@ -48,7 +48,7 @@ export interface DifferOptions {
    * assuming the items in the subsequence are unchanged. The time complexity for LCS is
    * slower (`O(LEN^2)`). The output will be:
    *
-   * ```text
+   * ```diff
    *   a b
    * - 1
    *   2 2
@@ -61,7 +61,7 @@ export interface DifferOptions {
    * When using `unorder-normal`, the differ will first sort 2 arrays, then act like `normal`.
    * The output will be:
    *
-   * ```text
+   * ```diff
    *   a b
    * * 1 0
    * * 2 1
@@ -73,7 +73,7 @@ export interface DifferOptions {
    * When using `unorder-lcs`, the differ will first sort 2 arrays, then act like `lcs`.
    * The output will be:
    *
-   * ```text
+   * ```diff
    *   a b
    * +   0
    *   1 1
