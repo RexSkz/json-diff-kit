@@ -25,6 +25,13 @@ const plugins = [
 <head>
   <title>JSON Diff Kit Playground</title>
   <meta charset="utf-8" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5D3V5T84WY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-5D3V5T84WY');
+  </script>
 </head>
 <body>
   <div id="root"></div>
