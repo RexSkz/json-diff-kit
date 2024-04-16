@@ -6,14 +6,14 @@
   .layout-left,
   .layout-right {
     display: flex;
-    flex-direction: column;
     box-sizing: border-box;
+    flex-direction: column;
   }
 
   .layout-left {
     flex: 0 0 300px;
-    border-right: 1px solid #ecf0f4;
     padding: 0 16px;
+    border-right: 1px solid #ecf0f4;
     overflow-y: auto;
 
     &::-webkit-scrollbar {
@@ -22,20 +22,20 @@
 
     .logo {
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       padding: 24px 0 8px;
       font-size: 24px;
       font-weight: 500;
     }
 
     .back {
-      background: #000;
-      color: #fff;
       padding: 8px 16px;
       border-radius: 4px;
-      text-align: center;
+      background: #000;
+      color: #fff;
       cursor: pointer;
+      text-align: center;
 
       &:hover {
         background: #333;
@@ -47,8 +47,8 @@
       margin-top: 16px;
 
       legend {
-        color: rgba(0, 0, 0, 0.5);
         margin: 16px 0 8px;
+        color: rgba(0, 0, 0, 0.5);
       }
 
       label {
@@ -62,21 +62,21 @@
 
         input,
         select {
+          max-width: 120px;
           height: 20px;
           box-sizing: border-box;
           font-size: 14px;
-          max-width: 120px;
         }
 
-        input[type=checkbox] {
+        input[type="checkbox"] {
           margin: 0;
         }
       }
     }
 
     pre {
-      margin: 0 -16px;
       padding: 8px 16px;
+      margin: 0 -16px;
       background: #f5f6f9;
       font-size: 12px;
     }
@@ -84,9 +84,9 @@
     .statistics {
       position: sticky;
       bottom: 0;
-      margin: auto -16px 0;
-      padding: 16px;
       display: flex;
+      padding: 16px;
+      margin: auto -16px 0;
       background: #fff;
     }
   }
@@ -99,8 +99,8 @@
       color: rgba(0, 0, 0, 0.5);
 
       .control-button {
-        margin-left: 4px;
         padding: 0 4px;
+        margin-left: 4px;
         cursor: pointer;
 
         &:hover {
@@ -130,16 +130,16 @@
 
       textarea {
         position: relative;
-        flex: 1;
         height: 100%;
-        padding: 16px;
         box-sizing: border-box;
+        flex: 1;
+        padding: 16px;
+        border: none;
+        font-family: monospace;
         font-size: 12px;
         line-height: 1.5;
-        border: none;
         outline: none;
         resize: none;
-        font-family: monospace;
         transition: all 0.3s;
 
         &:first-child {
@@ -159,8 +159,8 @@
 
     .results {
       position: relative;
-      overflow-y: auto;
       border-top: 1px solid #ecf0f4;
+      overflow-y: auto;
     }
 
     &.layout-right-fullscreen {

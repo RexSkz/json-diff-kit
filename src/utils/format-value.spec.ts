@@ -1,7 +1,6 @@
 import formatValue from './format-value';
 
 describe('Utility function: formatValue', () => {
-
   it('should work for primitives ', () => {
     expect(formatValue('a')).toBe('"a"');
     expect(formatValue(1)).toBe('1');
@@ -31,5 +30,4 @@ describe('Utility function: formatValue', () => {
     expect(formatValue('first line\n\tsecond line')).toBe('"first line\\n\\tsecond line"');
     expect(formatValue('"')).toBe('"\\""');
   });
-
 });

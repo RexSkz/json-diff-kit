@@ -16,7 +16,7 @@ const getOutputFunction = (line: DiffResult) => {
   if (line.type === 'remove') return terminal.bgRed;
   if (line.type === 'modify') return terminal.bgYellow;
   return terminal;
-}
+};
 
 const showContent = (leftResult: DiffResult[], rightResult: DiffResult[], columns: number, rows: number) => {
   const lineNumberWidth = Math.max(

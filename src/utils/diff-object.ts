@@ -1,11 +1,10 @@
+import type { DifferOptions, DiffResult, ArrayDiffFunc } from '../differ';
 import cmp from './cmp';
 import concat from './concat';
 import getType from './get-type';
 import prettyAppendLines from './pretty-append-lines';
 import sortKeys from './sort-keys';
 import stringify from './stringify';
-
-import type { DifferOptions, DiffResult, ArrayDiffFunc } from '../differ';
 
 const diffObject = (
   lhs: Record<string, any>,

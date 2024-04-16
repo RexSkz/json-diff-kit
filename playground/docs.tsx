@@ -1,5 +1,7 @@
+/* eslint-disable max-len, react/no-unescaped-entities */
+
 import React from 'react';
-import ForkMeOnGithub from 'fork-me-on-github';
+import _ForkMeOnGithub from 'fork-me-on-github';
 
 import { Differ, Viewer } from '../src';
 import type { DifferOptions } from '../src/differ';
@@ -12,6 +14,8 @@ import { updateInitialValues } from './initial-values';
 interface PropTypes {
   onSwitch: () => void;
 }
+
+const ForkMeOnGithub = _ForkMeOnGithub.default;
 
 const Docs: React.FC<PropTypes> = props => {
   // differ props
@@ -130,7 +134,7 @@ const Docs: React.FC<PropTypes> = props => {
   });
   const diff7 = React.useMemo(() => differ.diff(before7, after7), [differ, before7, after7]);
 
-  const openInPlayground = (l: any, r: any) => {
+  const openInPlayground = (l: unknown, r: unknown) => {
     updateInitialValues(JSON.stringify(l, null, 2), JSON.stringify(r, null, 2));
     props.onSwitch();
   };
@@ -177,7 +181,7 @@ const Docs: React.FC<PropTypes> = props => {
               type="checkbox"
               id="detect-circular"
               checked={detectCircular}
-              disabled={true}
+              disabled
             />
           </label>
           <blockquote>Whether to detect circular reference in source objects before diff starts. Default is <code>true</code>. If you are confident about your data (maybe it's from <code>JSON.parse</code> or an API response), you can set it to <code>false</code> to improve performance, but the algorithm may not stop if circular reference does show up.</blockquote>
@@ -289,7 +293,7 @@ const Docs: React.FC<PropTypes> = props => {
               onChange={e => setHighlightInlineDiff(e.target.checked)}
             />
           </label>
-          <blockquote>Whether to show the inline diff highlight. For example, if the left value <code>"JSON diff can't be possible"</code> is changed to the right value <code>"JSON diff is possible"</code>, it will be recognized as we first remove <code>can't be</code> and then add <code>is</code>. This feature is powered by <a href="https://github.com/gliese1337/fast-myers-diff" target="_blank">gliese1337/fast-myers-diff</a>. Note: the <code>showModification</code> must be enabled, or you will not see modified lines.</blockquote>
+          <blockquote>Whether to show the inline diff highlight. For example, if the left value <code>"JSON diff can't be possible"</code> is changed to the right value <code>"JSON diff is possible"</code>, it will be recognized as we first remove <code>can't be</code> and then add <code>is</code>. This feature is powered by <a href="https://github.com/gliese1337/fast-myers-diff" target="_blank" rel="noreferrer">gliese1337/fast-myers-diff</a>. Note: the <code>showModification</code> must be enabled, or you will not see modified lines.</blockquote>
           <label htmlFor="inline-diff-options">
             Inline diff options:
             <span>Diff method</span>
@@ -376,7 +380,7 @@ const Docs: React.FC<PropTypes> = props => {
       <div className="demo-footer">
         <p>Made with ♥ by Rex Zeng</p>
       </div>
-      <ForkMeOnGithub.default repo="https://github.com/rexskz/json-diff-kit" />
+      <ForkMeOnGithub repo="https://github.com/rexskz/json-diff-kit" />
     </div>
   );
 };

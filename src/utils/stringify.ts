@@ -30,8 +30,8 @@ const stringify = (
     : Array.isArray(obj)
       ? `[${obj.map(v => stringify(v, replacer, space, depth - 1, undefinedBehavior)).join(',')}]`
       : `{${Object.keys(obj)
-      .map((k) => `"${k}": ${stringify(obj[k], replacer, space, depth - 1, undefinedBehavior)}`)
-      .join(', ')}}`;
+        .map((k) => `"${k}": ${stringify(obj[k], replacer, space, depth - 1, undefinedBehavior)}`)
+        .join(', ')}}`;
   return JSON.stringify(JSON.parse(t), replacer, space);
 };
 

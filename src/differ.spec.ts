@@ -1,7 +1,6 @@
 import Differ from './differ';
 
 describe('2-dimensional array diff', () => {
-
   it('normal diff', () => {
     const l = [[1, 2, 3, 4], [5, 6], [9]];
     const r = [[1, 2, 4], [5, 9], [9]];
@@ -89,5 +88,4 @@ describe('2-dimensional array diff', () => {
       { lineNumber: 14, level: 0, type: 'equal', text: ']' },
     ]);
   });
-
 });

@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import fs from 'node:fs';
 
 import { program } from 'commander';
@@ -9,7 +11,7 @@ import writeToFile from './write-to-file';
 
 program
   .name('jsondiff')
-  .description('A better JSON differ & viewer, support LCS diff for arrays and recognise some changes as "modification" apart from simple "remove"+"add".')
+  .description('A better JSON differ & viewer, support LCS diff for arrays and recognise some changes as "modification" apart from simple "remove"+"add".') // eslint-disable-line max-len
   .version(__VERSION__);
 
 program
@@ -19,7 +21,7 @@ program
   .argument('<after>', 'Path to the second JSON file')
   .option('-c, --config <path>', 'Path to the config file, will override the default config')
   .option('-o --output <path>', 'Path to the output file, default to stdout')
-  .action(async (beforePath, afterPath, options) => {
+  .action(async(beforePath, afterPath, options) => {
     const config: DifferOptions = {};
     if (!fs.statSync(beforePath).isFile()) {
       console.error(`Error: ${beforePath} is not a file.`);

@@ -1,12 +1,12 @@
 .demo-root {
-  background: #fff;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.01);
-  box-sizing: border-box;
-  max-width: 1200px;
-  margin: auto;
-  padding: 1em 2em;
   position: relative;
   width: 100%;
+  max-width: 1200px;
+  box-sizing: border-box;
+  padding: 1em 2em;
+  margin: auto;
+  background: #fff;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.01);
 
   .statistics {
     img {
@@ -41,16 +41,16 @@
       & > label {
         display: flex;
         align-items: center;
-        margin-right: 8px;
         padding: 0 4px;
         border-radius: 4px;
-        user-select: none;
-        font-weight: bold;
+        margin-right: 8px;
         background: #e5e6e9;
+        font-weight: 700;
+        user-select: none;
 
         span {
-          font-weight: normal;
           margin-left: 1em;
+          font-weight: 400;
         }
 
         input,
@@ -58,7 +58,7 @@
           margin-left: 8px;
         }
 
-        input[type=number] {
+        input[type="number"] {
           min-width: 8em;
         }
       }
@@ -66,17 +66,17 @@
   }
 
   .diff-result .json-diff-viewer {
+    box-sizing: border-box;
+    padding: 1em;
     border: 1px solid;
     border-radius: 4px;
-    box-sizing: border-box;
     margin-top: 1em;
-    padding: 1em;
   }
 
   .demo-footer {
+    padding: 2em 0;
     border-top: 1px dashed;
     margin: 4em 0 0;
-    padding: 2em 0;
     text-align: center;
   }
 }

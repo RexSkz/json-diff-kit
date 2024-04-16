@@ -1,7 +1,6 @@
 import getType from './get-type';
 
 describe('Utility function: getType', () => {
-
   it('should work for primitives ', () => {
     expect(getType('a')).toBe('string');
     expect(getType(1)).toBe('number');
@@ -16,5 +15,4 @@ describe('Utility function: getType', () => {
     expect(getType([1, 2, '3'])).toBe('array');
     expect(getType({ a: 1 })).toBe('object');
   });
-
 });

@@ -6,15 +6,15 @@
 
   &-question-mark {
     display: inline-flex;
-    justify-content: center;
-    align-items: center;
     width: 16px;
     height: 16px;
     box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
     border: 1px solid;
     border-radius: 50%;
-    font-size: 12px;
     cursor: pointer;
+    font-size: 12px;
   }
 
   &-tip {
@@ -22,24 +22,24 @@
   }
 
   &-wrapper:hover &-question-mark {
-    background: #000;
     border-color: #000;
+    background: #000;
     color: #fff;
   }
 
   &-wrapper:hover &-tip {
-    display: block;
     position: absolute;
+    z-index: 1;
     top: 100%;
+    display: block;
     width: 268px;
-    padding: 8px 16px;
     box-sizing: border-box;
-    background-color: #fff;
+    padding: 8px 16px;
     border-radius: 4px;
+    background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    line-height: 1.5;
     color: #333;
     font-size: 12px;
-    z-index: 1;
+    line-height: 1.5;
   }
 }

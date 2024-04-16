@@ -77,17 +77,41 @@ const diffArrayNormal = (
           linesLeft = concat(linesLeft, resLeft);
           linesRight = concat(linesRight, resRight);
         } else if (cmp(itemLeft, itemRight, { ignoreCase: options.ignoreCase }) === 0) {
-          linesLeft.push({ level: level + 1, type: 'equal', text: formatValue(itemLeft, undefined, undefined, options.undefinedBehavior) });
-          linesRight.push({ level: level + 1, type: 'equal', text: formatValue(itemRight, undefined, undefined, options.undefinedBehavior) });
+          linesLeft.push({
+            level: level + 1,
+            type: 'equal',
+            text: formatValue(itemLeft, undefined, undefined, options.undefinedBehavior),
+          });
+          linesRight.push({
+            level: level + 1,
+            type: 'equal',
+            text: formatValue(itemRight, undefined, undefined, options.undefinedBehavior),
+          });
         } else {
           if (options.showModifications) {
-            linesLeft.push({ level: level + 1, type: 'modify', text: formatValue(itemLeft, undefined, undefined, options.undefinedBehavior) });
-            linesRight.push({ level: level + 1, type: 'modify', text: formatValue(itemRight, undefined, undefined, options.undefinedBehavior) });
+            linesLeft.push({
+              level: level + 1,
+              type: 'modify',
+              text: formatValue(itemLeft, undefined, undefined, options.undefinedBehavior),
+            });
+            linesRight.push({
+              level: level + 1,
+              type: 'modify',
+              text: formatValue(itemRight, undefined, undefined, options.undefinedBehavior),
+            });
           } else {
-            linesLeft.push({ level: level + 1, type: 'remove', text: formatValue(itemLeft, undefined, undefined, options.undefinedBehavior) });
+            linesLeft.push({
+              level: level + 1,
+              type: 'remove',
+              text: formatValue(itemLeft, undefined, undefined, options.undefinedBehavior),
+            });
             linesLeft.push({ level: level + 1, type: 'equal', text: '' });
             linesRight.push({ level: level + 1, type: 'equal', text: '' });
-            linesRight.push({ level: level + 1, type: 'add', text: formatValue(itemRight, undefined, undefined, options.undefinedBehavior) });
+            linesRight.push({
+              level: level + 1,
+              type: 'add',
+              text: formatValue(itemRight, undefined, undefined, options.undefinedBehavior),
+            });
           }
         }
         arrLeft.shift();

@@ -15,7 +15,7 @@ export const getSegmentHeight = (
 ) => {
   return isExpandLine(segment)
     ? expandLineHeight
-    : itemHeight * (segment.end - segment.start + 1)
+    : itemHeight * (segment.end - segment.start + 1);
 };
 
 export type InlineRenderInfo = InlineDiffResult & InlineHighlightResult;

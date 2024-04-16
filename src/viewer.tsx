@@ -190,7 +190,7 @@ const Viewer: React.FC<ViewerProps> = props => {
       }, 0);
     }
     forceUpdate({});
-  }
+  };
 
   React.useEffect(() => {
     linesLeftRef.current = linesLeft;
@@ -207,7 +207,7 @@ const Viewer: React.FC<ViewerProps> = props => {
     scrollContainer.addEventListener('scroll', onScroll);
     return () => {
       scrollContainer.removeEventListener('scroll', onScroll);
-    }
+    };
   }, [props.virtual, scrollContainer]);
 
   const onExpandBefore = (segmentIndex: number) => (lines: number) => {
@@ -221,7 +221,7 @@ const Viewer: React.FC<ViewerProps> = props => {
       newSegments[segmentIndex + 1] = {
         ...newSegments[segmentIndex + 1],
         start: Math.max(newSegment.end - lines, newSegment.start),
-      }
+      };
     }
     segmentsRef.current = newSegments;
     updateViewer();
@@ -238,7 +238,7 @@ const Viewer: React.FC<ViewerProps> = props => {
       newSegments[segmentIndex - 1] = {
         ...newSegments[segmentIndex - 1],
         end: Math.min(newSegment.start + lines, newSegment.end),
-      }
+      };
     }
     segmentsRef.current = newSegments;
     updateViewer();
@@ -256,12 +256,12 @@ const Viewer: React.FC<ViewerProps> = props => {
       newSegments[segmentIndex + 1] = {
         ...newSegments[segmentIndex + 1],
         start: newSegment.start,
-      }
+      };
     } else {
       newSegments[segmentIndex - 1] = {
         ...newSegments[segmentIndex - 1],
         end: newSegment.end,
-      }
+      };
     }
     segmentsRef.current = newSegments;
     updateViewer();
@@ -326,7 +326,10 @@ const Viewer: React.FC<ViewerProps> = props => {
           )
         }
         <td className={`line-${l.type}`} style={{ backgroundColor: bgLeft }}>
-          <pre>{l.text && indentChar.repeat(l.level * indentSize)}{renderInlineResult(l.text, lResult, l.comma, syntaxHighlightEnabled)}</pre>
+          <pre>
+            {l.text && indentChar.repeat(l.level * indentSize)}
+            {renderInlineResult(l.text, lResult, l.comma, syntaxHighlightEnabled)}
+          </pre>
         </td>
         {
           props.lineNumbers && (
@@ -339,7 +342,10 @@ const Viewer: React.FC<ViewerProps> = props => {
           )
         }
         <td className={`line-${r.type}`} style={{ backgroundColor: bgRight }}>
-          <pre>{r.text && indentChar.repeat(r.level * indentSize)}{renderInlineResult(r.text, rResult, r.comma, syntaxHighlightEnabled)}</pre>
+          <pre>
+            {r.text && indentChar.repeat(r.level * indentSize)}
+            {renderInlineResult(r.text, rResult, r.comma, syntaxHighlightEnabled)}
+          </pre>
         </td>
       </tr>
     );
@@ -427,7 +433,9 @@ const Viewer: React.FC<ViewerProps> = props => {
       );
     }
     if (!props.virtual) {
-      return segmentsRef.current.map((item, index) => renderSegment(item, index, 0, linesLeftRef.current.length, syntaxHighlightEnabled));
+      return segmentsRef.current.map((item, index) => (
+        renderSegment(item, index, 0, linesLeftRef.current.length, syntaxHighlightEnabled)
+      ));
     }
     const containerHeight = (scrollContainer as HTMLElement)?.clientHeight ?? 0;
     const scrollTop = (scrollContainer as HTMLElement)?.scrollTop ?? 0;
@@ -454,7 +462,14 @@ const Viewer: React.FC<ViewerProps> = props => {
       startLine,
       endSegment,
       endLine,
-    ] = findVisibleLines(segmentsRef.current, accTopRef.current, viewportTop, viewportBottom, itemHeight, expandLineHeight);
+    ] = findVisibleLines(
+      segmentsRef.current,
+      accTopRef.current,
+      viewportTop,
+      viewportBottom,
+      itemHeight,
+      expandLineHeight,
+    );
     const [topHeight, bottomHeight] = calculatePlaceholderHeight(
       segmentsRef.current,
       accTopRef.current,
@@ -470,7 +485,11 @@ const Viewer: React.FC<ViewerProps> = props => {
     return visibleSegments.length ? (
       <>
         <tr><td colSpan={4} style={{ height: topHeight, padding: 0 }} /></tr>
-        {visibleSegments.map((segment, index) => renderSegment(segment, index, startLine, endLine, syntaxHighlightEnabled))}
+        {
+          visibleSegments.map((segment, index) => (
+            renderSegment(segment, index, startLine, endLine, syntaxHighlightEnabled)
+          ))
+        }
         <tr><td colSpan={4} style={{ height: bottomHeight, padding: 0 }} /></tr>
       </>
     ) : (

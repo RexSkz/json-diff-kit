@@ -42,6 +42,7 @@ const getSegments = (l: DiffResult[], r: DiffResult[], options: HideUnchangedLin
   const _options = options === true ? defaultOptions : options;
   const { threshold, margin } = _options;
   if (threshold < margin * 2 + 1) {
+    // eslint-disable-next-line no-console, max-len
     console.warn(`Threshold (${threshold}) is no more than 2 margins + 1 "expand" line (${margin} * 2 + 1), it's not necessary to hide unchanged areas which have less than ${margin * 2 + 1} lines.`);
   }
 
@@ -61,10 +62,22 @@ const getSegments = (l: DiffResult[], r: DiffResult[], options: HideUnchangedLin
       result.push({ start: segment.end - margin, end: segment.end, isEqual: true });
     } else if (i === segments.length - 1) {
       result.push({ start: segment.start, end: segment.start + margin, isEqual: true });
-      result.push({ hasLinesBefore: false, hasLinesAfter: true, start: segment.start + margin, end: l.length, isEqual: true });
+      result.push({
+        hasLinesBefore: false,
+        hasLinesAfter: true,
+        start: segment.start + margin,
+        end: l.length,
+        isEqual: true,
+      });
     } else {
       result.push({ start: segment.start, end: segment.start + margin, isEqual: true });
-      result.push({ hasLinesBefore: true, hasLinesAfter: true, start: segment.start + margin, end: segment.end - margin, isEqual: true });
+      result.push({
+        hasLinesBefore: true,
+        hasLinesAfter: true,
+        start: segment.start + margin,
+        end: segment.end - margin,
+        isEqual: true,
+      });
       result.push({ start: segment.end - margin, end: segment.end, isEqual: true });
     }
   }

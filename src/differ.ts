@@ -190,7 +190,9 @@ class Differ {
   private detectCircular(source: any) {
     if (this.options.detectCircular) {
       if (detectCircular(source)) {
-        throw new Error(`Circular reference detected in object (with keys ${Object.keys(source).map(t => `"${t}"`).join(', ')})`);
+        throw new Error(
+          `Circular reference detected in object (with keys ${Object.keys(source).map(t => `"${t}"`).join(', ')})`,
+        );
       }
     }
   }
@@ -242,11 +244,11 @@ class Differ {
 
     for (let i = 0; i < result.length; i++) {
       if (
-        !result[i].text.endsWith('{')
-        && !result[i].text.endsWith('[')
-        && result[i].text
-        && nextLine[i]
-        && result[i].level <= result[nextLine[i]].level
+        !result[i].text.endsWith('{') &&
+        !result[i].text.endsWith('[') &&
+        result[i].text &&
+        nextLine[i] &&
+        result[i].level <= result[nextLine[i]].level
       ) {
         result[i].comma = true;
       }
@@ -258,8 +260,8 @@ class Differ {
     this.detectCircular(sourceRight);
 
     if (
-      this.options.arrayDiffMethod === 'unorder-normal'
-      || this.options.arrayDiffMethod === 'unorder-lcs'
+      this.options.arrayDiffMethod === 'unorder-normal' ||
+      this.options.arrayDiffMethod === 'unorder-lcs'
     ) {
       sourceLeft = sortInnerArrays(sourceLeft, this.options);
       sourceRight = sortInnerArrays(sourceRight, this.options);
@@ -276,13 +278,15 @@ class Differ {
     const typeLeft = getType(sourceLeft);
     const typeRight = getType(sourceRight);
     if (typeLeft !== typeRight) {
-      resultLeft = stringify(sourceLeft, undefined, 1, this.options.maxDepth, this.options.undefinedBehavior).split('\n').map(line => ({
+      const strLeft = stringify(sourceLeft, undefined, 1, this.options.maxDepth, this.options.undefinedBehavior);
+      resultLeft = strLeft.split('\n').map(line => ({
         level: line.match(/^\s+/)?.[0]?.length || 0,
         type: 'remove',
         text: line.replace(/^\s+/, '').replace(/,$/g, ''),
         comma: line.endsWith(','),
       }));
-      resultRight = stringify(sourceRight, undefined, 1, this.options.maxDepth, this.options.undefinedBehavior).split('\n').map(line => ({
+      const strRight = stringify(sourceRight, undefined, 1, this.options.maxDepth, this.options.undefinedBehavior);
+      resultRight = strRight.split('\n').map(line => ({
         level: line.match(/^\s+/)?.[0]?.length || 0,
         type: 'add',
         text: line.replace(/^\s+/, '').replace(/,$/g, ''),
@@ -311,21 +315,45 @@ class Differ {
           resultRight = [{ level: 0, type: 'equal', text: sourceRight }];
         }
       } else if (this.options.showModifications) {
-        resultLeft = [{ level: 0, type: 'modify', text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior) }];
-        resultRight = [{ level: 0, type: 'modify', text: stringify(sourceRight, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior) }];
+        resultLeft = [{
+          level: 0,
+          type: 'modify',
+          text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior),
+        }];
+        resultRight = [{
+          level: 0,
+          type: 'modify',
+          text: stringify(sourceRight, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior),
+        }];
       } else {
         resultLeft = [
-          { level: 0, type: 'remove', text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior) },
+          {
+            level: 0,
+            type: 'remove',
+            text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior),
+          },
           { ...EQUAL_EMPTY_LINE },
         ];
         resultRight = [
           { ...EQUAL_EMPTY_LINE },
-          { level: 0, type: 'add', text: stringify(sourceRight, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior) },
+          {
+            level: 0,
+            type: 'add',
+            text: stringify(sourceRight, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior),
+          },
         ];
       }
     } else {
-      resultLeft = [{ level: 0, type: 'equal', text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior) }];
-      resultRight = [{ level: 0, type: 'equal', text: stringify(sourceRight, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior) }];
+      resultLeft = [{
+        level: 0,
+        type: 'equal',
+        text: stringify(sourceLeft, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior),
+      }];
+      resultRight = [{
+        level: 0,
+        type: 'equal',
+        text: stringify(sourceRight, undefined, undefined, this.options.maxDepth, this.options.undefinedBehavior),
+      }];
     }
 
     this.sortResultLines(resultLeft, resultRight);

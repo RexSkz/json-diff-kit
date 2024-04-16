@@ -1,7 +1,6 @@
 import concat from './concat';
 
 describe('Utility function: concat', () => {
-
   it('should work for `append` mode', () => {
     expect(concat([1, 2, 3], ['a', 'b', 'c'])).toEqual([1, 2, 3, 'a', 'b', 'c']);
   });
@@ -14,5 +13,4 @@ describe('Utility function: concat', () => {
     expect(() => concat(1 as any, ['a', 'b', 'c'])).toThrowError();
     expect(() => concat([1, 2, 3], 'abc' as any)).toThrowError();
   });
-
 });

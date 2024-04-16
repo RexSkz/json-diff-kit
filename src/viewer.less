@@ -1,8 +1,8 @@
 .json-diff-viewer {
+  width: 100%;
   border-collapse: collapse;
   border-spacing: 0;
   table-layout: fixed;
-  width: 100%;
 
   tr {
     vertical-align: top;
@@ -22,7 +22,7 @@
     &:hover td {
       position: relative;
 
-      &::before {
+      &:before {
         position: absolute;
         top: 0;
         left: 0;
@@ -35,9 +35,9 @@
     }
 
     &.message-line {
-      text-align: center;
       border-top: 1px solid;
       border-bottom: 1px solid;
+      text-align: center;
 
       td {
         padding: 4px 0;
@@ -65,14 +65,14 @@
       }
 
       button {
-        margin: 0 0.5em;
         padding: 0;
-        color: #2196f3;
-        font-size: 12px;
         border: none;
+        margin: 0 0.5em;
         background: transparent;
-        user-select: none;
+        color: #2196f3;
         cursor: pointer;
+        font-size: 12px;
+        user-select: none;
 
         &:hover {
           text-decoration: underline;
@@ -86,21 +86,21 @@
     font-size: 0;
 
     &.line-number {
-      border-right: 1px solid;
       box-sizing: content-box;
+      padding: 0 8px;
+      border-right: 1px solid;
       font-family: monospace;
       font-size: 14px;
-      padding: 0 8px;
       text-align: right;
       user-select: none;
     }
   }
 
   pre {
+    overflow: hidden;
     margin: 0;
     font-size: 12px;
     line-height: 16px;
-    overflow: hidden;
     white-space: pre-wrap;
     word-break: break-all;
 
@@ -118,8 +118,8 @@
   }
 
   &-virtual pre {
-    white-space: pre;
     overflow-x: auto;
+    white-space: pre;
 
     &::-webkit-scrollbar {
       display: none;

@@ -20,7 +20,7 @@ const findVisibleLines = (
   let r = segments.length - 1;
   // start segment
   while (1) {
-    let m = Math.floor((l + r) / 2);
+    const m = Math.floor((l + r) / 2);
     const top = accTop[m];
     const bottom = top + getSegmentHeight(segments[m], itemHeight, expandLineHeight);
     if (bottom <= viewportTop) {
@@ -44,7 +44,7 @@ const findVisibleLines = (
   l = 0;
   r = segments.length - 1;
   while (1) {
-    let m = Math.floor((l + r + 1) / 2);
+    const m = Math.floor((l + r + 1) / 2);
     const top = accTop[m];
     if (top >= viewportBottom) {
       r = m - 1;

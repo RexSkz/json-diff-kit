@@ -1,3 +1,5 @@
+/* eslint-disable max-len, react/no-unescaped-entities */
+
 import React from 'react';
 import debounce from 'lodash/debounce';
 
@@ -56,7 +58,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
     preserveKeyOrder,
   ]);
   const differ = React.useMemo(() => new Differ(differOptions), [differOptions]);
-  const [diff, setDiff] = React.useState(differ.diff("", ""));
+  const [diff, setDiff] = React.useState(differ.diff('', ''));
   const [fullscreen, setFullscreen] = React.useState(false);
   const [error, setError] = React.useState('');
 
@@ -70,7 +72,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
       setDiff(result);
     } catch (e) {
       setError(e.message);
-      console.error(e);
+      console.error(e); // eslint-disable-line no-console
     }
   };
   const triggerDiff = React.useCallback(debounce(_triggerDiff, 500), [differ]);
@@ -153,7 +155,7 @@ return (
       }
     } catch (e) {
       setError(e.message);
-      console.error(e);
+      console.error(e); // eslint-disable-line no-console
     }
     if (before || after) {
       beforeInputRef.current!.value = before;
@@ -195,7 +197,7 @@ return (
                 type="checkbox"
                 id="detect-circular"
                 checked={detectCircular}
-                disabled={true}
+                disabled
               />
             </label>
             <label htmlFor="max-depth">
@@ -343,7 +345,7 @@ return (
                 title="Highlight inline diff"
                 tip={
                   <>
-                    Whether to show the inline diff highlight. For example, if the left value <code>"JSON diff can't be possible"</code> is changed to the right value <code>"JSON diff is possible"</code>, it will be recognized as we first remove <code>can't be</code> and then add <code>is</code>. This feature is powered by <a href="https://github.com/gliese1337/fast-myers-diff" target="_blank">gliese1337/fast-myers-diff</a>. Note: the <code>showModification</code> must be enabled, or you will not see modified lines.
+                    Whether to show the inline diff highlight. For example, if the left value <code>"JSON diff can't be possible"</code> is changed to the right value <code>"JSON diff is possible"</code>, it will be recognized as we first remove <code>can't be</code> and then add <code>is</code>. This feature is powered by <a href="https://github.com/gliese1337/fast-myers-diff" target="_blank" rel="noreferrer">gliese1337/fast-myers-diff</a>. Note: the <code>showModification</code> must be enabled, or you will not see modified lines.
                   </>
                 }
               />

@@ -1,9 +1,9 @@
+import type { DifferOptions, DiffResult } from '../differ';
 import formatValue from './format-value';
 import diffObject from './diff-object';
 import getType from './get-type';
 import stringify from './stringify';
 
-import type { DifferOptions, DiffResult } from '../differ';
 import isEqual from './is-equal';
 import shallowSimilarity from './shallow-similarity';
 import concat from './concat';
@@ -140,8 +140,16 @@ const lcs = (
             tLeft.unshift({ level: level + 1, type: 'equal', text: '{' });
             tRight.unshift({ level: level + 1, type: 'equal', text: '{' });
           } else {
-            tLeft.unshift({ level: level + 1, type: 'modify', text: formatValue(arrLeft[i - 1], undefined, undefined, options.undefinedBehavior) });
-            tRight.unshift({ level: level + 1, type: 'modify', text: formatValue(arrRight[j - 1], undefined, undefined, options.undefinedBehavior) });
+            tLeft.unshift({
+              level: level + 1,
+              type: 'modify',
+              text: formatValue(arrLeft[i - 1], undefined, undefined, options.undefinedBehavior),
+            });
+            tRight.unshift({
+              level: level + 1,
+              type: 'modify',
+              text: formatValue(arrRight[j - 1], undefined, undefined, options.undefinedBehavior),
+            });
           }
         } else {
           const reversedLeft = [];
