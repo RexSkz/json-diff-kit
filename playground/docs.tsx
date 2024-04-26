@@ -135,8 +135,7 @@ const Docs: React.FC<PropTypes> = props => {
   const diff7 = React.useMemo(() => differ.diff(before7, after7), [differ, before7, after7]);
 
   const openInPlayground = (l: unknown, r: unknown) => {
-    updateInitialValues(JSON.stringify(l, null, 2), JSON.stringify(r, null, 2));
-    props.onSwitch();
+    updateInitialValues('playground', JSON.stringify(l, null, 2), JSON.stringify(r, null, 2));
   };
 
   const viewerCommonProps: Partial<ViewerProps> = {

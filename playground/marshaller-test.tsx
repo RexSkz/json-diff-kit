@@ -3,22 +3,17 @@
 import React from 'react';
 import debounce from 'lodash/debounce';
 
-import { Differ, Viewer, ViewerProps } from '../src';
+import { Differ, Marshaller, MarshallerConfig } from '../src';
 import type { DifferOptions, InlineDiffOptions } from '../src';
 
 import GeneratedCode from './generated-code';
-import jsStringify from './js-stringify';
 import Label from './label';
 import { updateInitialValues, useInitialValues } from './initial-values';
 
 import '../src/viewer-monokai.less';
 import './playground.less';
 
-interface PlaygroundProps {
-  onSwitch: () => void;
-}
-
-const Playground: React.FC<PlaygroundProps> = props => {
+const MarshallerTest: React.FC = () => {
   // differ props
   const [detectCircular] = React.useState(true);
   const [maxDepth, setMaxDepth] = React.useState(Infinity);
@@ -36,7 +31,6 @@ const Playground: React.FC<PlaygroundProps> = props => {
   const [inlineDiffSeparator, setInlineDiffSeparator] = React.useState(' ');
   const [hideUnchangedLines, setHideUnchangedLines] = React.useState(true);
   const [syntaxHighlight, setSyntaxHighlight] = React.useState(false);
-  const [virtual, setVirtual] = React.useState(false);
 
   const differOptions = React.useMemo(() => ({
     detectCircular,
@@ -60,6 +54,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
   const differ = React.useMemo(() => new Differ(differOptions), [differOptions]);
   const [diff, setDiff] = React.useState(differ.diff('', ''));
   const [fullscreen, setFullscreen] = React.useState(false);
+  const [showHTMLSource, setShowHTMLSource] = React.useState(false);
   const [error, setError] = React.useState('');
 
   const _triggerDiff = (before: string, after: string) => {
@@ -81,42 +76,20 @@ const Playground: React.FC<PlaygroundProps> = props => {
     mode: inlineDiffMode,
     wordSeparator: inlineDiffSeparator,
   }), [inlineDiffMode, inlineDiffSeparator]);
-  const virtualOptions = React.useMemo(() => {
-    return virtual && {
-      scrollContainer: '.playground .layout-right .results',
-      itemHeight: 16,
-      expandLineHeight: 27,
-    };
-  }, [virtual]);
-  const viewerOptions: Omit<ViewerProps, 'diff'> = React.useMemo(() => ({
+  const viewerOptions: Omit<MarshallerConfig, 'diff'> = React.useMemo(() => ({
     indent,
     lineNumbers: true,
     highlightInlineDiff,
     inlineDiffOptions,
     hideUnchangedLines,
     syntaxHighlight: syntaxHighlight ? { theme: 'monokai' } : false,
-    virtual: virtualOptions,
   }), [
     indent,
     highlightInlineDiff,
     inlineDiffOptions,
     hideUnchangedLines,
     syntaxHighlight,
-    virtualOptions,
   ]);
-
-  const code = `
-const d = new Differ(${jsStringify(differOptions)});
-const diff = d.diff(before, after);
-
-const viewerProps = ${jsStringify(viewerOptions)};
-return (
-  <Viewer
-    diff={diff}
-    {...viewerProps}
-  />
-);
-`.trim();
 
   // inputs
   const { l, r } = useInitialValues();
@@ -126,14 +99,14 @@ return (
   const afterInputRef = React.useRef<HTMLTextAreaElement>(null);
   const setBefore = (value: string, diff: boolean) => {
     beforeRef.current = value;
-    updateInitialValues('playground', beforeRef.current, afterRef.current);
+    updateInitialValues('marshaller-test', beforeRef.current, afterRef.current);
     if (diff) {
       triggerDiff(beforeRef.current, afterRef.current);
     }
   };
   const setAfter = (value: string, diff: boolean) => {
     afterRef.current = value;
-    updateInitialValues('playground', beforeRef.current, afterRef.current);
+    updateInitialValues('marshaller-test', beforeRef.current, afterRef.current);
     if (diff) {
       triggerDiff(beforeRef.current, afterRef.current);
     }
@@ -141,7 +114,7 @@ return (
   const clearAll = () => {
     beforeRef.current = '';
     afterRef.current = '';
-    updateInitialValues('playground', '', '');
+    updateInitialValues('marshaller-test', '', '');
   };
   const beautify = () => {
     let before = '';
@@ -162,7 +135,7 @@ return (
       afterInputRef.current!.value = after;
       setBefore(before, false);
       setAfter(after, false);
-      updateInitialValues('playground', before, after);
+      updateInitialValues('marshaller-test', before, after);
     }
   };
   React.useEffect(() => {
@@ -179,8 +152,7 @@ return (
   return (
     <div className="playground">
       <div className="layout-left">
-        <div className="logo">JSON Diff Kit</div>
-        <div className="back" onClick={props.onSwitch}>Go to docs & demo</div>
+        <div className="logo">Marshaller Test</div>
         <div className="config">
           <form>
             <legend>DIFFER CONFIGURATION</legend>
@@ -329,7 +301,7 @@ return (
             <label htmlFor="indent">
               <Label
                 title="Indent"
-                tip={<>Controls the indent in the <code>&lt;Viewer&gt;</code> component.</>}
+                tip={<>Controls the indent in the <code>&lt;Marshaller&gt;</code> component.</>}
               />
               <input
                 type="number"
@@ -412,24 +384,6 @@ return (
                 onChange={e => setHideUnchangedLines(e.target.checked)}
               />
             </label>
-            <label htmlFor="use-virtual-scroll">
-              <Label
-                title="Use virtual scroll (experimental)"
-                tip="Whether to use virtual scroll. This can improve the rendering performance when the data is very large, but it's not well-tested."
-              />
-              <input
-                type="checkbox"
-                id="use-virtual-scroll"
-                checked={virtual}
-                onChange={e => setVirtual(e.target.checked)}
-              />
-            </label>
-          </form>
-        </div>
-        <div className="config">
-          <form>
-            <legend>GENERATEDE CODE</legend>
-            <GeneratedCode code={code} />
           </form>
         </div>
         <div className="statistics">
@@ -467,16 +421,25 @@ return (
         <div className="title">
           DIFF RESULTS
           <span className="control-button" onClick={() => setFullscreen(pre => !pre)}>[{fullscreen ? 'EXIT ' : ''}PAGE FULLSCREEN]</span>
+          <span className="control-button" onClick={() => setShowHTMLSource(pre => !pre)}>[{showHTMLSource ? 'EXIT ' : 'SHOW'} HTML SOURCE]</span>
           {!!error && <span className="error">{error}</span>}
         </div>
-        <div className="results">
-          <Viewer diff={diff} {...viewerOptions} />
-        </div>
+        {
+          showHTMLSource ? (
+            <GeneratedCode code={Marshaller({ diff, ...viewerOptions })} />
+          ) : (
+            <div
+              className="results"
+              // eslint-disable-next-line react/no-danger
+              dangerouslySetInnerHTML={{ __html: Marshaller({ diff, ...viewerOptions }) }}
+            />
+          )
+        }
       </div>
     </div>
   );
 };
 
-Playground.displayName = 'Playground';
+MarshallerTest.displayName = 'MarshallerTest';
 
-export default Playground;
+export default MarshallerTest;
