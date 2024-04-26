@@ -74,7 +74,9 @@
     "commander": "^11.1.0",
     "fast-myers-diff": "^3.0.1",
     "lodash": "^4.17.21",
-    "prompts": "^2.4.2",
+    "prompts": "^2.4.2"
+  },
+  "optionalDependencies": {
     "terminal-kit": "^3.0.1"
   }
 }

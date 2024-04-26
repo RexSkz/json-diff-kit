@@ -108,9 +108,11 @@ Please check the [playground page](https://json-diff-kit.js.org/), where you can
 
 ## CLI Tool
 
-You can use the CLI tool to generate the diff data from two JSON files.
+You can use the CLI tool to generate the diff data from two JSON files. Please install the package `terminal-kit` before using it.
 
 ```bash
+pnpm add terminal-kit # or make sure it's already installed in your project
+
 # Compare two JSON files, output the diff data to the terminal.
 # You can navigate it using keyboard like `less`.
 jsondiff run path/to/before.json path/to/after.json
