@@ -7,6 +7,7 @@
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
     "jsx": "react",
+    "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "typings",
     "resolveJsonModule": true,

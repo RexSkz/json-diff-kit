@@ -1,5 +1,4 @@
-import { terminal } from 'terminal-kit';
-
+import type { Terminal } from 'terminal-kit';
 import type { DiffResult } from '../differ';
 
 const DIVIDER = ' │ ';
@@ -11,14 +10,21 @@ const decorate = (line: DiffResult) => {
   return `${indent}${line.text}${comma}`;
 };
 
-const getOutputFunction = (line: DiffResult) => {
+const getOutputFunction = (terminal: Terminal, line: DiffResult) => {
   if (line.type === 'add') return terminal.bgGreen;
   if (line.type === 'remove') return terminal.bgRed;
   if (line.type === 'modify') return terminal.bgYellow;
   return terminal;
 };
 
-const showContent = (leftResult: DiffResult[], rightResult: DiffResult[], columns: number, rows: number) => {
+const showContent = (
+  terminal: Terminal,
+  leftResult: DiffResult[],
+  rightResult: DiffResult[],
+  columns: number,
+  rows: number,
+  startLine: number,
+) => {
   const lineNumberWidth = Math.max(
     ...leftResult.map(line => String(line.lineNumber || '').length),
     ...rightResult.map(line => String(line.lineNumber || '').length),
@@ -35,8 +41,8 @@ const showContent = (leftResult: DiffResult[], rightResult: DiffResult[], column
       continue;
     }
 
-    const leftOutputFunction = getOutputFunction(left);
-    const rightOutputFunction = getOutputFunction(right);
+    const leftOutputFunction = getOutputFunction(terminal, left);
+    const rightOutputFunction = getOutputFunction(terminal, right);
 
     leftOutputFunction((left.lineNumber || '').toString().padStart(lineNumberWidth - 1, ' ') + DIVIDER);
     leftOutputFunction(decorate(left).slice(0, contentWidth).padEnd(contentWidth, ' '));
@@ -51,11 +57,22 @@ const showContent = (leftResult: DiffResult[], rightResult: DiffResult[], column
   terminal.moveTo(1, rows);
 };
 
-let startLine = 0;
-let columns = terminal.width;
-let rows = terminal.height;
+const importTerminalKit = async() => {
+  try {
+    return await import('terminal-kit');
+  } catch {
+    // eslint-disable-next-line no-console
+    console.error('Please install the package "terminal-kit" to show diff in terminal.');
+    process.exit(1);
+  }
+};
 
-const showInTerminal = ([leftResult, rightResult]: readonly [DiffResult[], DiffResult[]]) => {
+const showInTerminal = async([leftResult, rightResult]: readonly [DiffResult[], DiffResult[]]) => {
+  const { terminal } = await importTerminalKit();
+  let startLine = 0;
+  let columns = terminal.width;
+  let rows = terminal.height;
+
   // Swap to an alternate screen buffer
   // https://github.com/vadimdemedes/ink/issues/263#issuecomment-600927688
   const enterAltScreenCommand = '\x1b[?1049h';
@@ -65,37 +82,37 @@ const showInTerminal = ([leftResult, rightResult]: readonly [DiffResult[], DiffR
     process.stdout.write(leaveAltScreenCommand);
   });
 
-  showContent(leftResult, rightResult, columns, rows);
+  showContent(terminal, leftResult, rightResult, columns, rows, startLine);
 
   terminal.on('resize', (newColumns: number, newRows: number) => {
     columns = newColumns;
     rows = newRows;
-    showContent(leftResult, rightResult, columns, rows);
+    showContent(terminal, leftResult, rightResult, columns, rows, startLine);
   });
 
-  terminal.grabInput();
+  terminal.grabInput(true);
   terminal.on('key', (key: string) => {
     switch (key) {
       case 'UP':
         if (startLine > 0) {
           startLine--;
-          showContent(leftResult, rightResult, columns, rows);
+          showContent(terminal, leftResult, rightResult, columns, rows, startLine);
         }
         break;
       case 'DOWN':
         if (startLine < leftResult.length - rows + 1) {
           startLine++;
-          showContent(leftResult, rightResult, columns, rows);
+          showContent(terminal, leftResult, rightResult, columns, rows, startLine);
         }
         break;
       case 'PAGE_UP':
         startLine = Math.max(0, startLine - rows + 1);
-        showContent(leftResult, rightResult, columns, rows);
+        showContent(terminal, leftResult, rightResult, columns, rows, startLine);
         break;
       case 'PAGE_DOWN':
       case 'SPACE':
         startLine = Math.min(leftResult.length - rows + 1, startLine + rows - 1);
-        showContent(leftResult, rightResult, columns, rows);
+        showContent(terminal, leftResult, rightResult, columns, rows, startLine);
         break;
       case 'q':
       case 'CTRL_C':
