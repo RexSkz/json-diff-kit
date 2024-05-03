@@ -21,6 +21,11 @@
       "import": "./dist/*",
       "require": "./dist/cjs/*",
       "types": "./typings/*.d.ts"
+    },
+    "./dist/*": {
+      "import": "./dist/*",
+      "require": "./dist/cjs/*",
+      "types": "./typings/*.d.ts"
     }
   },
   "scripts": {
