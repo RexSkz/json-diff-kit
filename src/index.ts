@@ -14,6 +14,6 @@ export type {
 
 export type {
   ViewerProps,
-} from '../src/viewer';
+} from './viewer';
 
 export { Differ, Viewer };

@@ -6,6 +6,7 @@
 .gitignore
 .npmignore
 .npmrc
+.stylelintrc.js
 .swcrc
 .travis.yml
 coverage
@@ -20,3 +21,4 @@ preview-cli.png
 rollup.*.ts
 src
 tsconfig.json
+tsconfig.*.json

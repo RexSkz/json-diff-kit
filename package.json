@@ -14,15 +14,13 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "require": "./dist/cjs/index.js"
+      "require": "./dist/cjs/index.js",
+      "types": "./typings/index.d.ts"
     },
-    "./differ": {
-      "import": "./dist/differ.js",
-      "require": "./dist/cjs/differ.js"
-    },
-    "./viewer": {
-      "import": "./dist/viewer.js",
-      "require": "./dist/cjs/viewer.js"
+    "./*": {
+      "import": "./dist/*",
+      "require": "./dist/cjs/*",
+      "types": "./typings/index.d.ts"
     }
   },
   "scripts": {
