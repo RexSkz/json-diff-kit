@@ -20,7 +20,7 @@
     "./*": {
       "import": "./dist/*",
       "require": "./dist/cjs/*",
-      "types": "./typings/index.d.ts"
+      "types": "./typings/*.d.ts"
     }
   },
   "scripts": {
