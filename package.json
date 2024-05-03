@@ -1,6 +1,6 @@
 {
   "name": "json-diff-kit",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "description": "A better JSON differ & viewer.",
   "main": "dist/cjs/index.js",
   "module": "dist/index.js",
@@ -8,7 +8,9 @@
   "bin": {
     "jsondiff": "bin/jsondiff.cjs"
   },
-  "sideEffects": ["*.css"],
+  "sideEffects": [
+    "*.css"
+  ],
   "scripts": {
     "start": "cross-env rollup -c rollup.config.pages.ts -w",
     "dev": "cross-env pnpm start",
