@@ -1,6 +1,6 @@
 {
   "name": "json-diff-kit",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "A better JSON differ & viewer.",
   "main": "dist/cjs/index.js",
   "module": "dist/index.js",
