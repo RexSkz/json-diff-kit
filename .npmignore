@@ -1,9 +1,11 @@
 .cache
 .editorconfig
+.eslintrc.cjs
 .eslintignore
 .github
 .gitignore
 .npmignore
+.npmrc
 .swcrc
 .travis.yml
 coverage
@@ -15,6 +17,6 @@ playground
 pnpm-lock.yaml
 preview.png
 preview-cli.png
-rollup.*.js
+rollup.*.ts
 src
 tsconfig.json

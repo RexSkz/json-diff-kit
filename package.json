@@ -11,6 +11,20 @@
   "sideEffects": [
     "*.css"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./differ": {
+      "import": "./dist/differ.js",
+      "require": "./dist/cjs/differ.js"
+    },
+    "./viewer": {
+      "import": "./dist/viewer.js",
+      "require": "./dist/cjs/viewer.js"
+    }
+  },
   "scripts": {
     "start": "cross-env rollup -c rollup.config.pages.ts -w",
     "dev": "cross-env pnpm start",

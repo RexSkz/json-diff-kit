@@ -4,7 +4,7 @@
     "parser": {
       "syntax": "typescript"
     },
-    "target": "es2016",
+    "target": "es2020",
     "loose": true,
     "keepClassNames": true
   },
