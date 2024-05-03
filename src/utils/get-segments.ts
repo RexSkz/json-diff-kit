@@ -1,7 +1,7 @@
 import type { DiffResult } from '../differ';
 import type { HideUnchangedLinesOptions } from '../viewer';
 
-const defaultOptions: HideUnchangedLinesOptions = {
+const defaultOptions = {
   threshold: 8,
   margin: 3,
 };
@@ -39,7 +39,7 @@ const getSegments = (l: DiffResult[], r: DiffResult[], options: HideUnchangedLin
     }
   }
 
-  const _options = options === true ? defaultOptions : options;
+  const _options = options === true ? defaultOptions : { ...defaultOptions, ...options };
   const { threshold, margin } = _options;
   if (threshold < margin * 2 + 1) {
     // eslint-disable-next-line no-console, max-len

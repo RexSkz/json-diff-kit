@@ -17,7 +17,7 @@ const cleanFields = (obj: unknown) => {
     return obj.map(cleanFields).filter(t => typeof t !== 'undefined');
   }
   const result = {};
-  for (const [key, value] of Object.entries(obj)) {
+  for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
     const cleaned = cleanFields(value);
     if (typeof cleaned !== 'undefined') {
       result[key] = cleaned;

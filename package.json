@@ -8,14 +8,16 @@
   "bin": {
     "jsondiff": "bin/jsondiff.cjs"
   },
+  "sideEffects": ["*.css"],
   "scripts": {
     "start": "cross-env rollup -c rollup.config.pages.ts -w",
     "dev": "cross-env pnpm start",
     "lint:eslint": "eslint ./{src,playground}/**/*.{ts,tsx} --quiet",
     "lint:stylelint": "stylelint '**/*.{css,less}' --fix",
     "test": "cross-env jest --coverage",
-    "build": "cross-env pnpm build:ts && pnpm build:less",
+    "build": "cross-env pnpm build:ts && pnpm build:less && pnpm build:typings",
     "build:ts": "cross-env rollup -c && rollup -c rollup.config.cli.ts",
+    "build:typings": "cross-env tsc -p tsconfig.build.json",
     "build:less": "cross-env lessc src/viewer.less dist/viewer.css && lessc src/viewer-monokai.less dist/viewer-monokai.css",
     "build:pages": "cross-env NODE_ENV=production BASEDIR=docs rollup -c rollup.config.pages.ts",
     "prepublish": "cross-env pnpm build"
