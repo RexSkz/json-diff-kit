@@ -1,4 +1,7 @@
 {
   "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outFile": "./typings/index.d.ts",
+  },
   "include": ["src"],
 }
