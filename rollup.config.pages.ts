@@ -32,6 +32,7 @@ const plugins = [
     gtag('js', new Date());
     gtag('config', 'G-5D3V5T84WY');
   </script>
+  <link rel="stylesheet" href="index.css" />
 </head>
 <body>
   <div id="root"></div>
