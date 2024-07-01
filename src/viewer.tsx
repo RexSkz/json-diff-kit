@@ -11,7 +11,7 @@ import getSegments from './utils/get-segments';
 import type { HiddenUnchangedLinesInfo, SegmentItem } from './utils/get-segments';
 import { isExpandLine, mergeSegments, type InlineRenderInfo } from './utils/segment-util';
 
-interface ExpandLineRendererOptions {
+export interface ExpandLineRendererOptions {
   /**
    * If this is `true`, you can show a "⬆️ Show xx lines" button
    */
@@ -122,9 +122,9 @@ export interface ViewerProps {
   style?: React.CSSProperties;
 }
 
-const DEFAULT_INDENT = 2;
-const DEFAULT_EXPAND_MORE_LINES_LIMIT = 20;
-const DEFAULT_TEXTS = {
+export const DEFAULT_INDENT = 2;
+export const DEFAULT_EXPAND_MORE_LINES_LIMIT = 20;
+export const DEFAULT_TEXTS = {
   noChangeDetected: 'No change detected',
 };
 
