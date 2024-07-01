@@ -102,6 +102,10 @@ The result is here:
 
 ![The result (using LCS array diff method).](./preview.png)
 
+## Other Version of Viewer
+
+Here is an experimental [Vue version](https://github.com/RexSkz/json-diff-kit-vue) of the `Viewer` component.
+
 ## More Complex Usages
 
 Please check the [playground page](https://json-diff-kit.js.org/), where you can adjust nearly all parameters and see the result.
@@ -143,8 +147,8 @@ Please refer to the article [JSON Diff Kit: A Combination of Several Simple Algo
 - [x] Generate code directly in the demo page (covered by playground)
 - [x] Optimise `Viewer` performance by adding virtual scrolling
 - [x] Add CLI tool
+- [x] Provide a Vue version of `Viewer`
 - [ ] Improve unit tests
-- [ ] Provide a Vue version of `Viewer`
 
 ## License
 
