@@ -16,5 +16,10 @@
     "target": "esnext",
     "types": ["node", "jest"],
   },
-  "include": ["src", "playground", ".eslintrc.cjs", "./*.ts"],
+  "include": [
+    "src",
+    "playground",
+    ".eslintrc.cjs",
+    "./*.mjs",
+  ],
 }

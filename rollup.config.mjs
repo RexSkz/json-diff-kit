@@ -2,9 +2,9 @@ import commonjs from '@rollup/plugin-commonjs';
 import less from 'rollup-plugin-less';
 import replace from '@rollup/plugin-replace';
 import resolve from '@rollup/plugin-node-resolve';
-import swc from 'rollup-plugin-swc';
+import swc from '@rollup/plugin-swc';
 
-import packageJson from './package.json';
+import packageJson from './package.json' assert { type: 'json' };
 
 const plugins = [
   less({ output: './dist/viewer.css' }),
