@@ -74,11 +74,9 @@
       }
     }
 
-    pre {
-      padding: 8px 16px;
+    .generated-code {
       margin: 0 -16px;
-      background: #f5f6f9;
-      font-size: 12px;
+      box-sizing: border-box;
     }
 
     .statistics {
@@ -163,12 +161,30 @@
       overflow-y: auto;
     }
 
+    .generated-code {
+      border-top: 1px solid #ecf0f4;
+    }
+
     &.layout-right-fullscreen {
       .title:first-child,
       .inputs {
         display: none;
       }
     }
+  }
+}
+
+div.generated-code {
+  flex: 1;
+  overflow: auto;
+
+  pre {
+    margin: 0;
+    padding: 8px 16px;
+    background: #f5f6f9;
+    font-size: 12px;
+    white-space: pre-wrap;
+    box-sizing: border-box;
   }
 }
 
