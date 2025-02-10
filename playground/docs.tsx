@@ -158,7 +158,7 @@ const Docs: React.FC<PropTypes> = props => {
       <div className="statistics">
         <img src="https://img.shields.io/npm/v/json-diff-kit.svg" />
         <img src="https://img.shields.io/npm/dm/json-diff-kit.svg" />
-        <img src="https://codecov.io/gh/RexSkz/json-diff-kit/branch/master/graph/badge.svg?token=8YRG3M4WTO" />
+        <img src="https://codecov.io/gh/RexSkz/json-diff-kit/branch/main/graph/badge.svg?token=8YRG3M4WTO" />
         <iframe
           src="https://ghbtns.com/github-btn.html?user=rexskz&repo=json-diff-kit&type=star&count=true"
           frameBorder="0"
