@@ -13,11 +13,11 @@ import { isExpandLine, mergeSegments, type InlineRenderInfo } from './utils/segm
 
 interface ExpandLineRendererOptions {
   /**
-   * If this is `true`, you can show a "⬆️ Show xx lines" button
+   * If this is `true`, you can show a "⭡ Show xx lines before" button
    */
   hasLinesBefore: boolean;
   /**
-   * If this is `true`, you can show a "⬇️ Show xx lines" button
+   * If this is `true`, you can show a "⭣ Show xx lines after" button
    */
   hasLinesAfter: boolean;
   /**
@@ -57,7 +57,7 @@ export type HideUnchangedLinesOptions = boolean | {
    * default renderer will produce the following buttons in this line:
    *
    * ```text
-   * [⬆️ Show 20 lines] [↕️ Show all unchanged lines] [⬇️ Show 20 lines]
+   * [⭡ Show 20 lines] [⭥ Show all unchanged lines] [⭣ Show 20 lines]
    * ```
    */
   expandLineRenderer?: (options?: ExpandLineRendererOptions) => JSX.Element;
@@ -115,6 +115,12 @@ export interface ViewerProps {
   texts?: {
     /** @default 'No change detected' */
     noChangeDetected?: string;
+    /** @default '⭡ Show %d lines before', where %d is the number */
+    showLinesBefore?: string;
+    /** @default '⭣ Show %d lines after', where %d is the number */
+    showLinesAfter?: string;
+    /** @default '⭥ Show all unchanged lines' */
+    showAll?: string;
   };
   /** Extra class names */
   className?: string;
@@ -126,6 +132,9 @@ const DEFAULT_INDENT = 2;
 const DEFAULT_EXPAND_MORE_LINES_LIMIT = 20;
 const DEFAULT_TEXTS = {
   noChangeDetected: 'No change detected',
+  showLinesBefore: '⭡ Show %d lines before',
+  showLinesAfter: '⭣ Show %d lines after',
+  showAll: '⭥ Show all unchanged lines',
 };
 
 const Viewer: React.FC<ViewerProps> = props => {
@@ -362,17 +371,17 @@ const Viewer: React.FC<ViewerProps> = props => {
         {
           hasLinesBefore && (
             <button onClick={() => onExpandBefore(index)(expandMoreLinesLimit)}>
-              ⭡ Show {expandMoreLinesLimit} lines before
+              {mergedTexts.showLinesBefore.replaceAll('%d', String(expandMoreLinesLimit))}
             </button>
           )
         }
         <button onClick={() => onExpandAll(index)()}>
-          ⭥ Show all unchanged lines
+          {mergedTexts.showAll}
         </button>
         {
           hasLinesAfter && (
             <button onClick={() => onExpandAfter(index)(expandMoreLinesLimit)}>
-              ⭣ Show {expandMoreLinesLimit} lines after
+              {mergedTexts.showLinesAfter.replaceAll('%d', String(expandMoreLinesLimit))}
             </button>
           )
         }
