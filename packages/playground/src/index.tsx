@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import Playground from './playground';
 import Docs from './docs';
 
-import '../src/viewer.less';
+import '@json-diff-kit/viewer-react/src/viewer.less';
 import './index.less';
 
 const Index: React.FC = () => {

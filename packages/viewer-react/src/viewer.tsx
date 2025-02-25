@@ -1,15 +1,15 @@
 import * as React from 'react';
 
-import type { DiffResult } from './differ';
+import type { DiffResult } from '@json-diff-kit/differ/src';
 
-import calculatePlaceholderHeight from './utils/calculate-placeholder-height';
-import findVisibleLines from './utils/find-visible-lines';
-import getInlineDiff from './utils/get-inline-diff';
-import type { InlineDiffOptions } from './utils/get-inline-diff';
-import getInlineSyntaxHighlight from './utils/get-inline-syntax-highlight';
-import getSegments from './utils/get-segments';
-import type { HiddenUnchangedLinesInfo, SegmentItem } from './utils/get-segments';
-import { isExpandLine, mergeSegments, type InlineRenderInfo } from './utils/segment-util';
+import calculatePlaceholderHeight from '@json-diff-kit/differ/src/utils/calculate-placeholder-height';
+import findVisibleLines from '@json-diff-kit/differ/src/utils/find-visible-lines';
+import getInlineDiff from '@json-diff-kit/differ/src/utils/get-inline-diff';
+import type { InlineDiffOptions } from '@json-diff-kit/differ/src/utils/get-inline-diff';
+import getInlineSyntaxHighlight from '@json-diff-kit/differ/src/utils/get-inline-syntax-highlight';
+import getSegments from '@json-diff-kit/differ/src/utils/get-segments';
+import type { HiddenUnchangedLinesInfo, SegmentItem } from '@json-diff-kit/differ/src/utils/get-segments';
+import { isExpandLine, mergeSegments, type InlineRenderInfo } from '@json-diff-kit/differ/src/utils/segment-util';
 
 interface ExpandLineRendererOptions {
   /**

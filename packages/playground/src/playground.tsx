@@ -3,15 +3,15 @@
 import React from 'react';
 import debounce from 'lodash/debounce';
 
-import { Differ, Viewer, ViewerProps } from '../src';
-import type { DifferOptions, InlineDiffOptions } from '../src';
+import { Differ, Viewer, ViewerProps } from '@json-diff-kit/differ/src';
+import type { DifferOptions, InlineDiffOptions } from '@json-diff-kit/differ/src';
 
 import GeneratedCode from './generated-code';
 import jsStringify from './js-stringify';
 import Label from './label';
 import { updateInitialValues, useInitialValues } from './initial-values';
 
-import '../src/viewer-monokai.less';
+import '@json-diff-kit/viewer-react/src/viewer-monokai.less';
 import './playground.less';
 
 interface PlaygroundProps {

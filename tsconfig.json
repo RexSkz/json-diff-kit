@@ -17,9 +17,7 @@
     "types": ["node", "jest"],
   },
   "include": [
-    "src",
-    "playground",
-    ".eslintrc.cjs",
-    "./*.mjs",
+    "packages/**/*",
+    "declares.d.ts",
   ],
 }

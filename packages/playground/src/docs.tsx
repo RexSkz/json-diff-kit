@@ -3,10 +3,10 @@
 import React from 'react';
 import _ForkMeOnGithub from 'fork-me-on-github';
 
-import { Differ, Viewer } from '../src';
-import type { DifferOptions } from '../src/differ';
-import { InlineDiffOptions } from '../src/utils/get-inline-diff';
-import type { ViewerProps } from '../src/viewer';
+import { Differ, Viewer } from '@json-diff-kit/differ/src';
+import type { DifferOptions } from '@json-diff-kit/differ/src/differ';
+import { InlineDiffOptions } from '@json-diff-kit/differ/src/utils/get-inline-diff';
+import type { ViewerProps } from '@json-diff-kit/viewer-react/src';
 
 import './docs.less';
 import { updateInitialValues } from './initial-values';

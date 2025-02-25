@@ -1,33 +1,9 @@
 {
-  "name": "json-diff-kit",
-  "version": "1.0.31",
-  "description": "A better JSON differ & viewer.",
+  "name": "@json-diff-kit/differ",
+  "description": "The differ of json-diff-kit",
   "main": "dist/cjs/index.js",
   "module": "dist/index.js",
   "typings": "typings",
-  "bin": {
-    "jsondiff": "bin/jsondiff.cjs"
-  },
-  "sideEffects": [
-    "*.css"
-  ],
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/cjs/index.js",
-      "types": "./typings/index.d.ts"
-    },
-    "./*": {
-      "import": "./dist/*",
-      "require": "./dist/cjs/*",
-      "types": "./typings/*.d.ts"
-    },
-    "./dist/*": {
-      "import": "./dist/*",
-      "require": "./dist/cjs/*",
-      "types": "./typings/*.d.ts"
-    }
-  },
   "scripts": {
     "start": "cross-env rollup -c rollup.config.pages.mjs -w",
     "dev": "cross-env pnpm start",
@@ -92,13 +68,8 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "commander": "^11.1.0",
     "fast-myers-diff": "^3.0.1",
-    "lodash": "^4.17.21",
-    "prompts": "^2.4.2"
+    "lodash": "^4.17.21"
   },
-  "optionalDependencies": {
-    "terminal-kit": "^3.0.1"
-  },
-  "packageManager": "pnpm@8.15.7+sha256.50783dd0fa303852de2dd1557cd4b9f07cb5b018154a6e76d0f40635d6cee019"
+  "packageManager": "pnpm@9.15.6+sha256.5bf88eca1e818b973b9359a16e57405177c7a9b8177b9125d587577311786e64"
 }

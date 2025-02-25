@@ -1,0 +1,11 @@
+.cache
+playground
+node_modules
+src
+.gitignore
+.npmignore
+.travis.yml
+esbuild.mjs
+pnpm-lock.yaml
+preview.png
+rollup.config.ts

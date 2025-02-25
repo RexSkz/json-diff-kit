@@ -1,5 +1,5 @@
 import type { Terminal } from 'terminal-kit';
-import type { DiffResult } from '../differ';
+import type { DiffResult } from '@json-diff-kit/differ/src';
 
 const DIVIDER = ' │ ';
 const HINT_TEXT = 'Press q to quit, ↑/↓ to scroll';

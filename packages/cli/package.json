@@ -1,0 +1,33 @@
+{
+  "name": "@json-diff-kit/cli",
+  "description": "The CLI of json-diff-kit",
+  "bin": {
+    "jsondiff": "bin/jsondiff.cjs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@json-diff-kit/differ": "workspace:*",
+    "commander": "^13.1.0",
+    "prompts": "^2.4.2",
+    "terminal-kit": "^3.1.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RexSkz/json-diff-kit.git"
+  },
+  "keywords": [
+    "json",
+    "diff",
+    "kit",
+    "cli"
+  ],
+  "author": "Rex Zeng <rex@rexskz.info>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RexSkz/json-diff-kit/issues"
+  },
+  "homepage": "https://github.com/RexSkz/json-diff-kit#readme",
+  "packageManager": "pnpm@9.15.6+sha256.5bf88eca1e818b973b9359a16e57405177c7a9b8177b9125d587577311786e64"
+}

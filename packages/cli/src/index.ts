@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import { program } from 'commander';
 import { prompts } from 'prompts';
 
-import Differ, { type DifferOptions } from '../differ';
+import { Differ, type DifferOptions } from '@json-diff-kit/differ/src';
 import showInTerminal from './show-in-terminal';
 import writeToFile from './write-to-file';
 

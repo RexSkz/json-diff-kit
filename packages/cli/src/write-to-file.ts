@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import type { DiffResult } from '../differ';
+import type { DiffResult } from '@json-diff-kit/differ/src';
 
 const decorate = (line: DiffResult) => {
   const sign = line.type === 'equal' ? ' ' : line.type === 'remove' ? '-' : '+';

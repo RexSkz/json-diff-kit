@@ -1,0 +1,25 @@
+{
+  "name": "@json-diff-kit/viewer-vue",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "dev": "pnpm start",
+    "build": "tsc --p ./tsconfig.build.json && vite build",
+    "build:docs": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0",
+    "vue": "^3.4.21",
+    "vue-tsc": "^2.0.6"
+  },
+  "dependencies": {
+    "@json-diff-kit/differ": "workspace:*",
+    "@json-diff-kit/viewer-react": "workspace:*",
+    "fast-myers-diff": "^3.2.0"
+  }
+}
