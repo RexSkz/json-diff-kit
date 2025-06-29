@@ -26,6 +26,7 @@ const Docs: React.FC<PropTypes> = props => {
   const [ignoreCase, setIgnoreCase] = React.useState(false);
   const [recursiveEqual, setRecursiveEqual] = React.useState(true);
   const [preserveKeyOrder, setPreserveKeyOrder] = React.useState<DifferOptions['preserveKeyOrder']>(undefined);
+  const [compareKey, setCompareKey] = React.useState<string>('');
 
   // viewer props
   const [indent, setIndent] = React.useState(4);
@@ -44,6 +45,7 @@ const Docs: React.FC<PropTypes> = props => {
     ignoreCase,
     recursiveEqual,
     preserveKeyOrder,
+    compareKey
   }), [
     detectCircular,
     maxDepth,
@@ -52,6 +54,7 @@ const Docs: React.FC<PropTypes> = props => {
     ignoreCase,
     recursiveEqual,
     preserveKeyOrder,
+    compareKey,
   ]);
   const differ = React.useMemo(() => new Differ(differOptions), [differOptions]);
 
@@ -231,9 +234,10 @@ const Docs: React.FC<PropTypes> = props => {
               <option value="lcs">lcs</option>
               <option value="unorder-normal">unorder-normal</option>
               <option value="unorder-lcs">unorder-lcs</option>
+              <option value="compare-key">compare-key</option>
             </select>
           </label>
-          <blockquote>The way to diff arrays, default is <code>"normal"</code>, using <code>"lcs"</code> may get a better result but much slower. <code>"unorder-normal"</code> and <code>"unorder-lcs"</code> are for unordered arrays (the order of elements in the array doesn't matter).</blockquote>
+          <blockquote>The way to diff arrays, default is <code>"normal"</code>, using <code>"lcs"</code> may get a better result but much slower. <code>"unorder-normal"</code> and <code>"unorder-lcs"</code> are for unordered arrays (the order of elements in the array doesn't matter). <code>"compare-key"</code> matches objects by a specific key property.</blockquote>
           <label htmlFor="ignore-case">
             Ignore case:
             <input
