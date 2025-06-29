@@ -7,6 +7,7 @@ import isEqual from './is-equal';
 import prettyAppendLines from './pretty-append-lines';
 import stringify from './stringify';
 import diffArrayLCS from './diff-array-lcs';
+import {  addArrayClosingBrackets, addArrayOpeningBrackets, addMaxDepthPlaceholder } from './array-bracket-utils';
 
 const diffArrayCompareKey = (
   arrLeft: any[],
@@ -30,17 +31,10 @@ const diffArrayCompareKey = (
     return diffArrayLCS(arrLeft, arrRight, keyLeft, keyRight, level, options, linesLeft, linesRight);
   }
 
-  if (keyLeft && keyRight) {
-    linesLeft.push({ level, type: 'equal', text: `"${keyLeft}": [` });
-    linesRight.push({ level, type: 'equal', text: `"${keyRight}": [` });
-  } else {
-    linesLeft.push({ level, type: 'equal', text: '[' });
-    linesRight.push({ level, type: 'equal', text: '[' });
-  }
+  addArrayOpeningBrackets(linesLeft, linesRight, keyLeft, keyRight, level)
 
   if (level >= (options.maxDepth || Infinity)) {
-    linesLeft.push({ level: level + 1, type: 'equal', text: '...' });
-    linesRight.push({ level: level + 1, type: 'equal', text: '...' });
+    addMaxDepthPlaceholder(linesLeft, linesRight, level);
   } else {
     const leftProcessed = new Set<number>();
     const rightProcessed = new Set<number>();
@@ -196,8 +190,7 @@ const diffArrayCompareKey = (
     }
   }
 
-  linesLeft.push({ level, type: 'equal', text: ']' });
-  linesRight.push({ level, type: 'equal', text: ']' });
+  addArrayClosingBrackets(linesLeft, linesRight, level)
   return [linesLeft, linesRight];
 };
 

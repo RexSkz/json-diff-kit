@@ -7,6 +7,7 @@ import getType from './get-type';
 import isEqual from './is-equal';
 import prettyAppendLines from './pretty-append-lines';
 import cmp from './cmp';
+import { addArrayClosingBrackets, addArrayOpeningBrackets, addMaxDepthPlaceholder } from './array-bracket-utils';
 
 const diffArrayNormal = (
   arrLeft: any[],
@@ -20,17 +21,10 @@ const diffArrayNormal = (
 ): [DiffResult[], DiffResult[]] => {
   arrLeft = [...arrLeft];
   arrRight = [...arrRight];
-  if (keyLeft && keyRight) {
-    linesLeft.push({ level, type: 'equal', text: `"${keyLeft}": [` });
-    linesRight.push({ level, type: 'equal', text: `"${keyRight}": [` });
-  } else {
-    linesLeft.push({ level, type: 'equal', text: '[' });
-    linesRight.push({ level, type: 'equal', text: '[' });
-  }
+  addArrayOpeningBrackets(linesLeft, linesRight, keyLeft, keyRight, level)
 
   if (level >= (options.maxDepth || Infinity)) {
-    linesLeft.push({ level: level + 1, type: 'equal', text: '...' });
-    linesRight.push({ level: level + 1, type: 'equal', text: '...' });
+    addMaxDepthPlaceholder(linesLeft, linesRight, level);
   } else {
     while (arrLeft.length || arrRight.length) {
       const itemLeft = arrLeft[0];
@@ -142,8 +136,7 @@ const diffArrayNormal = (
     }
   }
 
-  linesLeft.push({ level, type: 'equal', text: ']' });
-  linesRight.push({ level, type: 'equal', text: ']' });
+  addArrayClosingBrackets(linesLeft, linesRight, level)
   return [linesLeft, linesRight];
 };
 
