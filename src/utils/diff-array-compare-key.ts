@@ -6,7 +6,7 @@ import getType from './get-type';
 import isEqual from './is-equal';
 import prettyAppendLines from './pretty-append-lines';
 import stringify from './stringify';
-import diffArrayNormal from './diff-array-normal';
+import diffArrayLCS from './diff-array-lcs';
 
 const diffArrayCompareKey = (
   arrLeft: any[],
@@ -20,7 +20,14 @@ const diffArrayCompareKey = (
 ): [DiffResult[], DiffResult[]] => {
   if (!options.compareKey) {
     // Fallback to normal diff if no compare key is specified
-    return diffArrayNormal(arrLeft, arrRight, keyLeft, keyRight, level, options, linesLeft, linesRight);
+    return diffArrayLCS(arrLeft, arrRight, keyLeft, keyRight, level, options, linesLeft, linesRight);
+  }
+
+  // If arrays are not of objects, fallback to unordered LCS diff
+  const isObjectArray = (arr: any[]) => arr.every(item => getType(item) === 'object');
+  if (!isObjectArray(arrLeft) || !isObjectArray(arrRight)) {
+    // Use unordered LCS for arrays of primitives or mixed types
+    return diffArrayLCS(arrLeft, arrRight, keyLeft, keyRight, level, options, linesLeft, linesRight);
   }
 
   if (keyLeft && keyRight) {
