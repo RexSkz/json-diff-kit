@@ -8,6 +8,8 @@ import isEqual from './is-equal';
 import prettyAppendLines from './pretty-append-lines';
 import cmp from './cmp';
 import { addArrayClosingBrackets, addArrayOpeningBrackets, addMaxDepthPlaceholder } from './array-bracket-utils';
+import diffArrayCompareKey, { allObjectsHaveCompareKey } from './diff-array-compare-key';
+import { diffObjectWithArraySupport } from './diff-object-with-array-support';
 
 const diffArrayNormal = (
   arrLeft: any[],
@@ -61,15 +63,45 @@ const diffArrayNormal = (
         } else if (leftType === 'object') {
           linesLeft.push({ level: level + 1, type: 'equal', text: '{' });
           linesRight.push({ level: level + 1, type: 'equal', text: '{' });
-          const [leftLines, rightLines] = diffObject(itemLeft, itemRight, level + 2, options, diffArrayNormal);
-          linesLeft = concat(linesLeft, leftLines);
-          linesRight = concat(linesRight, rightLines);
+          let objLeft, objRight;
+          if (options.arrayDiffMethod === 'compare-key') {
+            [objLeft, objRight] = diffObjectWithArraySupport(
+              itemLeft,
+              itemRight,
+              level,
+              options,
+              diffArrayNormal,
+              diffArrayCompareKey,
+              allObjectsHaveCompareKey
+            );
+          } else {
+            [objLeft, objRight] = diffObject(
+              itemLeft,
+              itemRight,
+              level + 2,
+              options,
+              diffArrayNormal
+            );
+          }
+          linesLeft = concat(linesLeft, objLeft);
+          linesRight = concat(linesRight, objRight);
           linesLeft.push({ level: level + 1, type: 'equal', text: '}' });
           linesRight.push({ level: level + 1, type: 'equal', text: '}' });
         } else if (leftType === 'array') {
-          const [resLeft, resRight] = diffArrayNormal(itemLeft, itemRight, '', '', level + 1, options, [], []);
-          linesLeft = concat(linesLeft, resLeft);
-          linesRight = concat(linesRight, resRight);
+          // For nested arrays, check for compare-key logic
+          if (
+            options.compareKey &&
+            allObjectsHaveCompareKey(itemLeft, options.compareKey) &&
+            allObjectsHaveCompareKey(itemRight, options.compareKey)
+          ) {
+            const [resLeft, resRight] = diffArrayCompareKey(itemLeft, itemRight, '', '', level + 1, options, [], []);
+            linesLeft = concat(linesLeft, resLeft);
+            linesRight = concat(linesRight, resRight);
+          } else {
+            const [resLeft, resRight] = diffArrayNormal(itemLeft, itemRight, '', '', level + 1, options, [], []);
+            linesLeft = concat(linesLeft, resLeft);
+            linesRight = concat(linesRight, resRight);
+          }
         } else if (cmp(itemLeft, itemRight, { ignoreCase: options.ignoreCase }) === 0) {
           linesLeft.push({
             level: level + 1,
