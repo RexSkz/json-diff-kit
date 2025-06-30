@@ -3,6 +3,7 @@ import concat from './utils/concat';
 import detectCircular from './utils/detect-circular';
 import diffArrayLCS from './utils/diff-array-lcs';
 import diffArrayNormal from './utils/diff-array-normal';
+import diffArrayCompareKey from './utils/diff-array-compare-key';
 import diffObject from './utils/diff-object';
 import getType from './utils/get-type';
 import sortInnerArrays from './utils/sort-inner-arrays';
@@ -81,8 +82,26 @@ export interface DifferOptions {
    *   3 3
    * +   4
    * ```
+   *
+   * When using `compare-key`, the differ will match objects in arrays by a specific key
+   * property (specified by `compareKey` option). This is useful when comparing arrays of
+   * objects where the order doesn't matter but you want to match related objects.
+   * The output will be:
+   *
+   * ```diff
+   *   a b
+   *   1 1
+   * - 2
+   * +   3
+   *   4 4
+   * ```
    */
-  arrayDiffMethod?: 'normal' | 'lcs' | 'unorder-normal' | 'unorder-lcs';
+  arrayDiffMethod?:
+    | 'normal'
+    | 'lcs'
+    | 'unorder-normal'
+    | 'unorder-lcs'
+    | 'compare-key';
   /**
    * Whether to ignore the case when comparing strings, default `false`.
    */
@@ -116,6 +135,12 @@ export interface DifferOptions {
    * ("before" or "after"). Otherwise, differ will sort the keys of results.
    */
   preserveKeyOrder?: 'before' | 'after';
+  /**
+   * The key to use for matching objects in arrays when using `compare-key` array diff method.
+   * Objects with the same value for this key will be matched and compared, regardless of their
+   * position in the array.
+   */
+  compareKey?: string;
   /**
    * The behavior when encountering values that are not part of the JSON spec, e.g. `undefined`, `NaN`, `Infinity`, `123n`, `() => alert(1)`, `Symbol.iterator`.
    *
@@ -169,6 +194,7 @@ class Differ {
     ignoreCaseForKey = false,
     recursiveEqual = false,
     preserveKeyOrder,
+    compareKey,
     undefinedBehavior = UndefinedBehavior.stringify,
   }: DifferOptions = {}) {
     this.options = {
@@ -180,11 +206,17 @@ class Differ {
       ignoreCaseForKey,
       recursiveEqual,
       preserveKeyOrder,
+      compareKey,
       undefinedBehavior,
     };
-    this.arrayDiffFunc = arrayDiffMethod === 'lcs' || arrayDiffMethod === 'unorder-lcs'
-      ? diffArrayLCS
-      : diffArrayNormal;
+
+    if (arrayDiffMethod === 'compare-key') {
+      this.arrayDiffFunc = diffArrayCompareKey;
+    } else if (arrayDiffMethod === 'lcs' || arrayDiffMethod === 'unorder-lcs') {
+      this.arrayDiffFunc = diffArrayLCS;
+    } else {
+      this.arrayDiffFunc = diffArrayNormal;
+    }
   }
 
   private detectCircular(source: any) {

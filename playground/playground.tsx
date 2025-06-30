@@ -28,6 +28,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
   const [ignoreCaseForKey, setIgnoreCaseForKey] = React.useState(false);
   const [recursiveEqual, setRecursiveEqual] = React.useState(true);
   const [preserveKeyOrder, setPreserveKeyOrder] = React.useState<DifferOptions['preserveKeyOrder']>(undefined);
+  const [compareKey, setCompareKey] = React.useState<string>('');
 
   // viewer props
   const [indent, setIndent] = React.useState(4);
@@ -47,6 +48,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
     ignoreCaseForKey,
     recursiveEqual,
     preserveKeyOrder,
+    compareKey: compareKey || undefined,
   }), [
     detectCircular,
     maxDepth,
@@ -56,6 +58,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
     ignoreCaseForKey,
     recursiveEqual,
     preserveKeyOrder,
+    compareKey,
   ]);
   const differ = React.useMemo(() => new Differ(differOptions), [differOptions]);
   const [diff, setDiff] = React.useState(differ.diff('', ''));
@@ -251,7 +254,7 @@ return (
                 title="Array diff method"
                 tip={
                   <>
-                    The way to diff arrays, default is <code>"normal"</code>, using <code>"lcs"</code> may get a better result but much slower. <code>"unorder-normal"</code> and <code>"unorder-lcs"</code> are for unordered arrays (the order of elements in the array doesn't matter).
+                    The way to diff arrays, default is <code>"normal"</code>, using <code>"lcs"</code> may get a better result but much slower. <code>"unorder-normal"</code> and <code>"unorder-lcs"</code> are for unordered arrays (the order of elements in the array doesn't matter). <code>"compare-key"</code> matches objects by a specific key property.
                   </>
                 }
               />
@@ -264,8 +267,24 @@ return (
                 <option value="lcs">lcs</option>
                 <option value="unorder-normal">unorder-normal</option>
                 <option value="unorder-lcs">unorder-lcs</option>
+                <option value="compare-key">compare-key</option>
               </select>
             </label>
+            {arrayDiffMethod === 'compare-key' && (
+              <label htmlFor="compare-key">
+                <Label
+                  title="Compare key"
+                  tip="The key to use for matching objects in arrays. Objects with the same value for this key will be matched and compared, regardless of their position in the array."
+                />
+                <input
+                  type="text"
+                  id="compare-key"
+                  value={compareKey}
+                  onChange={e => setCompareKey(e.target.value)}
+                  placeholder="e.g., oid, userId, id"
+                />
+              </label>
+            )}
             <label htmlFor="ignore-case">
               <Label
                 title="Ignore case"

@@ -8,6 +8,7 @@ import isEqual from './is-equal';
 import shallowSimilarity from './shallow-similarity';
 import concat from './concat';
 import prettyAppendLines from './pretty-append-lines';
+import { addArrayClosingBrackets, addArrayOpeningBrackets, addMaxDepthPlaceholder } from './array-bracket-utils';
 
 const lcs = (
   arrLeft: any[],
@@ -208,25 +209,17 @@ const diffArrayLCS = (
   linesLeft: DiffResult[] = [],
   linesRight: DiffResult[] = [],
 ): [DiffResult[], DiffResult[]] => {
-  if (keyLeft && keyRight) {
-    linesLeft.push({ level, type: 'equal', text: `"${keyLeft}": [` });
-    linesRight.push({ level, type: 'equal', text: `"${keyRight}": [` });
-  } else {
-    linesLeft.push({ level, type: 'equal', text: '[' });
-    linesRight.push({ level, type: 'equal', text: '[' });
-  }
+  addArrayOpeningBrackets(linesLeft, linesRight, keyLeft, keyRight, level)
 
   if (level >= (options.maxDepth || Infinity)) {
-    linesLeft.push({ level: level + 1, type: 'equal', text: '...' });
-    linesRight.push({ level: level + 1, type: 'equal', text: '...' });
+    addMaxDepthPlaceholder(linesLeft, linesRight, level);
   } else {
     const [tLeftReverse, tRightReverse] = lcs(arrLeft, arrRight, keyLeft, keyRight, level, options);
     linesLeft = concat(linesLeft, tLeftReverse);
     linesRight = concat(linesRight, tRightReverse);
   }
 
-  linesLeft.push({ level, type: 'equal', text: ']' });
-  linesRight.push({ level, type: 'equal', text: ']' });
+  addArrayClosingBrackets(linesLeft, linesRight, level)
   return [linesLeft, linesRight];
 };
 
