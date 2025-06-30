@@ -173,10 +173,10 @@ describe('Utility function: diff-array-compare-key', () => {
       expect(linesRight).toContainEqual(expect.objectContaining({ text: '[' }));
 
       // Should show specific changes in the nested array content
-      // 数组 [1, 2, 3] vs [1, 3, 4] 按位置比较:
-      // - 位置0: 1 vs 1 → equal
-      // - 位置1: 2 vs 3 → modify
-      // - 位置2: 3 vs 4 → modify
+      // Array [1, 2, 3] vs [1, 3, 4] compared by position:
+      // - Position 0: 1 vs 1 → equal
+      // - Position 1: 2 vs 3 → modify
+      // - Position 2: 3 vs 4 → modify
 
       // Verify equal element
       expect(linesLeft.some((line) => line.text === '1' && line.type === 'equal')).toBe(true);

@@ -48,14 +48,17 @@ function processMatchedObjects(
     linesRight.push({ level: level + 1, type: 'equal', text: '{' });
 
     const keys = Array.from(new Set([...Object.keys(leftItem), ...Object.keys(rightItem)]));
+    const leftArraysToConcat: DiffResult[][] = [];
+    const rightArraysToConcat: DiffResult[][] = [];
+
     for (const key of keys) {
       const lVal = leftItem[key];
       const rVal = rightItem[key];
       if (Array.isArray(lVal) && Array.isArray(rVal)) {
         // Recursively diff arrays
         const [arrL, arrR] = diffArrayRecursive(lVal, rVal, '', '', level + 2, options, [], []);
-        linesLeft = concat(linesLeft, arrL);
-        linesRight = concat(linesRight, arrR);
+        leftArraysToConcat.push(arrL);
+        rightArraysToConcat.push(arrR);
       } else if (Array.isArray(lVal) || Array.isArray(rVal)) {
         // If only one side is array, treat as modification
         prettyAppendLines(linesLeft, linesRight, key, key, lVal, rVal, level + 2, options);
@@ -68,9 +71,17 @@ function processMatchedObjects(
           options,
           diffArrayRecursive
         );
-        linesLeft = concat(linesLeft, leftLines);
-        linesRight = concat(linesRight, rightLines);
+        leftArraysToConcat.push(leftLines);
+        rightArraysToConcat.push(rightLines);
       }
+    }
+
+    // Concatenate all collected arrays at once for better performance
+    if (leftArraysToConcat.length > 0) {
+      linesLeft.push(...leftArraysToConcat.flat());
+    }
+    if (rightArraysToConcat.length > 0) {
+      linesRight.push(...rightArraysToConcat.flat());
     }
     linesLeft.push({ level: level + 1, type: 'equal', text: '}' });
     linesRight.push({ level: level + 1, type: 'equal', text: '}' });
@@ -98,29 +109,29 @@ function processMatchedObjects(
 }
 
 // Optimized validation function that combines type checking and compare key validation in single pass
-function validateArrayForCompareKey(arr: any[], compareKey: string): { isValid: boolean; objectCount: number } {
-  let objectCount = 0;
+function validateArrayForCompareKey(arr: any[], compareKey: string): boolean {
+  let hasValidObjects = false;
 
   for (const item of arr) {
     const type = getType(item);
     if (type === 'object') {
-      objectCount++;
-      if (!(compareKey in item)) return { isValid: false, objectCount: 0 };
+      hasValidObjects = true;
+      if (!(compareKey in item)) return false;
       // Check nested arrays in object values
       for (const value of Object.values(item)) {
         if (Array.isArray(value) && !allObjectsHaveCompareKey(value, compareKey)) {
-          return { isValid: false, objectCount: 0 };
+          return false;
         }
       }
     } else if (Array.isArray(item)) {
-      if (!allObjectsHaveCompareKey(item, compareKey)) return { isValid: false, objectCount: 0 };
+      if (!allObjectsHaveCompareKey(item, compareKey)) return false;
     } else {
       // Non-object, non-array items make the array invalid for compareKey strategy
-      return { isValid: false, objectCount: 0 };
+      return false;
     }
   }
 
-  return { isValid: objectCount > 0, objectCount };
+  return hasValidObjects;
 }
 
 // Recursively checks if all objects (including in nested arrays) have the compare key
@@ -162,7 +173,7 @@ function diffArrayRecursive(
   const leftValidation = validateArrayForCompareKey(arrLeft, options.compareKey);
   const rightValidation = validateArrayForCompareKey(arrRight, options.compareKey);
 
-  if (!leftValidation.isValid || !rightValidation.isValid) {
+  if (!leftValidation || !rightValidation) {
     // Use unordered LCS for arrays of primitives, mixed types, or missing compare key
     return diffArrayNormal(arrLeft, arrRight, keyLeft, keyRight, level, options, linesLeft, linesRight);
   }
@@ -178,18 +189,14 @@ function diffArrayRecursive(
     // For small arrays, use simple O(n²) approach to avoid Map overhead
     const useMapOptimization = arrLeft.length > 10 || arrRight.length > 10;
     let rightKeyMap: Map<any, { item: any; index: number }[]> | null = null;
-    let rightValidItems: Set<number> | null = null;
 
     if (useMapOptimization) {
       // Build a map of compareKey values to right array items for O(n) matching
-      // Only store items that passed validation to reduce memory usage
       rightKeyMap = new Map<any, { item: any; index: number }[]>();
-      rightValidItems = new Set<number>(); // Track valid items to avoid re-checking
 
       for (let j = 0; j < arrRight.length; j++) {
         const rightItem = arrRight[j];
         if (isObjectWithCompareKey(rightItem, options.compareKey)) {
-          rightValidItems.add(j);
           const rightKeyValue = rightItem[options.compareKey];
           if (!rightKeyMap.has(rightKeyValue)) {
             rightKeyMap.set(rightKeyValue, []);
