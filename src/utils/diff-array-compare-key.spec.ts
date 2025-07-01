@@ -412,4 +412,206 @@ describe('Utility function: diff-array-compare-key', () => {
       expect(linesRight.some((line) => line.text.includes('Infinity'))).toBe(true);
     });
   });
+
+  // Large-scale scenario tests to validate compare by key logic with many JSON objects
+  describe('diffArrayCompareKey - Large-scale validation', () => {
+    it('should handle dozens of JSON objects correctly with various structures', () => {
+      // Create arrays with dozens of objects to validate large-scale handling
+      const createLargeArray = (size: number, baseId = 0) => {
+        return Array.from({ length: size }, (_, i) => ({
+          id: baseId + i + 1,
+          name: `Item ${baseId + i + 1}`,
+          type: ['user', 'admin', 'guest'][i % 3],
+          metadata: {
+            created: `2024-01-${String(i % 28 + 1).padStart(2, '0')}`,
+            tags: [`tag${i % 5}`, `category${i % 3}`],
+            settings: {
+              enabled: i % 2 === 0,
+              priority: i % 10,
+              config: {
+                theme: ['light', 'dark'][i % 2],
+                locale: ['en', 'es', 'fr'][i % 3],
+              },
+            },
+          },
+          data: Array.from({ length: i % 3 + 1 }, (_, j) => ({
+            id: (i + 1) * 10 + j,
+            value: `value-${i}-${j}`,
+          })),
+        }));
+      };
+
+      const leftArray = createLargeArray(50);
+      const rightArray = [
+        ...createLargeArray(30), // First 30 items unchanged
+        ...createLargeArray(15, 35).map((item) => ({ // Items 36-50, but modified
+          ...item,
+          name: `Modified ${item.name}`,
+          metadata: {
+            ...item.metadata,
+            updated: '2024-06-01',
+          },
+        })),
+        ...createLargeArray(10, 60), // New items 61-70
+      ];
+
+      const options = createOptions();
+      const [linesLeft, linesRight] = diffArrayCompareKey(leftArray, rightArray, '', '', 0, options);
+
+      // Verify the diff results
+      expect(linesLeft).toBeDefined();
+      expect(linesRight).toBeDefined();
+      expect(linesLeft.length).toBeGreaterThan(0);
+      expect(linesRight.length).toBeGreaterThan(0);
+
+      // Should have proper array structure brackets
+      expect(linesLeft.length).toBeGreaterThan(0);
+      expect(linesRight.length).toBeGreaterThan(0);
+
+      // Both sides should start and end with array brackets
+      expect(linesLeft[0].text).toBe('[');
+      expect(linesLeft[linesLeft.length - 1].text).toBe(']');
+      expect(linesRight[0].text).toBe('[');
+      expect(linesRight[linesRight.length - 1].text).toBe(']');
+
+      // Verify that items 1-30 are matched correctly (should appear as equal or modify)
+      const item1Left = linesLeft.find((line) => line.text.includes('"name": "Item 1"'));
+      const item1Right = linesRight.find((line) => line.text.includes('"name": "Item 1"'));
+      expect(item1Left).toBeDefined();
+      expect(item1Right).toBeDefined();
+
+      // Verify that items 31-50 are removed (only in left)
+      const removedItems = linesLeft.filter((line) => line.type === 'remove' && line.text.includes('"name": "Item 3'));
+      expect(removedItems.length).toBeGreaterThan(0);
+
+      // Verify that items 61-70 are added (only in right)
+      const addedItems = linesRight.filter((line) => line.type === 'add' && line.text.includes('"name": "Item 6'));
+      expect(addedItems.length).toBeGreaterThan(0);
+    });
+
+    it('should maintain performance with large arrays and mixed operations', () => {
+      const startTime = process.hrtime.bigint();
+
+      // Create even larger arrays to test performance
+      const createComplexArray = (size: number) => {
+        return Array.from({ length: size }, (_, i) => ({
+          id: `complex-${i}`,
+          data: {
+            values: Array.from({ length: 10 }, (_, j) => ({
+              id: `val-${i}-${j}`,
+              content: `Content for item ${i}, value ${j}`,
+              nested: {
+                deep: {
+                  props: [`prop${j}`, `attr${i % 5}`],
+                },
+              },
+            })),
+            metadata: {
+              created: Date.now() + i * 1000,
+              tags: Array.from({ length: i % 5 + 1 }, (_, k) => `tag-${k}`),
+            },
+          },
+        }));
+      };
+
+      const leftLarge = createComplexArray(100);
+      const rightLarge = [
+        ...createComplexArray(50), // First 50 unchanged
+        ...createComplexArray(30).map((item, i) => ({ // 30 modified items
+          ...item,
+          id: `complex-${i + 50}`,
+          data: {
+            ...item.data,
+            metadata: {
+              ...item.data.metadata,
+              updated: true,
+            },
+          },
+        })),
+        ...createComplexArray(40).map((item, i) => ({ // 40 new items
+          ...item,
+          id: `complex-new-${i}`,
+        })),
+      ];
+
+      const options = createOptions();
+      const [linesLeft, linesRight] = diffArrayCompareKey(leftLarge, rightLarge, '', '', 0, options);
+
+      const endTime = process.hrtime.bigint();
+      const executionTime = Number(endTime - startTime) / 1_000_000; // Convert to milliseconds
+
+      // Verify results are correct
+      expect(linesLeft).toBeDefined();
+      expect(linesRight).toBeDefined();
+      expect(linesLeft.length).toBeGreaterThan(0);
+      expect(linesRight.length).toBeGreaterThan(0);
+
+      // Performance should be reasonable (less than 1 second for this scale)
+      expect(executionTime).toBeLessThan(1000);
+
+      // Verify structural integrity - both sides should have proper array structure
+      expect(linesLeft[0].text).toBe('[');
+      expect(linesLeft[linesLeft.length - 1].text).toBe(']');
+      expect(linesRight[0].text).toBe('[');
+      expect(linesRight[linesRight.length - 1].text).toBe(']');
+    });
+
+    it('should correctly handle various JSON object structures without corruption', () => {
+      // Test with diverse object structures as suggested by the user
+      const diverseObjects = [
+        { id: 'user1', type: 'user', profile: { name: 'John', age: 30 } },
+        { id: 'org1', type: 'organization', details: { name: 'Company A', employees: 100 } },
+        { id: 'prod1', type: 'product', info: { title: 'Widget', price: 29.99, tags: ['electronics', 'gadget'] } },
+        { id: 'event1', type: 'event', data: { name: 'Conference', date: '2024-07-01', attendees: [] } },
+        { id: 'config1', type: 'configuration', settings: { theme: 'dark', notifications: true, preferences: {} } },
+      ];
+
+      const modifiedObjects = [
+        { id: 'user1', type: 'user', profile: { name: 'John Smith', age: 31 } }, // Modified
+        { id: 'org1', type: 'organization', details: { name: 'Company A', employees: 120 } }, // Modified
+        { id: 'prod2', type: 'product', info: { title: 'New Widget', price: 39.99, tags: ['electronics'] } }, // New
+        { id: 'event1', type: 'event', data: { name: 'Conference', date: '2024-07-01', attendees: ['John'] } }, // Modified
+        // config1 removed, prod1 removed
+      ];
+
+      const options = createOptions();
+      const [linesLeft, linesRight] = diffArrayCompareKey(diverseObjects, modifiedObjects, '', '', 0, options);
+
+      // Verify no corruption in output structure
+      expect(linesLeft).toBeDefined();
+      expect(linesRight).toBeDefined();
+
+      // Should have proper array brackets
+      expect(linesLeft[0].text).toBe('[');
+      expect(linesLeft[linesLeft.length - 1].text).toBe(']');
+      expect(linesRight[0].text).toBe('[');
+      expect(linesRight[linesRight.length - 1].text).toBe(']');
+
+      // Verify that modifications are detected correctly
+      const userModified = linesLeft.some((line) => line.text.includes('"name": "John"')) &&
+                          linesRight.some((line) => line.text.includes('"name": "John Smith"'));
+      expect(userModified).toBe(true);
+
+      // Verify that removals are handled correctly
+      const prodRemoved = linesLeft.some((line) => line.type === 'remove' && line.text.includes('prod1'));
+      expect(prodRemoved).toBe(true);
+
+      // Verify that additions are handled correctly
+      const prodAdded = linesRight.some((line) => line.type === 'add' && line.text.includes('prod2'));
+      expect(prodAdded).toBe(true);
+
+      // Ensure no lines are corrupted (all should have valid text)
+      linesLeft.forEach((line) => {
+        expect(typeof line.text).toBe('string');
+        expect(line.level).toBeGreaterThanOrEqual(0);
+        expect(['equal', 'add', 'remove', 'modify']).toContain(line.type);
+      });
+
+      linesRight.forEach((line) => {
+        expect(typeof line.text).toBe('string');
+        expect(line.level).toBeGreaterThanOrEqual(0);
+        expect(['equal', 'add', 'remove', 'modify']).toContain(line.type);
+      });
+    });
+  });
 });
