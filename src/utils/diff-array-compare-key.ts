@@ -120,7 +120,7 @@ function diffArrayRecursive(
             const rVal = rightItem[key];
             if (Array.isArray(lVal) && Array.isArray(rVal)) {
               // Recursively diff arrays
-              const [arrL, arrR] = diffArrayRecursive(lVal, rVal, '', '', level + 2, options, [], []);
+              const [arrL, arrR] = diffArrayRecursive(lVal, rVal, key, key, level + 2, options, [], []);
               linesLeft = concat(linesLeft, arrL);
               linesRight = concat(linesRight, arrR);
             } else if (Array.isArray(lVal) || Array.isArray(rVal)) {
