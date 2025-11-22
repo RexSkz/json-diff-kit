@@ -166,6 +166,7 @@ const Viewer: React.FC<ViewerProps> = props => {
   const scrollContainer = _scrollContainer === 'body'
     ? document.body
     : document.querySelector(_scrollContainer);
+  const totalColumns = props.lineNumbers ? 4 : 2;
 
   // Use these refs to keep the diff data and segments sync,
   // or it may cause runtime error because of their mismatch.
@@ -409,7 +410,6 @@ const Viewer: React.FC<ViewerProps> = props => {
     const expandMoreLinesLimit = typeof hideUnchangedLines === 'boolean'
       ? DEFAULT_EXPAND_MORE_LINES_LIMIT
       : hideUnchangedLines.expandMoreLinesLimit || DEFAULT_EXPAND_MORE_LINES_LIMIT;
-    const totalColumns = props.lineNumbers ? 4 : 2;
     return [
       <tr key={`expand-line-${index}`} className="expand-line">
         <td
@@ -434,7 +434,6 @@ const Viewer: React.FC<ViewerProps> = props => {
 
   const renderTbody = (syntaxHighlightEnabled: boolean) => {
     if (jsonsAreEqual && hideUnchangedLines) {
-      const totalColumns = props.lineNumbers ? 4 : 2;
       return (
         <tr key="message-line" className="message-line">
           <td colSpan={totalColumns}>
@@ -460,7 +459,6 @@ const Viewer: React.FC<ViewerProps> = props => {
     }
 
     if (firstElementTop > scrollBottom || firstElementTop + totalHeightRef.current < scrollTop) {
-      const totalColumns = props.lineNumbers ? 4 : 2;
       return (
         <tr>
           <td colSpan={totalColumns} style={{ height: `${totalHeightRef.current}px` }} />
@@ -496,17 +494,17 @@ const Viewer: React.FC<ViewerProps> = props => {
     const visibleSegments = segmentsRef.current.slice(startSegment, endSegment + 1);
     return visibleSegments.length ? (
       <>
-        <tr><td colSpan={props.lineNumbers ? 4 : 2} style={{ height: topHeight, padding: 0 }} /></tr>
+        <tr><td colSpan={totalColumns} style={{ height: topHeight, padding: 0 }} /></tr>
         {
           visibleSegments.map((segment, index) => (
             renderSegment(segment, index, startLine, endLine, syntaxHighlightEnabled)
           ))
         }
-        <tr><td colSpan={props.lineNumbers ? 4 : 2} style={{ height: bottomHeight, padding: 0 }} /></tr>
+        <tr><td colSpan={totalColumns} style={{ height: bottomHeight, padding: 0 }} /></tr>
       </>
     ) : (
       <tr>
-        <td colSpan={props.lineNumbers ? 4 : 2} style={{ height: `${totalHeightRef.current}px` }} />
+        <td colSpan={totalColumns} style={{ height: `${totalHeightRef.current}px` }} />
       </tr>
     );
   };
