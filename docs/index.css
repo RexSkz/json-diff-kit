@@ -1,0 +1,420 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: #f2f4f6;
+  font-family: sans-serif;
+  font-size: 14px;
+}
+code {
+  padding: 0 4px;
+  background: #f9f2f4;
+  color: #c7254e;
+}
+a,
+a:visited {
+  color: #2196f3;
+}
+[disabled] {
+  cursor: not-allowed;
+}
+.json-diff-viewer {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+.json-diff-viewer tr {
+  vertical-align: top;
+}
+.json-diff-viewer tr .line-add {
+  background: #a5d6a7;
+}
+.json-diff-viewer tr .line-remove {
+  background: #ef9a9a;
+}
+.json-diff-viewer tr .line-modify {
+  background: #ffe082;
+}
+.json-diff-viewer tr:hover td {
+  position: relative;
+}
+.json-diff-viewer tr:hover td:before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.05);
+  content: '';
+  pointer-events: none;
+}
+.json-diff-viewer tr.message-line {
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+  text-align: center;
+}
+.json-diff-viewer tr.message-line td {
+  padding: 4px 0;
+  font-size: 12px;
+}
+.json-diff-viewer tr.expand-line {
+  text-align: center;
+}
+.json-diff-viewer tr.expand-line td {
+  padding: 4px 0;
+}
+.json-diff-viewer tr.expand-line:hover td:before {
+  background: transparent;
+}
+.json-diff-viewer tr.expand-line .has-lines-before {
+  border-bottom: 1px solid;
+}
+.json-diff-viewer tr.expand-line .has-lines-after {
+  border-top: 1px solid;
+}
+.json-diff-viewer tr.expand-line button {
+  padding: 0;
+  border: none;
+  margin: 0 0.5em;
+  background: transparent;
+  color: #2196f3;
+  cursor: pointer;
+  font-size: 12px;
+  user-select: none;
+}
+.json-diff-viewer tr.expand-line button:hover {
+  text-decoration: underline;
+}
+.json-diff-viewer td {
+  padding: 1px;
+  font-size: 0;
+}
+.json-diff-viewer td.line-number {
+  box-sizing: content-box;
+  padding: 0 8px;
+  border-right: 1px solid;
+  font-family: monospace;
+  font-size: 14px;
+  text-align: right;
+  user-select: none;
+}
+.json-diff-viewer pre {
+  overflow: hidden;
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.json-diff-viewer pre .inline-diff-add {
+  background: rgba(0, 0, 0, 0.08);
+  text-decoration: underline;
+  word-break: break-all;
+}
+.json-diff-viewer pre .inline-diff-remove {
+  background: rgba(0, 0, 0, 0.08);
+  text-decoration: line-through;
+  word-break: break-all;
+}
+.json-diff-viewer-virtual pre {
+  overflow-x: auto;
+  white-space: pre;
+}
+.json-diff-viewer-virtual pre::-webkit-scrollbar {
+  display: none;
+}
+.json-diff-viewer.json-diff-viewer-theme-monokai {
+  background: #272822;
+  color: #f8f8f2;
+}
+.json-diff-viewer.json-diff-viewer-theme-monokai .line-number {
+  color: #999;
+}
+.json-diff-viewer.json-diff-viewer-theme-monokai tr:hover {
+  background: #3e3d32;
+}
+.json-diff-viewer.json-diff-viewer-theme-monokai tr .line-add {
+  background: #040;
+}
+.json-diff-viewer.json-diff-viewer-theme-monokai tr .line-remove {
+  background: #400;
+}
+.json-diff-viewer.json-diff-viewer-theme-monokai tr .line-modify {
+  background: #440;
+}
+.json-diff-viewer.json-diff-viewer-theme-monokai tr.expand-line button {
+  color: #f8f8f2;
+}
+.json-diff-viewer.json-diff-viewer-theme-monokai .string {
+  color: #e6db74;
+}
+.json-diff-viewer.json-diff-viewer-theme-monokai .number,
+.json-diff-viewer.json-diff-viewer-theme-monokai .boolean,
+.json-diff-viewer.json-diff-viewer-theme-monokai .null {
+  color: #ae81ff;
+}
+.json-diff-viewer.json-diff-viewer-theme-monokai .key {
+  color: #f92672;
+}
+.json-diff-viewer.json-diff-viewer-theme-monokai .invalid {
+  background: #960050;
+  color: #fff;
+}
+.playground {
+  display: flex;
+  height: 100vh;
+  background: #fff;
+}
+.playground .layout-left,
+.playground .layout-right {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+}
+.playground .layout-left {
+  flex: 0 0 300px;
+  padding: 0 16px;
+  border-right: 1px solid #ecf0f4;
+  overflow-y: auto;
+}
+.playground .layout-left::-webkit-scrollbar {
+  display: none;
+}
+.playground .layout-left .logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0 8px;
+  font-size: 24px;
+  font-weight: 500;
+}
+.playground .layout-left .back {
+  padding: 8px 16px;
+  border-radius: 4px;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  text-align: center;
+}
+.playground .layout-left .back:hover {
+  background: #333;
+  text-decoration: underline;
+}
+.playground .layout-left .config {
+  margin-top: 16px;
+}
+.playground .layout-left .config legend {
+  margin: 16px 0 8px;
+  color: rgba(0, 0, 0, 0.5);
+}
+.playground .layout-left .config label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.playground .layout-left .config label > span:first-child {
+  margin-right: auto;
+}
+.playground .layout-left .config label input,
+.playground .layout-left .config label select {
+  max-width: 120px;
+  height: 20px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+.playground .layout-left .config label input[type="checkbox"] {
+  margin: 0;
+}
+.playground .layout-left pre {
+  padding: 8px 16px;
+  margin: 0 -16px;
+  background: #f5f6f9;
+  font-size: 12px;
+}
+.playground .layout-left .statistics {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  padding: 16px;
+  margin: auto -16px 0;
+  background: #fff;
+}
+.playground .layout-right {
+  flex: 1;
+}
+.playground .layout-right .title {
+  padding: 8px 16px;
+  color: rgba(0, 0, 0, 0.5);
+}
+.playground .layout-right .title .control-button {
+  padding: 0 4px;
+  margin-left: 4px;
+  cursor: pointer;
+}
+.playground .layout-right .title .control-button:hover {
+  text-decoration: underline;
+}
+.playground .layout-right .loading,
+.playground .layout-right .error {
+  margin-left: 8px;
+}
+.playground .layout-right .error {
+  color: red;
+}
+.playground .layout-right .inputs,
+.playground .layout-right .results {
+  flex: 1;
+}
+.playground .layout-right .inputs {
+  display: flex;
+  border-top: 1px solid #ecf0f4;
+  border-bottom: 1px solid #ecf0f4;
+}
+.playground .layout-right .inputs textarea {
+  position: relative;
+  height: 100%;
+  box-sizing: border-box;
+  flex: 1;
+  padding: 16px;
+  border: none;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  outline: none;
+  resize: none;
+  transition: all 0.3s;
+}
+.playground .layout-right .inputs textarea:first-child {
+  border-right: 1px solid #ecf0f4;
+}
+.playground .layout-right .inputs textarea:focus {
+  z-index: 1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+.playground .layout-right .inputs:focus-within textarea {
+  border-color: transparent;
+}
+.playground .layout-right .results {
+  position: relative;
+  border-top: 1px solid #ecf0f4;
+  overflow-y: auto;
+}
+.playground .layout-right.layout-right-fullscreen .title:first-child,
+.playground .layout-right.layout-right-fullscreen .inputs {
+  display: none;
+}
+.token.operator {
+  background: none;
+}
+.demo-root {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  box-sizing: border-box;
+  padding: 1em 2em;
+  margin: auto;
+  background: #fff;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.01);
+}
+.demo-root .statistics img {
+  margin-right: 8px;
+}
+.demo-root .banner {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 4px;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+}
+.demo-root .banner:hover {
+  background: #333;
+  text-decoration: underline;
+}
+.demo-root blockquote {
+  margin: 0 0 1em;
+  line-height: 24px;
+}
+.demo-root .diff-config form,
+.demo-root .view-config form {
+  overflow: hidden;
+}
+.demo-root .diff-config form > label,
+.demo-root .view-config form > label {
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  border-radius: 4px;
+  margin-right: 8px;
+  background: #e5e6e9;
+  font-weight: 700;
+  user-select: none;
+}
+.demo-root .diff-config form > label span,
+.demo-root .view-config form > label span {
+  margin-left: 1em;
+  font-weight: 400;
+}
+.demo-root .diff-config form > label input,
+.demo-root .view-config form > label input,
+.demo-root .diff-config form > label select,
+.demo-root .view-config form > label select {
+  margin-left: 8px;
+}
+.demo-root .diff-config form > label input[type="number"],
+.demo-root .view-config form > label input[type="number"] {
+  min-width: 8em;
+}
+.demo-root .diff-result .json-diff-viewer {
+  box-sizing: border-box;
+  padding: 1em;
+  border: 1px solid;
+  border-radius: 4px;
+  margin-top: 1em;
+}
+.demo-root .demo-footer {
+  padding: 2em 0;
+  border-top: 1px dashed;
+  margin: 4em 0 0;
+  text-align: center;
+}
+.label-wrapper {
+  position: relative;
+  margin-right: 4px;
+}
+.label-question-mark {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+}
+.label-tip {
+  display: none;
+}
+.label-wrapper:hover .label-question-mark {
+  border-color: #000;
+  background: #000;
+  color: #fff;
+}
+.label-wrapper:hover .label-tip {
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  display: block;
+  width: 268px;
+  box-sizing: border-box;
+  padding: 8px 16px;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  color: #333;
+  font-size: 12px;
+  line-height: 1.5;
+}
