@@ -32,6 +32,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
 
   // viewer props
   const [indent, setIndent] = React.useState(4);
+  const [lineNumbers, setLineNumbers] = React.useState(true);
   const [highlightInlineDiff, setHighlightInlineDiff] = React.useState(true);
   const [inlineDiffMode, setInlineDiffMode] = React.useState<InlineDiffOptions['mode']>('word');
   const [inlineDiffSeparator, setInlineDiffSeparator] = React.useState(' ');
@@ -93,7 +94,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
   }, [virtual]);
   const viewerOptions: Omit<ViewerProps, 'diff'> = React.useMemo(() => ({
     indent,
-    lineNumbers: true,
+    lineNumbers,
     highlightInlineDiff,
     inlineDiffOptions,
     hideUnchangedLines,
@@ -101,6 +102,7 @@ const Playground: React.FC<PlaygroundProps> = props => {
     virtual: virtualOptions,
   }), [
     indent,
+    lineNumbers,
     highlightInlineDiff,
     inlineDiffOptions,
     hideUnchangedLines,
@@ -357,6 +359,18 @@ return (
                 max={16}
                 value={indent}
                 onChange={e => setIndent(Number(e.target.value))}
+              />
+            </label>
+            <label htmlFor="line-numbers">
+              <Label
+                title="Line numbers"
+                tip={<>Whether to show line numbers.</>}
+              />
+              <input
+                type="checkbox"
+                id="line-numbers"
+                checked={lineNumbers}
+                onChange={e => setLineNumbers(e.target.checked)}
               />
             </label>
             <label htmlFor="highlight-inline-diff">

@@ -30,6 +30,7 @@ const Docs: React.FC<PropTypes> = props => {
 
   // viewer props
   const [indent, setIndent] = React.useState(4);
+  const [lineNumbers, setLineNumbers] = React.useState(true);
   const [highlightInlineDiff, setHighlightInlineDiff] = React.useState(true);
   const [inlineDiffMode, setInlineDiffMode] = React.useState<InlineDiffOptions['mode']>('word');
   const [inlineDiffSeparator, setInlineDiffSeparator] = React.useState(' ');
@@ -45,7 +46,7 @@ const Docs: React.FC<PropTypes> = props => {
     ignoreCase,
     recursiveEqual,
     preserveKeyOrder,
-    compareKey
+    compareKey,
   }), [
     detectCircular,
     maxDepth,
@@ -143,8 +144,8 @@ const Docs: React.FC<PropTypes> = props => {
   };
 
   const viewerCommonProps: Partial<ViewerProps> = {
-    indent: indent,
-    lineNumbers: true,
+    indent,
+    lineNumbers,
     highlightInlineDiff,
     inlineDiffOptions: {
       mode: inlineDiffMode,
@@ -288,6 +289,16 @@ const Docs: React.FC<PropTypes> = props => {
             />
           </label>
           <blockquote>Controls the indent in the <code>&lt;Viewer&gt;</code> component.</blockquote>
+          <label htmlFor="line-numbers">
+            Line numbers:
+            <input
+              type="checkbox"
+              id="line-numbers"
+              checked={lineNumbers}
+              onChange={e => setLineNumbers(e.target.checked)}
+            />
+          </label>
+          <blockquote>Whether to show line numbers.</blockquote>
           <label htmlFor="highlight-inline-diff">
             Highlight inline diff:
             <input
