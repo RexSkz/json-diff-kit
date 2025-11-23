@@ -166,6 +166,7 @@ const Viewer: React.FC<ViewerProps> = props => {
   const scrollContainer = _scrollContainer === 'body'
     ? document.body
     : document.querySelector(_scrollContainer);
+  const totalColumns = props.lineNumbers ? 4 : 2;
 
   // Use these refs to keep the diff data and segments sync,
   // or it may cause runtime error because of their mismatch.
@@ -412,7 +413,7 @@ const Viewer: React.FC<ViewerProps> = props => {
     return [
       <tr key={`expand-line-${index}`} className="expand-line">
         <td
-          colSpan={4}
+          colSpan={totalColumns}
           className={`${hasLinesBefore ? 'has-lines-before' : ''} ${hasLinesAfter ? 'has-lines-after' : ''}`}
         >
           {
@@ -435,7 +436,7 @@ const Viewer: React.FC<ViewerProps> = props => {
     if (jsonsAreEqual && hideUnchangedLines) {
       return (
         <tr key="message-line" className="message-line">
-          <td colSpan={4}>
+          <td colSpan={totalColumns}>
             {mergedTexts.noChangeDetected}
           </td>
         </tr>
@@ -460,7 +461,7 @@ const Viewer: React.FC<ViewerProps> = props => {
     if (firstElementTop > scrollBottom || firstElementTop + totalHeightRef.current < scrollTop) {
       return (
         <tr>
-          <td colSpan={4} style={{ height: `${totalHeightRef.current}px` }} />
+          <td colSpan={totalColumns} style={{ height: `${totalHeightRef.current}px` }} />
         </tr>
       );
     }
@@ -493,17 +494,17 @@ const Viewer: React.FC<ViewerProps> = props => {
     const visibleSegments = segmentsRef.current.slice(startSegment, endSegment + 1);
     return visibleSegments.length ? (
       <>
-        <tr><td colSpan={4} style={{ height: topHeight, padding: 0 }} /></tr>
+        <tr><td colSpan={totalColumns} style={{ height: topHeight, padding: 0 }} /></tr>
         {
           visibleSegments.map((segment, index) => (
             renderSegment(segment, index, startLine, endLine, syntaxHighlightEnabled)
           ))
         }
-        <tr><td colSpan={4} style={{ height: bottomHeight, padding: 0 }} /></tr>
+        <tr><td colSpan={totalColumns} style={{ height: bottomHeight, padding: 0 }} /></tr>
       </>
     ) : (
       <tr>
-        <td colSpan={4} style={{ height: `${totalHeightRef.current}px` }} />
+        <td colSpan={totalColumns} style={{ height: `${totalHeightRef.current}px` }} />
       </tr>
     );
   };
