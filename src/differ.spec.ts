@@ -1,6 +1,22 @@
 import Differ from './differ';
 
 describe('object diff', () => {
+  it('should not infinite loop when an object has an empty string key', () => {
+    const l = { '': 'before', a: 1 };
+    const r = { '': 'after', b: 2 };
+    const d = new Differ();
+    // Should complete without hanging or throwing
+    expect(() => d.diff(l, r)).not.toThrow();
+    const result = d.diff(l, r);
+    // Both sides must have the same number of lines
+    expect(result[0].length).toBe(result[1].length);
+    // The empty-string key's value change should appear as a modification
+    const leftTypes = result[0].map(line => line.type);
+    const rightTypes = result[1].map(line => line.type);
+    expect(leftTypes).toContain('modify');
+    expect(rightTypes).toContain('modify');
+  });
+
   it('preserve key order', () => {
     const l = { a: 1, b: 2, c: 3 };
     const r = { c: 3, b: 2, d: 4, a: 1 };

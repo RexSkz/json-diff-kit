@@ -181,9 +181,9 @@ const diffObject = (
       }
     }
 
-    if (!keyLeft) {
+    if (keyLeft === undefined) {
       keysRight.shift();
-    } else if (!keyRight) {
+    } else if (keyRight === undefined) {
       keysLeft.shift();
     } else if (keyCmpResult === 0) {
       keysLeft.shift();
