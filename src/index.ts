@@ -1,5 +1,6 @@
 import Differ from './differ';
 import Viewer from './viewer';
+import Marshaller from './marshaller';
 
 export type {
   InlineDiffOptions,
@@ -16,4 +17,10 @@ export type {
   ViewerProps,
 } from './viewer';
 
-export { Differ, Viewer };
+export type {
+  MarshallerConfig,
+  MarshallerExpandLineRendererOptions,
+  MarshallerHideUnchangedLinesOptions,
+} from './marshaller';
+
+export { Differ, Viewer, Marshaller };

@@ -16,7 +16,9 @@ const GeneratedCode: React.FC<PropTypes> = ({ code }) => {
   }, [code]);
 
   return (
-    <pre className="language-tsx" dangerouslySetInnerHTML={{ __html: html }} />
+    <div className="generated-code">
+      <pre className="language-tsx" dangerouslySetInnerHTML={{ __html: html }} />
+    </div>
   );
 };
 

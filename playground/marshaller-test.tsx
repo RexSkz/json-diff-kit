@@ -3,22 +3,17 @@
 import React from 'react';
 import debounce from 'lodash/debounce';
 
-import { Differ, Viewer, ViewerProps } from '../src';
+import { Differ, Marshaller, MarshallerConfig } from '../src';
 import type { DifferOptions, InlineDiffOptions } from '../src';
 
 import GeneratedCode from './generated-code';
-import jsStringify from './js-stringify';
 import Label from './label';
 import { updateInitialValues, useInitialValues } from './initial-values';
 
 import '../src/viewer-monokai.less';
 import './playground.less';
 
-interface PlaygroundProps {
-  onSwitch: () => void;
-}
-
-const Playground: React.FC<PlaygroundProps> = props => {
+const MarshallerTest: React.FC = () => {
   // differ props
   const [detectCircular] = React.useState(true);
   const [maxDepth, setMaxDepth] = React.useState(Infinity);
@@ -28,17 +23,14 @@ const Playground: React.FC<PlaygroundProps> = props => {
   const [ignoreCaseForKey, setIgnoreCaseForKey] = React.useState(false);
   const [recursiveEqual, setRecursiveEqual] = React.useState(true);
   const [preserveKeyOrder, setPreserveKeyOrder] = React.useState<DifferOptions['preserveKeyOrder']>(undefined);
-  const [compareKey, setCompareKey] = React.useState<string>('');
 
   // viewer props
   const [indent, setIndent] = React.useState(4);
-  const [lineNumbers, setLineNumbers] = React.useState(true);
   const [highlightInlineDiff, setHighlightInlineDiff] = React.useState(true);
   const [inlineDiffMode, setInlineDiffMode] = React.useState<InlineDiffOptions['mode']>('word');
   const [inlineDiffSeparator, setInlineDiffSeparator] = React.useState(' ');
   const [hideUnchangedLines, setHideUnchangedLines] = React.useState(true);
   const [syntaxHighlight, setSyntaxHighlight] = React.useState(false);
-  const [virtual, setVirtual] = React.useState(false);
 
   const differOptions = React.useMemo(() => ({
     detectCircular,
@@ -49,7 +41,6 @@ const Playground: React.FC<PlaygroundProps> = props => {
     ignoreCaseForKey,
     recursiveEqual,
     preserveKeyOrder,
-    compareKey: compareKey || undefined,
   }), [
     detectCircular,
     maxDepth,
@@ -59,11 +50,11 @@ const Playground: React.FC<PlaygroundProps> = props => {
     ignoreCaseForKey,
     recursiveEqual,
     preserveKeyOrder,
-    compareKey,
   ]);
   const differ = React.useMemo(() => new Differ(differOptions), [differOptions]);
   const [diff, setDiff] = React.useState(differ.diff('', ''));
   const [fullscreen, setFullscreen] = React.useState(false);
+  const [showHTMLSource, setShowHTMLSource] = React.useState(false);
   const [error, setError] = React.useState('');
 
   const _triggerDiff = (before: string, after: string) => {
@@ -85,43 +76,20 @@ const Playground: React.FC<PlaygroundProps> = props => {
     mode: inlineDiffMode,
     wordSeparator: inlineDiffSeparator,
   }), [inlineDiffMode, inlineDiffSeparator]);
-  const virtualOptions = React.useMemo(() => {
-    return virtual && {
-      scrollContainer: '.playground .layout-right .results',
-      itemHeight: 16,
-      expandLineHeight: 27,
-    };
-  }, [virtual]);
-  const viewerOptions: Omit<ViewerProps, 'diff'> = React.useMemo(() => ({
+  const viewerOptions: Omit<MarshallerConfig, 'diff'> = React.useMemo(() => ({
     indent,
-    lineNumbers,
+    lineNumbers: true,
     highlightInlineDiff,
     inlineDiffOptions,
     hideUnchangedLines,
     syntaxHighlight: syntaxHighlight ? { theme: 'monokai' } : false,
-    virtual: virtualOptions,
   }), [
     indent,
-    lineNumbers,
     highlightInlineDiff,
     inlineDiffOptions,
     hideUnchangedLines,
     syntaxHighlight,
-    virtualOptions,
   ]);
-
-  const code = `
-const d = new Differ(${jsStringify(differOptions)});
-const diff = d.diff(before, after);
-
-const viewerProps = ${jsStringify(viewerOptions)};
-return (
-  <Viewer
-    diff={diff}
-    {...viewerProps}
-  />
-);
-`.trim();
 
   // inputs
   const { l, r } = useInitialValues();
@@ -131,14 +99,14 @@ return (
   const afterInputRef = React.useRef<HTMLTextAreaElement>(null);
   const setBefore = (value: string, diff: boolean) => {
     beforeRef.current = value;
-    updateInitialValues('playground', beforeRef.current, afterRef.current);
+    updateInitialValues('marshaller-test', beforeRef.current, afterRef.current);
     if (diff) {
       triggerDiff(beforeRef.current, afterRef.current);
     }
   };
   const setAfter = (value: string, diff: boolean) => {
     afterRef.current = value;
-    updateInitialValues('playground', beforeRef.current, afterRef.current);
+    updateInitialValues('marshaller-test', beforeRef.current, afterRef.current);
     if (diff) {
       triggerDiff(beforeRef.current, afterRef.current);
     }
@@ -146,7 +114,7 @@ return (
   const clearAll = () => {
     beforeRef.current = '';
     afterRef.current = '';
-    updateInitialValues('playground', '', '');
+    updateInitialValues('marshaller-test', '', '');
   };
   const beautify = () => {
     let before = '';
@@ -167,7 +135,7 @@ return (
       afterInputRef.current!.value = after;
       setBefore(before, false);
       setAfter(after, false);
-      updateInitialValues('playground', before, after);
+      updateInitialValues('marshaller-test', before, after);
     }
   };
   React.useEffect(() => {
@@ -184,8 +152,7 @@ return (
   return (
     <div className="playground">
       <div className="layout-left">
-        <div className="logo">JSON Diff Kit</div>
-        <div className="back" onClick={props.onSwitch}>Go to docs & demo</div>
+        <div className="logo">Marshaller Test</div>
         <div className="config">
           <form>
             <legend>DIFFER CONFIGURATION</legend>
@@ -256,7 +223,7 @@ return (
                 title="Array diff method"
                 tip={
                   <>
-                    The way to diff arrays, default is <code>"normal"</code>, using <code>"lcs"</code> may get a better result but much slower. <code>"unorder-normal"</code> and <code>"unorder-lcs"</code> are for unordered arrays (the order of elements in the array doesn't matter). <code>"compare-key"</code> matches objects by a specific key property.
+                    The way to diff arrays, default is <code>"normal"</code>, using <code>"lcs"</code> may get a better result but much slower. <code>"unorder-normal"</code> and <code>"unorder-lcs"</code> are for unordered arrays (the order of elements in the array doesn't matter).
                   </>
                 }
               />
@@ -269,24 +236,8 @@ return (
                 <option value="lcs">lcs</option>
                 <option value="unorder-normal">unorder-normal</option>
                 <option value="unorder-lcs">unorder-lcs</option>
-                <option value="compare-key">compare-key</option>
               </select>
             </label>
-            {arrayDiffMethod === 'compare-key' && (
-              <label htmlFor="compare-key">
-                <Label
-                  title="Compare key"
-                  tip="The key to use for matching objects in arrays. Objects with the same value for this key will be matched and compared, regardless of their position in the array."
-                />
-                <input
-                  type="text"
-                  id="compare-key"
-                  value={compareKey}
-                  onChange={e => setCompareKey(e.target.value)}
-                  placeholder="e.g., oid, userId, id"
-                />
-              </label>
-            )}
             <label htmlFor="ignore-case">
               <Label
                 title="Ignore case"
@@ -350,7 +301,7 @@ return (
             <label htmlFor="indent">
               <Label
                 title="Indent"
-                tip={<>Controls the indent in the <code>&lt;Viewer&gt;</code> component.</>}
+                tip={<>Controls the indent in the <code>&lt;Marshaller&gt;</code> component.</>}
               />
               <input
                 type="number"
@@ -359,18 +310,6 @@ return (
                 max={16}
                 value={indent}
                 onChange={e => setIndent(Number(e.target.value))}
-              />
-            </label>
-            <label htmlFor="line-numbers">
-              <Label
-                title="Line numbers"
-                tip={<>Whether to show line numbers.</>}
-              />
-              <input
-                type="checkbox"
-                id="line-numbers"
-                checked={lineNumbers}
-                onChange={e => setLineNumbers(e.target.checked)}
               />
             </label>
             <label htmlFor="highlight-inline-diff">
@@ -445,24 +384,6 @@ return (
                 onChange={e => setHideUnchangedLines(e.target.checked)}
               />
             </label>
-            <label htmlFor="use-virtual-scroll">
-              <Label
-                title="Use virtual scroll (experimental)"
-                tip="Whether to use virtual scroll. This can improve the rendering performance when the data is very large, but it's not well-tested."
-              />
-              <input
-                type="checkbox"
-                id="use-virtual-scroll"
-                checked={virtual}
-                onChange={e => setVirtual(e.target.checked)}
-              />
-            </label>
-          </form>
-        </div>
-        <div className="config">
-          <form>
-            <legend>GENERATEDE CODE</legend>
-            <GeneratedCode code={code} />
           </form>
         </div>
         <div className="statistics">
@@ -500,16 +421,25 @@ return (
         <div className="title">
           DIFF RESULTS
           <span className="control-button" onClick={() => setFullscreen(pre => !pre)}>[{fullscreen ? 'EXIT ' : ''}PAGE FULLSCREEN]</span>
+          <span className="control-button" onClick={() => setShowHTMLSource(pre => !pre)}>[{showHTMLSource ? 'EXIT ' : 'SHOW'} HTML SOURCE]</span>
           {!!error && <span className="error">{error}</span>}
         </div>
-        <div className="results">
-          <Viewer diff={diff} {...viewerOptions} />
-        </div>
+        {
+          showHTMLSource ? (
+            <GeneratedCode code={Marshaller({ diff, ...viewerOptions })} />
+          ) : (
+            <div
+              className="results"
+              // eslint-disable-next-line react/no-danger
+              dangerouslySetInnerHTML={{ __html: Marshaller({ diff, ...viewerOptions }) }}
+            />
+          )
+        }
       </div>
     </div>
   );
 };
 
-Playground.displayName = 'Playground';
+MarshallerTest.displayName = 'MarshallerTest';
 
-export default Playground;
+export default MarshallerTest;
