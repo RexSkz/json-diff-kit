@@ -1,12 +1,19 @@
+---
+description: A better JSON differ & viewer library written in TypeScript
+keywords: [json, diff, differ, viewer, typescript, visual-diff]
+github: RexSkz/json-diff-kit
+npm: json-diff-kit
+---
+
 # JSON Diff Kit
 
 [![NPM version][npm-image]][npm-url]
 [![Downloads][download-badge]][npm-url]
 [![Codecov](https://codecov.io/gh/RexSkz/json-diff-kit/branch/main/graph/badge.svg?token=8YRG3M4WTO)](https://codecov.io/gh/RexSkz/json-diff-kit)
 
-A better JSON differ & viewer library written in TypeScript. [Try it out in the playground!](https://json-diff-kit.js.org/)
+> A better JSON differ & viewer library written in TypeScript. [Try it out in the playground](https://json-diff-kit.js.org/)!
 
-## Install
+## Installation
 
 You can install `json-diff-kit` via various package managers.
 
@@ -21,140 +28,137 @@ yarn add json-diff-kit
 pnpm add json-diff-kit
 ```
 
-## Quick Start
+## Usage
 
-To generate the diff data:
+### Generate Diff Data
 
-```ts
+```typescript
 import { Differ } from 'json-diff-kit';
-// or if you are using vue, you can import the differ only
+// Vue users can import only the differ
 import Differ from 'json-diff-kit/dist/differ';
 
-// the two JS objects
-const before = {
-  a: 1,
-  b: 2,
-  d: [1, 5, 4],
-  e: ['1', 2, { f: 3, g: null, h: [5], i: [] }, 9],
-  m: [],
-  q: 'JSON diff can\'t be possible',
-  r: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-  s: 1024,
-};
-const after = {
-  b: 2,
-  c: 3,
-  d: [1, 3, 4, 6],
-  e: ['1', 2, 3, { f: 4, g: false, i: [7, 8] }, 10],
-  j: { k: 11, l: 12 },
-  m: [
-    { n: 1, o: 2 },
-    { p: 3 },
-  ],
-  q: 'JSON diff is possible!',
-  r: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed quasi architecto beatae incididunt ut labore et dolore magna aliqua.',
-  s: '1024',
-};
-
-// all configs are optional
 const differ = new Differ({
-  detectCircular: true,    // default `true`
-  maxDepth: Infinity,      // default `Infinity`
-  showModifications: true, // default `true`
-  arrayDiffMethod: 'lcs',  // default `"normal"`, but `"lcs"` may be more useful
+  detectCircular: true,      // default: true
+  maxDepth: Infinity,       // default: Infinity
+  showModifications: true,   // default: true
+  arrayDiffMethod: 'normal', // 'normal' | 'lcs' (default: 'normal')
 });
 
-// you may want to use `useMemo` (for React) or `computed` (for Vue)
-// to avoid redundant computations
+const before = { a: 1, b: 2, m: [] };
+const after = { b: 2, c: 3, m: [{ n: 1, o: 2 }] };
+
 const diff = differ.diff(before, after);
-console.log(diff);
+// Returns: [DiffResult[], DiffResult[]]
 ```
 
-You can use your own component to visualize the `diff` data, or use the built-in viewer:
+### Render Diff Viewer
 
 ```tsx
 import { Viewer } from 'json-diff-kit';
 import type { DiffResult } from 'json-diff-kit';
-
 import 'json-diff-kit/dist/viewer.css';
 
-interface PageProps {
-  diff: [DiffResult[], DiffResult[]];
-}
-
-const Page: React.FC<PageProps> = props => {
-  return (
-    <Viewer
-      diff={props.diff}          // required
-      indent={4}                 // default `2`
-      lineNumbers={true}         // default `false`
-      highlightInlineDiff={true} // default `false`
-      inlineDiffOptions={{
-        mode: 'word',            // default `"char"`, but `"word"` may be more useful
-        wordSeparator: ' ',      // default `""`, but `" "` is more useful for sentences
-      }}
-    />
-  );
-};
+<Viewer
+  diff={diff}                          // [DiffResult[], DiffResult[]] - required
+  indent={2}                           // number - default: 2
+  lineNumbers={false}                  // boolean - default: false
+  highlightInlineDiff={false}         // boolean - default: false
+  inlineDiffOptions={{
+    mode: 'char',                     // 'char' | 'word' - default: 'char'
+    wordSeparator: '',                 // string - default: ''
+  }}
+/>
 ```
 
-The result is here:
+![Preview](./preview.png)
 
-![The result (using LCS array diff method).](./preview.png)
+## API Reference
 
-## Other Version of Viewer
+### Differ Class
 
-Here is an experimental [Vue version](https://github.com/RexSkz/json-diff-kit-vue) of the `Viewer` component.
+```typescript
+new Differ(options?: DifferOptions)
+```
 
-## More Complex Usages
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `detectCircular` | `boolean` | `true` | Detect circular references |
+| `maxDepth` | `number` | `Infinity` | Maximum nesting depth |
+| `showModifications` | `boolean` | `true` | Merge remove+add as modification |
+| `arrayDiffMethod` | `'normal' \| 'lcs'` | `'normal'` | Array diff algorithm |
 
-Please check the [playground page](https://json-diff-kit.js.org/), where you can adjust nearly all parameters and see the result.
+**Methods:**
+
+```typescript
+differ.diff(before: unknown, after: unknown): [DiffResult[], DiffResult[]]
+```
+
+### Viewer Component
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `diff` | `[DiffResult[], DiffResult[]]` | required | Diff data from Differ |
+| `indent` | `number` | `2` | Indentation spaces |
+| `lineNumbers` | `boolean` | `false` | Show line numbers |
+| `highlightInlineDiff` | `boolean` | `false` | Highlight inline changes |
+| `inlineDiffOptions.mode` | `'char' \| 'word'` | `'char'` | Char or word level diff |
+| `inlineDiffOptions.wordSeparator` | `string` | `''` | Separator for word mode |
+
+### Types
+
+```typescript
+interface DiffResult {
+  path: (string | number)[];
+  type: 'array' | 'object' | 'number' | 'string' | 'boolean' | 'null';
+  oldValue?: unknown;
+  newValue?: unknown;
+  children?: DiffResult[];
+}
+```
+
+## Vue Version
+
+Experimental Vue component available: [json-diff-kit-vue](https://github.com/RexSkz/json-diff-kit-vue)
 
 ## CLI Tool
 
-You can use the CLI tool to generate the diff data from two JSON files. Please install the package `terminal-kit` before using it.
+Requires `terminal-kit` package.
 
 ```bash
-pnpm add terminal-kit # or make sure it's already installed in your project
-
-# Compare two JSON files, output the diff data to the terminal.
-# You can navigate it using keyboard like `less`.
-jsondiff run path/to/before.json path/to/after.json
-
-# Output the diff data to a file.
-# Notice there will be no side-by-side view since it's not a TTY.
-jsondiff run path/to/before.json path/to/after.json -o path/to/result.diff
-
-# Use a custom configuration file and output the diff data to a file.
-jsondiff run path/to/before.json path/to/after.json -c path/to/config.json -o path/to/result.diff
-
-# Print the help message.
-jsondiff --help
-jsondiff run --help
+pnpm add terminal-kit
+jsondiff run <before.json> <after.json>        # Terminal output
+jsondiff run <before.json> <after.json> -o <output.diff>  # File output
+jsondiff run <before.json> <after.json> -c <config.json>  # Custom config
 ```
 
-![A screenshot when using CLI.](./preview-cli.png)
+![CLI Preview](./preview-cli.png)
 
-## Algorithm Details
+## Algorithms
 
-Please refer to the article [JSON Diff Kit: A Combination of Several Simple Algorithms](https://blog.rexskz.info/json-diff-kit-a-combination-of-several-simple-algorithms.html?cc_lang=en).
+See [JSON Diff Kit: A Combination of Several Simple Algorithms](https://blog.rexskz.info/json-diff-kit-a-combination-of-several-simple-algorithms.html?cc_lang=en).
 
-## Features & Roadmap
+## Roadmap
 
-- [x] Provide a `Differ` class and a `Viewer` component
-- [x] Merge "remove & add" at the same place as a modification
-- [x] Support inline diffing by word instead of by character
-- [x] Generate code directly in the demo page (covered by playground)
-- [x] Optimise `Viewer` performance by adding virtual scrolling
-- [x] Add CLI tool
-- [x] Provide a Vue version of `Viewer`
-- [ ] Improve unit tests
+| Status | Feature |
+|--------|---------|
+| ✅ | Differ class & Viewer component |
+| ✅ | Merge remove+add as modification |
+| ✅ | Word-level inline diff |
+| ✅ | Virtual scrolling in Viewer |
+| ✅ | CLI tool |
+| ✅ | Vue version of Viewer |
+| 🔄 | Improved unit tests |
 
-## License
+## Playground
 
-MIT
+Test all parameters at [json-diff-kit.js.org](https://json-diff-kit.js.org/)
+
+---
+
+**License:** MIT
 
 [npm-url]: https://npmjs.org/package/json-diff-kit
 [npm-image]: https://img.shields.io/npm/v/json-diff-kit.svg
-
 [download-badge]: https://img.shields.io/npm/dm/json-diff-kit.svg
